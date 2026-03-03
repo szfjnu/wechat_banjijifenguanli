@@ -314,7 +314,7 @@ export default function CertificatesPage(props) {
           bgColor: 'bg-amber-50',
           textColor: 'text-amber-700',
           borderColor: 'border-amber-200',
-          icon: AwardIcon
+          icon: Award
         };
       case 'rejected':
         return {
