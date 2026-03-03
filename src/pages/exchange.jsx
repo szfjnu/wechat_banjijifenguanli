@@ -466,7 +466,7 @@ export default function ExchangePage({
       <header className="bg-white border-b border-gray-200 p-3 sticky top-0 z-40">
         <div className="flex items-center justify-between">
           <h1 className="text-lg font-bold text-gray-900">积分兑换中心</h1>
-          <Button onClick={handleExport} variant="outline" size="icon" className="h-8 w-8">
+          <Button onClick={handleExportCSV} variant="outline" size="icon" className="h-8 w-8">
             <Download className="w-4 h-4" />
           </Button>
         </div>
