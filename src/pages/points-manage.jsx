@@ -126,7 +126,7 @@ export default function PointsManage({
               <Settings2 className="w-8 h-8 text-orange-400" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white mb-1" style={{
+              <h1 className="text-lg font-bold text-white mb-1" style={{
               fontFamily: 'Noto Serif SC, serif'
             }}>积分管理</h1>
               <p className="text-slate-300 text-sm">积分设置与管理中心</p>
@@ -143,7 +143,7 @@ export default function PointsManage({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs text-gray-500 mb-1">积分项目</p>
-                <p className="text-2xl font-bold text-gray-800">{stats.totalProjects}</p>
+                <p className="text-base font-bold text-gray-800">{stats.totalProjects}</p>
               </div>
               <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
                 <Target className="w-5 h-5 text-blue-600" />
@@ -154,7 +154,7 @@ export default function PointsManage({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs text-gray-500 mb-1">住宿学生</p>
-                <p className="text-2xl font-bold text-gray-800">{stats.totalStudents}</p>
+                <p className="text-base font-bold text-gray-800">{stats.totalStudents}</p>
               </div>
               <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
                 <Bed className="w-5 h-5 text-amber-600" />
@@ -165,7 +165,7 @@ export default function PointsManage({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs text-gray-500 mb-1">兑换物品</p>
-                <p className="text-2xl font-bold text-gray-800">{stats.totalItems}</p>
+                <p className="text-base font-bold text-gray-800">{stats.totalItems}</p>
               </div>
               <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
                 <ShoppingBag className="w-5 h-5 text-purple-600" />
@@ -176,7 +176,7 @@ export default function PointsManage({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs text-gray-500 mb-1">平均积分</p>
-                <p className="text-2xl font-bold text-gray-800">{stats.avgPoints}</p>
+                <p className="text-base font-bold text-gray-800">{stats.avgPoints}</p>
               </div>
               <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
                 <TrendingUp className="w-5 h-5 text-green-600" />
@@ -216,7 +216,7 @@ export default function PointsManage({
                       <div className={`mt-4 p-3 rounded-lg ${colors.light} ${colors.border} border`}>
                         <div className="flex items-center justify-between">
                           <span className={`text-sm font-medium ${colors.text}`}>{item.stats.label}</span>
-                          <span className="text-2xl font-bold text-gray-800">{item.stats.value}<span className="text-sm font-normal text-gray-600 ml-1">{item.stats.suffix}</span></span>
+                          <span className="text-base font-bold text-gray-800">{item.stats.value}<span className="text-sm font-normal text-gray-600 ml-1">{item.stats.suffix}</span></span>
                         </div>
                       </div>
                       

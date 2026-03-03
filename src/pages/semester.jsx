@@ -230,7 +230,7 @@ export default function SemesterPage(props) {
       {/* 顶部标题栏 */}
       <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+          <h1 className="text-base font-bold text-slate-800 flex items-center gap-2">
             <CalendarDays className="w-7 h-7 text-indigo-600" strokeWidth={2.5} />
             学期管理
           </h1>
@@ -245,7 +245,7 @@ export default function SemesterPage(props) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-500 mb-1">学期总数</p>
-                <p className="text-3xl font-bold text-slate-800">{totalSemesters}</p>
+                <p className="text-lg font-bold text-slate-800">{totalSemesters}</p>
               </div>
               <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
                 <CalendarDays className="w-6 h-6 text-blue-600" strokeWidth={2.5} />

@@ -470,7 +470,7 @@ export default function DutyRoster(props) {
   return <div className="min-h-screen bg-gray-50 pb-16">
       {/* 头部统计 */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 pb-8">
-        <h1 className="text-2xl font-bold mb-2 flex items-center">
+        <h1 className="text-base font-bold mb-2 flex items-center">
           <CalendarDays className="mr-2" />
           卫生值日表
         </h1>
@@ -558,7 +558,7 @@ export default function DutyRoster(props) {
                 <div className="flex items-start gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-2xl">{task.taskIcon}</span>
+                      <span className="text-base">{task.taskIcon}</span>
                       <div>
                         <h3 className="font-semibold text-gray-800">{task.taskName}</h3>
                         <p className="text-sm text-gray-500">{task.studentName} · {task.studentNo}</p>

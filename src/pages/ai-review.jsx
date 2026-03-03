@@ -243,7 +243,7 @@ ${name}同学在本学期表现优异，总积分达到${data.totalPoints}分，
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <Brain className="w-8 h-8 text-amber-600" />
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-600 to-rose-600 bg-clip-text text-transparent">
+            <h1 className="text-lg font-bold bg-gradient-to-r from-amber-600 to-rose-600 bg-clip-text text-transparent">
               AI智能点评
             </h1>
           </div>
@@ -300,19 +300,19 @@ ${name}同学在本学期表现优异，总积分达到${data.totalPoints}分，
                   </div>
                   <div className="mt-4 grid grid-cols-4 gap-4">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-amber-600">{selectedStudent.totalPoints}</div>
+                      <div className="text-lg font-bold text-amber-600">{selectedStudent.totalPoints}</div>
                       <div className="text-xs text-gray-600">当前积分</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-rose-600">{selectedStudent.gpa}</div>
+                      <div className="text-lg font-bold text-rose-600">{selectedStudent.gpa}</div>
                       <div className="text-xs text-gray-600">GPA</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-purple-600">{selectedStudent.certificates}</div>
+                      <div className="text-lg font-bold text-purple-600">{selectedStudent.certificates}</div>
                       <div className="text-xs text-gray-600">证书数</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-blue-600">{selectedStudent.volunteerHours}</div>
+                      <div className="text-lg font-bold text-blue-600">{selectedStudent.volunteerHours}</div>
                       <div className="text-xs text-gray-600">志愿时长</div>
                     </div>
                   </div>
@@ -404,7 +404,7 @@ ${name}同学在本学期表现优异，总积分达到${data.totalPoints}分，
           </div>}
 
         {/* 说明卡片 */}
-        <div className="mt-6 p-6 bg-gradient-to-r from-amber-100 to-rose-100 rounded-2xl">
+        <div className="mt-4 p-4 bg-gradient-to-r from-amber-100 to-rose-100 rounded-lg">
           <div className="flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
             <div className="flex-1">

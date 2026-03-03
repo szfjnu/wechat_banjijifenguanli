@@ -465,7 +465,7 @@ export default function ExchangePage({
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* 页面头部 */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">积分兑换中心</h1>
+          <h1 className="text-lg font-bold text-gray-900 mb-2">积分兑换中心</h1>
           <p className="text-gray-600">使用积分兑换心仪的物品，或参与投标竞拍</p>
         </div>
         
@@ -488,28 +488,28 @@ export default function ExchangePage({
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-2">
               <Gift className="w-8 h-8 text-orange-500" />
-              <span className="text-2xl font-bold text-gray-900">{filteredItems.length}</span>
+              <span className="text-base font-bold text-gray-900">{filteredItems.length}</span>
             </div>
             <div className="text-sm text-gray-600">可兑换物品</div>
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-2">
               <Trophy className="w-8 h-8 text-purple-500" />
-              <span className="text-2xl font-bold text-gray-900">{filteredItems.filter(i => i.mode === 'bidding').length}</span>
+              <span className="text-base font-bold text-gray-900">{filteredItems.filter(i => i.mode === 'bidding').length}</span>
             </div>
             <div className="text-sm text-gray-600">投标物品</div>
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-2">
               <Users className="w-8 h-8 text-blue-500" />
-              <span className="text-2xl font-bold text-gray-900">{filteredBiddings.length}</span>
+              <span className="text-base font-bold text-gray-900">{filteredBiddings.length}</span>
             </div>
             <div className="text-sm text-gray-600">投标记录</div>
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-2">
               <CheckCircle className="w-8 h-8 text-green-500" />
-              <span className="text-2xl font-bold text-gray-900">{filteredExchanges.length}</span>
+              <span className="text-base font-bold text-gray-900">{filteredExchanges.length}</span>
             </div>
             <div className="text-sm text-gray-600">兑换成功</div>
           </div>

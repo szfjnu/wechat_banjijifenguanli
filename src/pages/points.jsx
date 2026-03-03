@@ -372,54 +372,54 @@ export default function PointsPage(props) {
   const categories = ['all', '学习', '品德', '纪律', '卫生'];
   return <div className="min-h-screen bg-gray-50 pb-16">
       {/* 头部 */}
-      <div className="bg-gradient-to-r from-blue-600 to-amber-500 text-white px-4 pt-6 pb-8 shadow-lg">
+      <header className="bg-gradient-to-r from-blue-600 to-amber-500 text-white px-3 py-3 shadow-sm">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-2">积分管理</h1>
-          <p className="text-blue-100 text-sm">记录学生日常表现，量化综合素质评价</p>
+          <h1 className="text-lg font-bold mb-0.5">积分管理</h1>
+          <p className="text-blue-100 text-xs">记录学生日常表现，量化综合素质评价</p>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-4xl mx-auto px-4 -mt-4">
+      <div className="max-w-4xl mx-auto px-3 py-3">
         {/* 快捷操作卡片 */}
-        <div className="bg-white rounded-lg shadow-md p-3 mb-3">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-gray-800">快捷操作</h2>
-            <Button onClick={() => setShowAddModal(true)} className="bg-gradient-to-r from-blue-500 to-amber-500 text-white hover:shadow-lg transition-all">
-              <Plus className="w-4 h-4 mr-2" />
+        <div className="bg-white rounded-lg shadow-sm p-3 mb-3">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-bold text-gray-800">快捷操作</h2>
+            <Button onClick={() => setShowAddModal(true)} className="bg-gradient-to-r from-blue-500 to-amber-500 text-white h-7 text-xs">
+              <Plus className="w-3.5 h-3.5 mr-1" />
               添加积分记录
             </Button>
           </div>
-          <div className="grid grid-cols-3 gap-3">
-            <button onClick={() => setShowAddModal(true)} className="p-4 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all text-left">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="w-5 h-5 text-blue-600" />
-                <span className="text-sm font-medium text-gray-700">加分</span>
+          <div className="grid grid-cols-3 gap-2">
+            <button onClick={() => setShowAddModal(true)} className="p-2.5 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all text-left">
+              <div className="flex items-center gap-1.5 mb-1">
+                <TrendingUp className="w-4 h-4 text-blue-600" />
+                <span className="text-xs font-medium text-gray-700">加分</span>
               </div>
-              <p className="text-xs text-gray-500">记录优秀表现</p>
+              <p className="text-[10px] text-gray-500">记录优秀表现</p>
             </button>
-            <button onClick={() => setShowAddModal(true)} className="p-4 bg-amber-50 hover:bg-amber-100 rounded-xl transition-all text-left">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingDown className="w-5 h-5 text-amber-600" />
-                <span className="text-sm font-medium text-gray-700">扣分</span>
+            <button onClick={() => setShowAddModal(true)} className="p-2.5 bg-amber-50 hover:bg-amber-100 rounded-lg transition-all text-left">
+              <div className="flex items-center gap-1.5 mb-1">
+                <TrendingDown className="w-4 h-4 text-amber-600" />
+                <span className="text-xs font-medium text-gray-700">扣分</span>
               </div>
-              <p className="text-xs text-gray-500">记录违纪行为</p>
+              <p className="text-[10px] text-gray-500">记录违纪行为</p>
             </button>
-            <button onClick={() => setShowHistory(true)} className="p-4 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-all text-left">
-              <div className="flex items-center gap-2 mb-2">
-                <FileText className="w-5 h-5 text-emerald-600" />
-                <span className="text-sm font-medium text-gray-700">历史记录</span>
+            <button onClick={() => setShowHistory(true)} className="p-2.5 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-all text-left">
+              <div className="flex items-center gap-1.5 mb-1">
+                <FileText className="w-4 h-4 text-emerald-600" />
+                <span className="text-xs font-medium text-gray-700">历史记录</span>
               </div>
-              <p className="text-xs text-gray-500">查看所有记录</p>
+              <p className="text-[10px] text-gray-500">查看所有记录</p>
             </button>
           </div>
         </div>
 
         {/* 积分历史记录 */}
-        {showHistory && <div className="bg-white rounded-lg shadow-md p-3 mb-3">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-gray-800">积分历史</h2>
+        {showHistory && <div className="bg-white rounded-lg shadow-sm p-3 mb-3">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-bold text-gray-800">积分历史</h2>
               <div className="flex gap-2">
-                <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} className="px-3 py-1.5 bg-gray-100 rounded-lg text-sm font-medium text-gray-700 border-0 focus:ring-2 focus:ring-blue-500">
+                <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} className="px-2 py-1 bg-gray-100 rounded text-xs font-medium text-gray-700 border-0 focus:ring-2 focus:ring-blue-500 h-7">
                   {categories.map(cat => <option key={cat} value={cat}>
                       {cat === 'all' ? '全部' : cat}
                     </option>)}
@@ -457,7 +457,7 @@ export default function PointsPage(props) {
                           {record.note && <span className="text-gray-600">{record.note}</span>}
                         </div>
                       </div>
-                      <div className={`text-2xl font-bold ${record.points > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                      <div className={`text-base font-bold ${record.points > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
                         {record.points > 0 ? '+' : ''}{record.points}
                       </div>
                     </div>
@@ -480,7 +480,7 @@ export default function PointsPage(props) {
 
       {/* 添加积分记录弹窗 */}
       {showAddModal && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold text-gray-800">添加积分记录</h3>
@@ -525,7 +525,7 @@ export default function PointsPage(props) {
                 {/* 显示分值 */}
                 {formData.points !== 0 && <div className={`p-4 rounded-xl ${formData.points > 0 ? 'bg-emerald-50' : 'bg-red-50'}`}>
                     <div className="text-center">
-                      <span className={`text-3xl font-bold ${formData.points > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                      <span className={`text-lg font-bold ${formData.points > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
                         {formData.points > 0 ? '+' : ''}{formData.points}
                       </span>
                       <p className="text-sm text-gray-600 mt-1">积分</p>

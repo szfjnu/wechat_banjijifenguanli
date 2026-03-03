@@ -357,7 +357,7 @@ export default function PointsSettings({
                 <Settings2 className="w-6 h-6" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold">积分项目设置</h1>
+                <h1 className="text-base font-bold">积分项目设置</h1>
                 <p className="text-sm text-white/80">管理日常积分项目及其规则</p>
               </div>
             </div>
@@ -370,19 +370,19 @@ export default function PointsSettings({
           {/* Stats Cards */}
           <div className="grid grid-cols-4 gap-3">
             <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3">
-              <div className="text-2xl font-bold">{stats.total}</div>
+              <div className="text-base font-bold">{stats.total}</div>
               <div className="text-xs text-white/80">项目总数</div>
             </div>
             <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3">
-              <div className="text-2xl font-bold">{stats.enabled}</div>
+              <div className="text-base font-bold">{stats.enabled}</div>
               <div className="text-xs text-white/80">已启用</div>
             </div>
             <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3">
-              <div className="text-2xl font-bold">{stats.positive}</div>
+              <div className="text-base font-bold">{stats.positive}</div>
               <div className="text-xs text-white/80">加分项</div>
             </div>
             <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3">
-              <div className="text-2xl font-bold">{stats.totalUsage}</div>
+              <div className="text-base font-bold">{stats.totalUsage}</div>
               <div className="text-xs text-white/80">使用次数</div>
             </div>
           </div>
@@ -471,7 +471,7 @@ export default function PointsSettings({
       
       {/* Edit/Add Dialog */}
       {showEditDialog && <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-6 rounded-t-2xl">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold">{editingItem ? '编辑积分项目' : '添加积分项目'}</h2>
@@ -519,7 +519,7 @@ export default function PointsSettings({
                   <input type="number" value={formData.points} onChange={e => setFormData({
                 ...formData,
                 points: parseInt(e.target.value) || 0
-              })} className="w-20 text-center text-2xl font-bold px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+              })} className="w-20 text-center text-base font-bold px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
                   <button type="button" onClick={() => setFormData({
                 ...formData,
                 points: formData.points + 1

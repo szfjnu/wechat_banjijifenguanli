@@ -399,7 +399,7 @@ export default function CertificatesPage(props) {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold mb-1" style={{
+              <h1 className="text-lg font-bold mb-1" style={{
               fontFamily: 'Noto Serif SC, serif'
             }}>技能证书管理</h1>
               <p className="text-emerald-100 text-sm">记录学生技能证书，奖励积分</p>
@@ -420,7 +420,7 @@ export default function CertificatesPage(props) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">证书总数</p>
-                <p className="text-2xl font-bold text-gray-900" style={{
+                <p className="text-base font-bold text-gray-900" style={{
                 fontFamily: 'JetBrains Mono, monospace'
               }}>{stats.total}</p>
               </div>
@@ -434,7 +434,7 @@ export default function CertificatesPage(props) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">奖励总积分</p>
-                <p className="text-2xl font-bold text-blue-600" style={{
+                <p className="text-base font-bold text-blue-600" style={{
                 fontFamily: 'JetBrains Mono, monospace'
               }}>+{stats.totalPoints}</p>
               </div>
@@ -448,7 +448,7 @@ export default function CertificatesPage(props) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">获奖学生数</p>
-                <p className="text-2xl font-bold text-gray-900" style={{
+                <p className="text-base font-bold text-gray-900" style={{
                 fontFamily: 'JetBrains Mono, monospace'
               }}>{stats.studentsCount}</p>
               </div>
@@ -462,7 +462,7 @@ export default function CertificatesPage(props) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">本月新增</p>
-                <p className="text-2xl font-bold text-gray-900" style={{
+                <p className="text-base font-bold text-gray-900" style={{
                 fontFamily: 'JetBrains Mono, monospace'
               }}>{stats.thisMonth}</p>
               </div>
@@ -715,7 +715,7 @@ export default function CertificatesPage(props) {
                 })}
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-900">{selectedCertificate.certificateName}</h3>
+                    <h3 className="text-base font-bold text-gray-900">{selectedCertificate.certificateName}</h3>
                     <p className="text-gray-600">{selectedCertificate.levelName}</p>
                   </div>
                 </div>
@@ -727,7 +727,7 @@ export default function CertificatesPage(props) {
                   </div>
                   <div className="bg-emerald-50 rounded-lg p-4">
                     <p className="text-sm text-emerald-600 mb-1">奖励积分</p>
-                    <p className="text-2xl font-bold text-emerald-600">+{selectedCertificate.points}</p>
+                    <p className="text-base font-bold text-emerald-600">+{selectedCertificate.points}</p>
                   </div>
                   <div className="bg-gray-50 rounded-lg p-4">
                     <p className="text-sm text-gray-500 mb-1">获得日期</p>
