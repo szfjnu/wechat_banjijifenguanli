@@ -5,6 +5,7 @@ import { Bed, AlertTriangle, Search, Filter, TrendingDown, Shield, ShieldAlert, 
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
 
+import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 
 // 宿舍扣分项目预设数据
@@ -528,89 +529,33 @@ export default function DormPointsPage(props) {
         </header>
 
         <main className="px-3 py-2">
-        {/* 页面头部 */}
-        <header className="bg-gradient-to-r from-blue-600 to-blue-700 text-white pt-12 pb-6 px-4 shadow-lg">
-          <div className="max-w-6xl mx-auto">
-            <div className="flex justify-between items-start">
-              <div>
-                <h1 className="text-3xl font-bold mb-2" style={{
-              fontFamily: 'Noto Serif SC, serif'
-            }}>宿舍积分管理</h1>
-                <p className="text-blue-100 text-sm">仅管理住宿生宿舍积分与折算</p>
-              </div>
-              <div className="flex gap-2">
-                <button onClick={() => setShowSettingsModal(true)} className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors">
-                  <Settings className="w-4 h-4" />
-                  <span className="text-sm">设置</span>
-                </button>
-                <button onClick={() => setShowResetConfirm(true)} className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors">
-                  <RefreshCw className="w-4 h-4" />
-                  <span className="text-sm">学期重置</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </header>
-
-          {/* 统计概览 */}
+          {/* 统计概览 - 紧凑 */}
           <div className="grid grid-cols-2 gap-2 mb-3">
-            <div className="bg-white rounded-xl p-4 shadow-md border-l-4 border-blue-500">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">住宿生总数</p>
-                  <p className="text-2xl font-bold text-gray-800">{students.length}</p>
-                </div>
-                <Bed className="w-8 h-8 text-blue-500" />
-              </div>
-            </div>
-            <div className="bg-white rounded-xl p-4 shadow-md border-l-4 border-green-500">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">正常状态</p>
-                  <p className="text-2xl font-bold text-gray-800">{students.filter(s => s.dormPoints >= 60).length}</p>
-                </div>
-                <Shield className="w-8 h-8 text-green-500" />
-              </div>
-            </div>
-            <div className="bg-white rounded-xl p-4 shadow-md border-l-4 border-orange-500">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">留宿察看</p>
-                  <p className="text-2xl font-bold text-gray-800">{students.filter(s => s.dormPoints < 60 && s.dormPoints >= 40).length}</p>
-                </div>
-                <AlertTriangle className="w-8 h-8 text-orange-500" />
-              </div>
-            </div>
-            <div className="bg-white rounded-xl p-4 shadow-md border-l-4 border-red-500">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">勒令退宿</p>
-                  <p className="text-2xl font-bold text-gray-800">{students.filter(s => s.dormPoints < 40).length}</p>
-                </div>
-                <ShieldAlert className="w-8 h-8 text-red-500" />
-              </div>
-            </div>
+            <StatCard title="住宿生总数" value={students.length} icon={Bed} color="blue" />
+            <StatCard title="正常状态" value={students.filter(s => s.dormPoints >= 60).length} icon={Shield} color="green" />
+            <StatCard title="留宿察看" value={students.filter(s => s.dormPoints < 60 && s.dormPoints >= 40).length} icon={AlertTriangle} color="amber" />
+            <StatCard title="勒令退宿" value={students.filter(s => s.dormPoints < 40).length} icon={ShieldAlert} color="rose" />
           </div>
 
-          {/* 筛选栏 */}
-          <div className="bg-white rounded-xl p-4 shadow-md mb-6">
-            <div className="flex flex-col md:flex-row gap-4">
+          {/* 筛选栏 - 紧凑 */}
+          <div className="bg-white rounded-lg shadow-sm p-3 mb-3">
+            <div className="flex gap-2">
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input type="text" placeholder="搜索姓名或学号..." className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                <input type="text" placeholder="搜索..." className="w-full pl-8 pr-3 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
               </div>
-              <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value={selectedRoom} onChange={e => setSelectedRoom(e.target.value)}>
+              <select className="px-2 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs" value={selectedRoom} onChange={e => setSelectedRoom(e.target.value)}>
                 <option value="">全部宿舍</option>
                 {dormRooms.map(room => <option key={room} value={room}>{room}室</option>)}
               </select>
             </div>
           </div>
 
-          {/* 住宿生列表 */}
-          <div className="bg-white rounded-xl shadow-md overflow-hidden mb-6">
-            <div className="bg-gradient-to-r from-blue-50 to-blue-100 px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                <Users className="w-5 h-5 text-blue-600" />
+          {/* 住宿生列表 - 紧凑 */}
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-3">
+            <div className="bg-gray-50 px-3 py-2 border-b border-gray-200">
+              <h2 className="text-sm font-semibold text-gray-800 flex items-center gap-1.5">
+                <Users className="w-4 h-4 text-blue-600" />
                 住宿生列表
               </h2>
             </div>
@@ -618,52 +563,49 @@ export default function DormPointsPage(props) {
               {filteredStudents.map(student => {
             const warning = getWarningLevel(student.dormPoints);
             const WarningIcon = warning?.icon;
-            return <div key={student.id} className={`p-4 hover:bg-gray-50 transition-colors ${warning?.bgColor || ''}`}>
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            return <div key={student.id} className={`p-2.5 hover:bg-gray-50 transition-colors ${warning?.bgColor || ''}`}>
+                    <div className="flex items-center justify-between gap-2">
                       {/* 学生信息 */}
                       <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
                             {student.name[0]}
                           </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h3 className="font-semibold text-gray-800">{student.name}</h3>
-                              {warning && <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full ${warning.bgColor} ${warning.textColor} ${warning.borderColor} border`}>
-                                  <WarningIcon className="w-3 h-3" />
+                          <div className="flex-1">
+                            <div className="flex items-center gap-1.5">
+                              <h3 className="font-medium text-gray-800 text-sm">{student.name}</h3>
+                              {warning && <span className={`inline-flex items-center gap-0.5 px-1 py-0.5 text-[10px] font-medium rounded-full ${warning.bgColor} ${warning.textColor} ${warning.borderColor} border`}>
+                                  <WarningIcon className="w-2.5 h-2.5" />
                                   {warning.text}
                                 </span>}
                             </div>
-                            <p className="text-sm text-gray-500">{student.studentId} · {student.group}</p>
+                            <p className="text-xs text-gray-500">{student.studentId} · {student.group}</p>
                           </div>
-                        </div>
-                        <div className="flex flex-wrap gap-2 text-xs">
-                          <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-full">{student.dormRoom}室</span>
                         </div>
                       </div>
 
-                      {/* 积分信息 */}
-                      <div className="flex gap-6">
+                      {/* 积分信息 - 紧凑 */}
+                      <div className="flex gap-2 text-xs">
                         <div>
-                          <p className="text-xs text-gray-500 mb-1">宿舍原始积分</p>
-                          <p className={`text-lg font-bold ${student.dormPoints < 60 ? 'text-red-600' : 'text-gray-800'}`}>
+                          <p className="text-[10px] text-gray-500">原始</p>
+                          <p className={`text-sm font-bold ${student.dormPoints < 60 ? 'text-red-600' : 'text-gray-800'}`}>
                             {student.dormPoints}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-500 mb-1">已折算积分</p>
-                          <p className={`text-lg font-bold ${student.convertedPoints < 0 ? 'text-orange-600' : 'text-gray-800'}`}>
+                          <p className="text-[10px] text-gray-500">折算</p>
+                          <p className={`text-sm font-bold ${student.convertedPoints < 0 ? 'text-orange-600' : 'text-gray-800'}`}>
                             {student.convertedPoints.toFixed(1)}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-500 mb-1">折算比例</p>
-                          <p className="text-lg font-bold text-gray-800">{(conversionRate * 100).toFixed(0)}%</p>
+                          <p className="text-[10px] text-gray-500">比例</p>
+                          <p className="text-sm font-bold text-gray-800">{(conversionRate * 100).toFixed(0)}%</p>
                         </div>
                       </div>
 
                       {/* 操作按钮 */}
-                      <Button onClick={() => openDeductionDialog(student)} className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors">
+                      <Button onClick={() => openDeductionDialog(student)} className="h-7 px-2 text-xs bg-red-500 hover:bg-red-600 text-white rounded-lg">
                         扣分
                       </Button>
                     </div>
@@ -672,54 +614,49 @@ export default function DormPointsPage(props) {
             </div>
           </div>
 
-          {/* 折算比例说明 */}
-          <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-4 shadow-md border border-amber-200 mb-6">
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0">
-                <FileText className="w-5 h-5 text-amber-600" />
-              </div>
+          {/* 折算比例说明 - 紧凑 */}
+          <div className="bg-amber-50 rounded-lg p-2.5 border border-amber-200 mb-3">
+            <div className="flex items-start gap-2">
+              <FileText className="w-4 h-4 text-amber-600" />
               <div>
-                <h3 className="font-semibold text-gray-800 mb-2">双重账本说明</h3>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• 宿舍原始积分：直接记录宿舍行为积分，每学期初重置为100分</li>
-                  <li>• 已折算积分：按{(conversionRate * 100).toFixed(0)}%比例折算到日常积分账本中</li>
-                  <li>• 预警机制：宿舍积分&lt;60分留宿察看，&lt;40分勒令退宿</li>
-                  <li>• 折算比例可由管理员修改，修改后按新比例计算</li>
+                <h3 className="font-medium text-gray-800 text-xs mb-1">双重账本说明</h3>
+                <ul className="text-xs text-gray-600 space-y-0.5">
+                  <li>• 宿舍积分每学期初重置为100分</li>
+                  <li>• 按{(conversionRate * 100).toFixed(0)}%比例折算到日常积分</li>
+                  <li>• 预警：&lt;60分留宿察看，&lt;40分勒令退宿</li>
                 </ul>
               </div>
             </div>
           </div>
 
-          {/* 历史记录 */}
-          <div className="bg-white rounded-xl shadow-md overflow-hidden">
-            <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-gray-600" />
-                扣分历史记录
+          {/* 历史记录 - 紧凑 */}
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-3">
+            <div className="bg-gray-50 px-3 py-2 border-b border-gray-200">
+              <h2 className="text-sm font-semibold text-gray-800 flex items-center gap-1.5">
+                <FileText className="w-4 h-4 text-gray-600" />
+                扣分历史
               </h2>
             </div>
             <div className="divide-y divide-gray-100">
-              {deductionHistory.length === 0 ? <div className="p-8 text-center text-gray-500">
+              {deductionHistory.length === 0 ? <div className="p-6 text-center text-gray-500 text-xs">
                   暂无历史记录
-                </div> : deductionHistory.slice(0, 10).map(record => <div key={record.id} className="p-4 hover:bg-gray-50">
-                    <div className="flex items-start justify-between gap-4">
+                </div> : deductionHistory.slice(0, 10).map(record => <div key={record.id} className="p-2.5 hover:bg-gray-50">
+                    <div className="flex items-start justify-between gap-2">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-semibold text-gray-800">{record.studentName}</span>
-                          <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${record.points < 0 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          <span className="font-medium text-gray-800 text-sm">{record.studentName}</span>
+                          <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-full ${record.points < 0 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
                             {record.points > 0 ? '+' : ''}{record.points}分
                           </span>
                         </div>
-                        <p className="text-sm text-gray-600">{record.itemName}</p>
-                        {record.remark && <p className="text-xs text-gray-500 mt-1">备注：{record.remark}</p>}
-                        {record.images && record.images.length > 0 && <button onClick={() => viewHistoryImages(record)} className="mt-2 inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800">
-                            <ImageIcon className="w-3 h-3" />
-                            查看图片（{record.images.length}张）
+                        <p className="text-xs text-gray-600">{record.itemName}</p>
+                        {record.images && record.images.length > 0 && <button onClick={() => viewHistoryImages(record)} className="mt-1 inline-flex items-center gap-0.5 text-[10px] text-blue-600 hover:text-blue-800">
+                            <ImageIcon className="w-2.5 h-2.5" />
+                            查看图片
                           </button>}
                       </div>
-                      <div className="text-right text-sm">
+                      <div className="text-right text-xs">
                         <p className="text-gray-500">{record.date}</p>
-                        <p className="text-gray-400">{record.operator}</p>
                         <p className={`font-medium ${record.convertedPoints < 0 ? 'text-orange-600' : 'text-gray-600'}`}>
                           折算：{record.convertedPoints.toFixed(1)}分
                         </p>
@@ -731,7 +668,7 @@ export default function DormPointsPage(props) {
         </main>
 
         {/* 扣分对话框 */}
-        {showDeductionDialog && selectedStudent && <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        {showDeductionDialog && selectedStudent && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
               <div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-4 rounded-t-xl">
                 <h3 className="text-xl font-bold">宿舍扣分</h3>
@@ -826,7 +763,7 @@ export default function DormPointsPage(props) {
           </div>}
 
         {/* 设置对话框 */}
-        {showSettingsModal && <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        {showSettingsModal && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
               <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4 rounded-t-xl">
                 <h3 className="text-xl font-bold">折算比例设置</h3>
@@ -863,7 +800,7 @@ export default function DormPointsPage(props) {
           </div>}
 
         {/* 学期重置确认对话框 */}
-        {showResetConfirm && <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        {showResetConfirm && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
               <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-4 rounded-t-xl">
                 <h3 className="text-xl font-bold">学期重置确认</h3>
@@ -901,7 +838,5 @@ export default function DormPointsPage(props) {
           </div>}
 
         <TabBar currentPage={currentPage} onPageChange={setCurrentPage} />
-      </div>
-      </div>
-    </div>
-  }
+      </div>;
+}
