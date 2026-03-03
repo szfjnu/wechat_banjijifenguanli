@@ -1,10 +1,11 @@
 // @ts-ignore;
 import React, { useState, useEffect } from 'react';
 // @ts-ignore;
-import { Award as AwardIcon, Upload, Search, Filter, Plus, FileText, Calendar, TrendingUp, Download, Eye, CheckCircle, Star } from 'lucide-react';
+import { Award, Upload, Search, Filter, Plus, FileText, Calendar, TrendingUp, Download, Eye, CheckCircle, Star, Trophy, Medal } from 'lucide-react';
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
 
+import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 
 // 证书级别预设数据（包含奖励积分）
@@ -28,35 +29,35 @@ const CERTIFICATE_LEVELS = [{
   points: 20,
   level: 'advanced',
   description: '高级技能认证',
-  icon: AwardIcon
+  icon: Award
 }, {
   id: 4,
   name: '特级证书',
   points: 30,
   level: 'expert',
   description: '专家级技能认证',
-  icon: AwardIcon
+  icon: Award
 }, {
   id: 5,
   name: '省级获奖',
   points: 25,
   level: 'competition',
   description: '省级竞赛获奖',
-  icon: AwardIcon
+  icon: Trophy
 }, {
   id: 6,
   name: '国家级获奖',
   points: 40,
   level: 'competition',
   description: '国家级竞赛获奖',
-  icon: AwardIcon
+  icon: Trophy
 }, {
   id: 7,
   name: '国际级获奖',
   points: 50,
   level: 'competition',
   description: '国际级竞赛获奖',
-  icon: AwardIcon
+  icon: Medal
 }];
 
 // 模拟学生数据
@@ -90,6 +91,12 @@ const MOCK_STUDENTS = [{
   studentId: '202401005',
   group: '第二组',
   totalPoints: 138
+}, {
+  id: 6,
+  name: '孙八',
+  studentId: '202401006',
+  group: '第三组',
+  totalPoints: 140
 }];
 
 // 模拟证书数据
@@ -98,56 +105,67 @@ const MOCK_CERTIFICATES = [{
   studentId: 1,
   studentName: '张三',
   certificateName: '英语四级',
-  levelId: 2,
-  levelName: '中级证书',
-  points: 10,
-  date: '2026-01-15',
-  fileUrl: null,
+  levelId: 3,
+  levelName: '高级证书',
+  points: 20,
+  date: '2025-02-15',
+  status: 'verified',
   note: '全国大学生英语四级考试'
 }, {
   id: 2,
   studentId: 2,
   studentName: '李四',
+  certificateName: '数学竞赛省级一等奖',
+  levelId: 5,
+  levelName: '省级获奖',
+  points: 25,
+  date: '2025-02-10',
+  status: 'verified',
+  note: '全国大学生数学竞赛'
+}, {
+  id: 3,
+  studentId: 1,
+  studentName: '张三',
   certificateName: '计算机二级',
   levelId: 2,
   levelName: '中级证书',
   points: 10,
-  date: '2026-02-20',
-  fileUrl: null,
+  date: '2025-01-20',
+  status: 'verified',
   note: '全国计算机等级考试'
 }, {
-  id: 3,
+  id: 4,
   studentId: 3,
   studentName: '王五',
-  certificateName: '全国数学竞赛一等奖',
+  certificateName: '物理竞赛国家级二等奖',
   levelId: 6,
   levelName: '国家级获奖',
   points: 40,
-  date: '2026-02-10',
-  fileUrl: null,
-  note: '全国大学生数学建模竞赛'
-}, {
-  id: 4,
-  studentId: 1,
-  studentName: '张三',
-  certificateName: '英语六级',
-  levelId: 3,
-  levelName: '高级证书',
-  points: 20,
-  date: '2026-02-25',
-  fileUrl: null,
-  note: '全国大学生英语六级考试'
+  date: '2025-01-15',
+  status: 'verified',
+  note: '全国大学生物理竞赛'
 }, {
   id: 5,
   studentId: 4,
   studentName: '赵六',
-  certificateName: '英语四级',
-  levelId: 2,
-  levelName: '中级证书',
-  points: 10,
-  date: '2026-02-28',
-  fileUrl: null,
-  note: '全国大学生英语四级考试'
+  certificateName: '英语六级',
+  levelId: 3,
+  levelName: '高级证书',
+  points: 20,
+  date: '2025-02-01',
+  status: 'verified',
+  note: '全国大学生英语六级考试'
+}, {
+  id: 6,
+  studentId: 5,
+  studentName: '钱七',
+  certificateName: '编程竞赛省级三等奖',
+  levelId: 5,
+  levelName: '省级获奖',
+  points: 25,
+  date: '2025-02-20',
+  status: 'pending',
+  note: 'ACM程序设计竞赛'
 }];
 export default function CertificatesPage(props) {
   const {
@@ -156,14 +174,20 @@ export default function CertificatesPage(props) {
   const {
     toast
   } = useToast();
+  const [currentPage, setCurrentPage] = useState('certificates');
   const [certificates, setCertificates] = useState([]);
   const [filteredCertificates, setFilteredCertificates] = useState([]);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [selectedCertificate, setSelectedCertificate] = useState(null);
+  const [showDetailDialog, setShowDetailDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStudent, setFilterStudent] = useState('all');
   const [filterLevel, setFilterLevel] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('all');
   const [uploading, setUploading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  const [exportRange, setExportRange] = useState('all');
   const [stats, setStats] = useState({
     total: 0,
     totalPoints: 0,
@@ -185,11 +209,13 @@ export default function CertificatesPage(props) {
   }, []);
   useEffect(() => {
     filterCertificates();
-  }, [certificates, searchTerm, filterStudent, filterLevel]);
+    calculateStats();
+  }, [certificates, searchTerm, filterStudent, filterLevel, filterStatus]);
   const loadCertificates = async () => {
     try {
+      setLoading(true);
       // 模拟数据加载（后续替换为真实数据源调用）
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 500));
       setCertificates(MOCK_CERTIFICATES);
     } catch (error) {
       toast({
@@ -197,141 +223,142 @@ export default function CertificatesPage(props) {
         description: '无法加载证书数据',
         variant: 'destructive'
       });
+    } finally {
+      setLoading(false);
     }
   };
   const filterCertificates = () => {
-    let filtered = certificates;
-
+    let result = certificates;
     // 搜索过滤
     if (searchTerm) {
-      filtered = filtered.filter(cert => cert.studentName.toLowerCase().includes(searchTerm.toLowerCase()) || cert.certificateName.toLowerCase().includes(searchTerm.toLowerCase()) || cert.note.toLowerCase().includes(searchTerm.toLowerCase()));
+      result = result.filter(cert => cert.studentName.toLowerCase().includes(searchTerm.toLowerCase()) || cert.certificateName.toLowerCase().includes(searchTerm.toLowerCase()));
     }
-
     // 学生过滤
     if (filterStudent !== 'all') {
-      filtered = filtered.filter(cert => cert.studentId.toString() === filterStudent);
+      result = result.filter(cert => cert.studentId === parseInt(filterStudent));
     }
-
     // 级别过滤
     if (filterLevel !== 'all') {
-      if (filterLevel === 'basic') {
-        filtered = filtered.filter(cert => cert.levelId === 1);
-      } else if (filterLevel === 'intermediate') {
-        filtered = filtered.filter(cert => cert.levelId === 2);
-      } else if (filterLevel === 'advanced') {
-        filtered = filtered.filter(cert => cert.levelId === 3);
-      } else if (filterLevel === 'expert') {
-        filtered = filtered.filter(cert => cert.levelId === 4);
-      } else if (filterLevel === 'competition') {
-        filtered = filtered.filter(cert => [5, 6, 7].includes(cert.levelId));
-      }
+      result = result.filter(cert => cert.levelId === parseInt(filterLevel));
     }
-    setFilteredCertificates(filtered);
-    updateStats(filtered);
+    // 状态过滤
+    if (filterStatus !== 'all') {
+      result = result.filter(cert => cert.status === filterStatus);
+    }
+    setFilteredCertificates(result);
   };
-  const updateStats = certs => {
-    const uniqueStudents = [...new Set(certs.map(c => c.studentId))].length;
-    const thisMonthCerts = certs.filter(cert => {
+  const calculateStats = () => {
+    const now = new Date();
+    const thisMonthCerts = certificates.filter(cert => {
       const certDate = new Date(cert.date);
-      const now = new Date();
       return certDate.getMonth() === now.getMonth() && certDate.getFullYear() === now.getFullYear();
     });
+    const uniqueStudents = [...new Set(certificates.map(cert => cert.studentId))];
+    const totalPoints = certificates.reduce((sum, cert) => sum + cert.points, 0);
     setStats({
-      total: certs.length,
-      totalPoints: certs.reduce((sum, c) => sum + c.points, 0),
-      studentsCount: uniqueStudents,
+      total: certificates.length,
+      totalPoints: totalPoints,
+      studentsCount: uniqueStudents.length,
       thisMonth: thisMonthCerts.length
     });
   };
-  const handleInputChange = e => {
-    const {
-      name,
-      value
-    } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-  const handleFileUpload = async e => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    // 验证文件类型
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
-    if (!allowedTypes.includes(file.type)) {
-      toast({
-        title: '文件类型不支持',
-        description: '仅支持上传 JPG、PNG、PDF 格式的文件',
-        variant: 'destructive'
-      });
-      return;
+  // 获取级别样式
+  const getLevelStyles = levelId => {
+    const level = CERTIFICATE_LEVELS.find(l => l.id === levelId);
+    if (!level) return {
+      bgColor: 'bg-gray-100',
+      textColor: 'text-gray-700',
+      borderColor: 'border-gray-300'
+    };
+    switch (level.level) {
+      case 'expert':
+      case 'competition':
+        return {
+          bgColor: 'bg-purple-100',
+          textColor: 'text-purple-700',
+          borderColor: 'border-purple-300'
+        };
+      case 'advanced':
+        return {
+          bgColor: 'bg-blue-100',
+          textColor: 'text-blue-700',
+          borderColor: 'border-blue-300'
+        };
+      case 'intermediate':
+        return {
+          bgColor: 'bg-green-100',
+          textColor: 'text-green-700',
+          borderColor: 'border-green-300'
+        };
+      case 'basic':
+      default:
+        return {
+          bgColor: 'bg-yellow-100',
+          textColor: 'text-yellow-700',
+          borderColor: 'border-yellow-300'
+        };
     }
-
-    // 验证文件大小（5MB）
-    if (file.size > 5 * 1024 * 1024) {
+  };
+  // 获取状态样式
+  const getStatusStyles = status => {
+    switch (status) {
+      case 'verified':
+        return {
+          bgColor: 'bg-green-50',
+          textColor: 'text-green-700',
+          borderColor: 'border-green-200',
+          icon: CheckCircle
+        };
+      case 'pending':
+        return {
+          bgColor: 'bg-amber-50',
+          textColor: 'text-amber-700',
+          borderColor: 'border-amber-200',
+          icon: AwardIcon
+        };
+      case 'rejected':
+        return {
+          bgColor: 'bg-red-50',
+          textColor: 'text-red-700',
+          borderColor: 'border-red-200',
+          icon: FileText
+        };
+      default:
+        return {
+          bgColor: 'bg-gray-50',
+          textColor: 'text-gray-700',
+          borderColor: 'border-gray-200',
+          icon: FileText
+        };
+    }
+  };
+  // 添加证书
+  const handleAddCertificate = async () => {
+    if (!formData.studentId || !formData.certificateName || !formData.levelId) {
       toast({
-        title: '文件过大',
-        description: '文件大小不能超过 5MB',
+        title: '填写不完整',
+        description: '请填写所有必填项',
         variant: 'destructive'
       });
       return;
     }
     try {
       setUploading(true);
-
-      // 模拟文件上传（后续替换为云存储上传）
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setFormData(prev => ({
-        ...prev,
-        file
-      }));
-      toast({
-        title: '上传成功',
-        description: `文件 "${file.name}" 上传成功`
-      });
-    } catch (error) {
-      toast({
-        title: '上传失败',
-        description: '文件上传失败，请重试',
-        variant: 'destructive'
-      });
-    } finally {
-      setUploading(false);
-    }
-  };
-  const handleSubmit = async e => {
-    e.preventDefault();
-    if (!formData.studentId || !formData.certificateName || !formData.levelId) {
-      toast({
-        title: '请填写完整信息',
-        description: '请选择学生、填写证书名称和级别',
-        variant: 'destructive'
-      });
-      return;
-    }
-    try {
-      const student = MOCK_STUDENTS.find(s => s.id.toString() === formData.studentId);
-      const level = CERTIFICATE_LEVELS.find(l => l.id.toString() === formData.levelId);
+      const student = MOCK_STUDENTS.find(s => s.id === parseInt(formData.studentId));
+      const level = CERTIFICATE_LEVELS.find(l => l.id === parseInt(formData.levelId));
       const newCertificate = {
-        id: certificates.length + 1,
+        id: Math.max(...certificates.map(c => c.id), 0) + 1,
         studentId: parseInt(formData.studentId),
         studentName: student.name,
         certificateName: formData.certificateName,
-        levelId: parseInt(formData.levelId),
+        levelId: level.id,
         levelName: level.name,
         points: level.points,
         date: formData.date,
-        fileUrl: formData.file ? 'mock-url' : null,
+        status: 'pending',
         note: formData.note
       };
-      setCertificates(prev => [newCertificate, ...prev]);
-
-      // 更新学生积分（模拟）
-      const studentIndex = MOCK_STUDENTS.findIndex(s => s.id === parseInt(formData.studentId));
-      if (studentIndex !== -1) {
-        MOCK_STUDENTS[studentIndex].totalPoints += level.points;
-      }
+      setCertificates([...certificates, newCertificate]);
       setShowAddDialog(false);
       setFormData({
         studentId: '',
@@ -342,427 +369,341 @@ export default function CertificatesPage(props) {
         file: null
       });
       toast({
-        title: '证书录入成功',
-        description: `已为 ${student.name} 录入证书，积分 +${level.points}`
-      });
-
-      // 模拟创建积分记录
-      console.log('自动创建积分记录:', {
-        studentId: student.id,
-        studentName: student.name,
-        itemName: `${level.name} - ${formData.certificateName}`,
-        points: level.points,
-        type: 'certificate',
-        date: formData.date,
-        note: `技能证书：${formData.note || '无备注'}`
+        title: '添加成功',
+        description: '证书记录已添加'
       });
     } catch (error) {
+      console.error('添加失败:', error);
       toast({
-        title: '录入失败',
-        description: '证书录入失败，请重试',
+        title: '添加失败',
+        description: error.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+  // 查看详情
+  const handleViewDetail = certificate => {
+    setSelectedCertificate(certificate);
+    setShowDetailDialog(true);
+  };
+  // 导出数据
+  const handleExportData = async () => {
+    try {
+      let exportData = filteredCertificates;
+      if (exportRange === 'current_month') {
+        const now = new Date();
+        exportData = filteredCertificates.filter(cert => {
+          const certDate = new Date(cert.date);
+          return certDate.getMonth() === now.getMonth() && certDate.getFullYear() === now.getFullYear();
+        });
+      } else if (exportRange === 'last_month') {
+        const now = new Date();
+        const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1);
+        exportData = filteredCertificates.filter(cert => {
+          const certDate = new Date(cert.date);
+          return certDate.getMonth() === lastMonth.getMonth() && certDate.getFullYear() === lastMonth.getFullYear();
+        });
+      }
+      // 模拟导出
+      const csvContent = `学生姓名,学号,证书名称,级别,积分,日期,状态,备注\n${exportData.map(c => `${c.studentName},${MOCK_STUDENTS.find(s => s.id === c.studentId).studentId},${c.certificateName},${c.levelName},${c.points},${c.date},${c.status},${c.note}`).join('\n')}`;
+      const blob = new Blob([csvContent], {
+        type: 'text/csv;charset=utf-8;'
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `证书记录_${new Date().toISOString().split('T')[0]}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+      setShowExportDialog(false);
+      toast({
+        title: '导出成功',
+        description: '证书记录已导出'
+      });
+    } catch (error) {
+      console.error('导出失败:', error);
+      toast({
+        title: '导出失败',
+        description: error.message,
         variant: 'destructive'
       });
     }
   };
-  const handleViewCertificate = cert => {
-    setSelectedCertificate(cert);
-  };
-  const handleDownloadCertificate = cert => {
-    // 模拟下载（后续替换为真实下载）
-    toast({
-      title: '开始下载',
-      description: `正在下载 ${cert.certificateName} 证书扫描件...`
-    });
-  };
-  const getLevelColor = levelId => {
-    switch (levelId) {
-      case 1:
-        return 'bg-gray-100 text-gray-800';
-      case 2:
-        return 'bg-blue-100 text-blue-800';
-      case 3:
-        return 'bg-purple-100 text-purple-800';
-      case 4:
-        return 'bg-amber-100 text-amber-800';
+  // 获取状态文本
+  const getStatusText = status => {
+    switch (status) {
+      case 'verified':
+        return '已认证';
+      case 'pending':
+        return '待审核';
+      case 'rejected':
+        return '已拒绝';
       default:
-        return 'bg-green-100 text-green-800';
+        return status;
     }
   };
-  const getLevelIcon = levelId => {
-    const level = CERTIFICATE_LEVELS.find(l => l.id === levelId);
-    if (!level) return Star;
-    return level.icon;
-  };
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen bg-gray-50">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+            <p className="text-gray-600 text-sm">加载中...</p>
+          </div>
+        </div>;
+  }
   return <div className="min-h-screen bg-gray-50 pb-16">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-6 py-6 shadow-lg">
-        <div className="max-w-7xl mx-auto">
+        {/* 页面头部 - 紧凑 */}
+        <header className="bg-white border-b border-gray-200 p-3 sticky top-0 z-40">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold mb-1" style={{
-              fontFamily: 'Noto Serif SC, serif'
-            }}>技能证书管理</h1>
-              <p className="text-emerald-100 text-sm">记录学生技能证书，奖励积分</p>
+              <h1 className="text-lg font-bold text-gray-900">证书管理</h1>
+              <p className="text-xs text-gray-500">学生获奖与证书管理</p>
             </div>
-            <Button onClick={() => setShowAddDialog(true)} className="bg-white text-emerald-600 hover:bg-emerald-50" size="lg">
-              <Plus className="mr-2 h-5 w-5" />
-              录入证书
-            </Button>
-          </div>
-        </div>
-      </div>
-      
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-6 pb-24">
-        {/* 统计卡片 */}
-        <div className="grid grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-xl shadow-sm border-l-4 border-emerald-500 p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">证书总数</p>
-                <p className="text-2xl font-bold text-gray-900" style={{
-                fontFamily: 'JetBrains Mono, monospace'
-              }}>{stats.total}</p>
-              </div>
-              <div className="bg-emerald-100 p-3 rounded-lg">
-                <AwardIcon className="h-6 w-6 text-emerald-600" />
-              </div>
+            <div className="flex gap-1">
+              <Button onClick={() => setShowExportDialog(true)} variant="outline" size="icon" className="h-8 w-8">
+                <Download className="w-4 h-4" />
+              </Button>
+              <Button onClick={() => setShowAddDialog(true)} variant="outline" size="icon" className="h-8 w-8">
+                <Plus className="w-4 h-4" />
+              </Button>
             </div>
           </div>
-          
-          <div className="bg-white rounded-xl shadow-sm border-l-4 border-blue-500 p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">奖励总积分</p>
-                <p className="text-2xl font-bold text-blue-600" style={{
-                fontFamily: 'JetBrains Mono, monospace'
-              }}>+{stats.totalPoints}</p>
+        </header>
+
+        <main className="px-3 py-2">
+          {/* 统计概览 - 紧凑 */}
+          <div className="grid grid-cols-2 gap-2 mb-3">
+            <StatCard title="证书总数" value={stats.total} icon={Award} color="purple" />
+            <StatCard title="总积分" value={stats.totalPoints} icon={TrendingUp} color="blue" />
+            <StatCard title="获奖学生" value={stats.studentsCount} icon={CheckCircle} color="green" />
+            <StatCard title="本月新增" value={stats.thisMonth} icon={Calendar} color="amber" />
+          </div>
+
+          {/* 筛选栏 - 紧凑 */}
+          <div className="bg-white rounded-lg shadow-sm p-3 mb-3">
+            <div className="flex gap-2">
+              <div className="flex-1 relative">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                <input type="text" placeholder="搜索学生、证书..." className="w-full pl-8 pr-3 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-xs" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
               </div>
-              <div className="bg-blue-100 p-3 rounded-lg">
-                <TrendingUp className="h-6 w-6 text-blue-600" />
-              </div>
+              <select className="px-2 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-xs" value={filterStudent} onChange={e => setFilterStudent(e.target.value)}>
+                <option value="all">全部学生</option>
+                {MOCK_STUDENTS.map(student => <option key={student.id} value={student.id}>{student.name}</option>)}
+              </select>
             </div>
           </div>
-          
-          <div className="bg-white rounded-xl shadow-sm border-l-4 border-purple-500 p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">获奖学生数</p>
-                <p className="text-2xl font-bold text-gray-900" style={{
-                fontFamily: 'JetBrains Mono, monospace'
-              }}>{stats.studentsCount}</p>
-              </div>
-              <div className="bg-purple-100 p-3 rounded-lg">
-                <Star className="h-6 w-6 text-purple-600" />
-              </div>
+
+          {/* 证书列表 - 紧凑 */}
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-3">
+            <div className="bg-gray-50 px-3 py-2 border-b border-gray-200">
+              <h2 className="text-sm font-semibold text-gray-800 flex items-center gap-1.5">
+                <Award className="w-4 h-4 text-purple-600" />
+                证书列表
+              </h2>
             </div>
-          </div>
-          
-          <div className="bg-white rounded-xl shadow-sm border-l-4 border-orange-500 p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">本月新增</p>
-                <p className="text-2xl font-bold text-gray-900" style={{
-                fontFamily: 'JetBrains Mono, monospace'
-              }}>{stats.thisMonth}</p>
-              </div>
-              <div className="bg-orange-100 p-3 rounded-lg">
-                <Calendar className="h-6 w-6 text-orange-600" />
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* 筛选栏 */}
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-          <div className="flex gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <input type="text" placeholder="搜索学生、证书名称或备注..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" />
-            </div>
-            
-            <select value={filterStudent} onChange={e => setFilterStudent(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
-              <option value="all">所有学生</option>
-              {MOCK_STUDENTS.map(student => <option key={student.id} value={student.id}>{student.name} ({student.studentId})</option>)}
-            </select>
-            
-            <select value={filterLevel} onChange={e => setFilterLevel(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
-              <option value="all">所有级别</option>
-              <option value="basic">初级证书</option>
-              <option value="intermediate">中级证书</option>
-              <option value="advanced">高级证书</option>
-              <option value="expert">特级证书</option>
-              <option value="competition">竞赛获奖</option>
-            </select>
-          </div>
-        </div>
-        
-        {/* 证书列表 */}
-        <div className="space-y-3">
-          {filteredCertificates.length === 0 ? <div className="text-center py-12 text-gray-500">
-              <AwardIcon className="mx-auto h-12 w-12 mb-4 text-gray-300" />
-              <p>暂无证书记录</p>
-            </div> : filteredCertificates.map(cert => {
-          const LevelIcon = getLevelIcon(cert.levelId);
-          return <div key={cert.id} className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-5">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className={`p-2 rounded-lg ${getLevelColor(cert.levelId)}`}>
-                        <LevelIcon className="h-5 w-5" />
+            <div className="divide-y divide-gray-100">
+              {filteredCertificates.length === 0 ? <div className="p-6 text-center text-gray-500 text-sm">
+                  暂无证书记录
+                </div> : filteredCertificates.map(certificate => {
+            const levelStyles = getLevelStyles(certificate.levelId);
+            const statusStyles = getStatusStyles(certificate.status);
+            const StatusIcon = statusStyles.icon;
+            return <div key={certificate.id} className={`p-2.5 hover:bg-gray-50 transition-colors ${certificate.status === 'pending' ? 'bg-amber-50/50' : ''}`}>
+                    <div className="flex items-start gap-2">
+                      {/* 学生头像 */}
+                      <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                        {certificate.studentName[0]}
                       </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900">{cert.certificateName}</h3>
-                        <p className="text-sm text-gray-500">{cert.studentName} · {cert.levelName}</p>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          <h3 className="font-medium text-gray-800 text-sm">{certificate.studentName}</h3>
+                          <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-full ${levelStyles.bgColor} ${levelStyles.textColor} ${levelStyles.borderColor} border`}>
+                            {certificate.levelName}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-800 mb-1 truncate">{certificate.certificateName}</p>
+                        <div className="flex items-center gap-2">
+                          <span className={`inline-flex items-center gap-1 text-[10px] font-medium ${statusStyles.textColor}`}>
+                            <StatusIcon className="w-2.5 h-2.5" />
+                            {getStatusText(certificate.status)}
+                          </span>
+                          <span className={`text-[10px] font-medium ${certificate.points > 0 ? 'text-green-600' : 'text-gray-600'}`}>
+                            +{certificate.points}分
+                          </span>
+                          <span className="text-[10px] text-gray-400">
+                            {certificate.date}
+                          </span>
+                        </div>
+                      </div>
+                      {/* 操作按钮 */}
+                      <div className="flex gap-1">
+                        <Button onClick={() => handleViewDetail(certificate)} variant="ghost" size="icon" className="h-7 w-7">
+                          <Eye className="w-3.5 h-3.5 text-gray-500" />
+                        </Button>
                       </div>
                     </div>
-                    
-                    <div className="flex items-center gap-6 text-sm text-gray-600 mb-2">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" />
-                        <span>{cert.date}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <TrendingUp className="h-4 w-4 text-emerald-600" />
-                        <span className="text-emerald-600 font-semibold">+{cert.points} 积分</span>
-                      </div>
-                      {cert.fileUrl && <div className="flex items-center gap-1 text-blue-600">
-                        <FileText className="h-4 w-4" />
-                        <span>已上传证书</span>
-                      </div>}
-                    </div>
-                    
-                    {cert.note && <p className="text-sm text-gray-500 mt-2">备注：{cert.note}</p>}
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => handleViewCertificate(cert)}>
-                      <Eye className="h-4 w-4 mr-1" />
-                      查看
-                    </Button>
-                    {cert.fileUrl && <Button variant="outline" size="sm" onClick={() => handleDownloadCertificate(cert)}>
-                        <Download className="h-4 w-4 mr-1" />
-                        下载
-                      </Button>}
-                  </div>
-                </div>
-              </div>;
-        })}
-        </div>
-        
-        {/* 说明区域 */}
-        <div className="mt-8 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-lg p-6 border border-emerald-200">
-          <h3 className="text-lg font-semibold text-emerald-800 mb-3 flex items-center">
-            <AwardIcon className="h-5 w-5 mr-2" />
-            积分奖励说明
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div>
-              <span className="font-medium text-gray-900">初级证书：</span>
-              <span className="text-gray-600">+5 积分</span>
-            </div>
-            <div>
-              <span className="font-medium text-gray-900">中级证书：</span>
-              <span className="text-gray-600">+10 积分</span>
-            </div>
-            <div>
-              <span className="font-medium text-gray-900">高级证书：</span>
-              <span className="text-gray-600">+20 积分</span>
-            </div>
-            <div>
-              <span className="font-medium text-gray-900">特级证书：</span>
-              <span className="text-gray-600">+30 积分</span>
-            </div>
-            <div>
-              <span className="font-medium text-gray-900">省级获奖：</span>
-              <span className="text-gray-600">+25 积分</span>
-            </div>
-            <div>
-              <span className="font-medium text-gray-900">国家级获奖：</span>
-              <span className="text-gray-600">+40 积分</span>
-            </div>
-            <div>
-              <span className="font-medium text-gray-900">国际级获奖：</span>
-              <span className="text-gray-600">+50 积分</span>
-            </div>
-            <div>
-              <span className="font-medium text-gray-900">证书录入：</span>
-              <span className="text-gray-600">自动创建积分记录</span>
+                  </div>;
+          })}
             </div>
           </div>
-        </div>
-      </div>
-      
-      {/* 录入证书对话框 */}
-      {showAddDialog && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-6 py-4 rounded-t-xl">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold" style={{
-              fontFamily: 'Noto Serif SC, serif'
-            }}>录入技能证书</h2>
-                <Button variant="ghost" className="text-white hover:bg-white/20" onClick={() => setShowAddDialog(false)}>
-                  ✕
-                </Button>
+        </main>
+
+        {/* 添加证书对话框 */}
+        {showAddDialog && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
+              <div className="p-4 border-b border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-800">添加证书</h3>
               </div>
-            </div>
-            
-            <form onSubmit={handleSubmit} className="p-6">
-              <div className="space-y-4">
-                {/* 选择学生 */}
+              <div className="p-4 space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    选择学生 <span className="text-red-500">*</span>
-                  </label>
-                  <select name="studentId" value={formData.studentId} onChange={handleInputChange} required className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">学生</label>
+                  <select className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm" value={formData.studentId} onChange={e => setFormData({
+              ...formData,
+              studentId: e.target.value
+            })}>
                     <option value="">请选择学生</option>
-                    {MOCK_STUDENTS.map(student => <option key={student.id} value={student.id}>{student.name} ({student.studentId}) - {student.group} - 当前积分：{student.totalPoints}</option>)}
+                    {MOCK_STUDENTS.map(student => <option key={student.id} value={student.id}>{student.name} ({student.studentId})</option>)}
                   </select>
                 </div>
-                
-                {/* 证书名称 */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    证书名称 <span className="text-red-500">*</span>
-                  </label>
-                  <input type="text" name="certificateName" value={formData.certificateName} onChange={handleInputChange} placeholder="例如：英语四级、计算机二级" required className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">证书名称</label>
+                  <input type="text" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm" value={formData.certificateName} onChange={e => setFormData({
+              ...formData,
+              certificateName: e.target.value
+            })} placeholder="请输入证书名称" />
                 </div>
-                
-                {/* 证书级别 */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    证书级别 <span className="text-red-500">*</span>
-                  </label>
-                  <select name="levelId" value={formData.levelId} onChange={handleInputChange} required className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                    <option value="">请选择级别</option>
-                    {CERTIFICATE_LEVELS.map(level => <option key={level.id} value={level.id}>{level.name} - 奖励积分：+{level.points}</option>)}
+                  <label className="block text-sm font-medium text-gray-700 mb-1">证书级别</label>
+                  <select className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm" value={formData.levelId} onChange={e => setFormData({
+              ...formData,
+              levelId: e.target.value
+            })}>
+                    <option value="">请选择证书级别</option>
+                    {CERTIFICATE_LEVELS.map(level => <option key={level.id} value={level.id}>{level.name} ({level.points}分)</option>)}
                   </select>
-                  {formData.levelId && (() => {
-                const level = CERTIFICATE_LEVELS.find(l => l.id.toString() === formData.levelId);
-                return <p className="mt-2 text-sm text-emerald-600">预计获得 +{level.points} 积分奖励</p>;
-              })()}
                 </div>
-                
-                {/* 获得日期 */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    获得日期
-                  </label>
-                  <input type="date" name="date" value={formData.date} onChange={handleInputChange} className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">获得日期</label>
+                  <input type="date" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm" value={formData.date} onChange={e => setFormData({
+              ...formData,
+              date: e.target.value
+            })} />
                 </div>
-                
-                {/* 备注 */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    备注
-                  </label>
-                  <textarea name="note" value={formData.note} onChange={handleInputChange} rows={3} placeholder="填写证书相关信息，如考试名称、竞赛名称等" className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
-                </div>
-                
-                {/* 上传证书扫描件 */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    上传证书扫描件
-                  </label>
-                  <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center hover:border-emerald-500 transition-colors">
-                    <input type="file" accept="image/jpeg,image/png,image/jpg,application/pdf" onChange={handleFileUpload} disabled={uploading} className="hidden" id="file-upload" />
-                    <label htmlFor="file-upload" className="cursor-pointer">
-                      <Upload className="mx-auto h-10 w-10 text-gray-400 mb-3" />
-                      <p className="text-sm text-gray-600 mb-1">点击上传证书扫描件</p>
-                      <p className="text-xs text-gray-400">支持 JPG、PNG、PDF 格式，最大 5MB</p>
-                    </label>
-                    {formData.file && <div className="mt-3 inline-flex items-center gap-2 text-sm text-emerald-600 bg-emerald-50 px-3 py-2 rounded-lg">
-                        <CheckCircle className="h-4 w-4" />
-                        <span>{formData.file.name}</span>
-                      </div>}
-                  </div>
-                </div>
-                
-                {/* 按钮组 */}
-                <div className="flex gap-3 pt-4 border-t">
-                  <Button type="button" variant="outline" onClick={() => setShowAddDialog(false)} className="flex-1">
-                    取消
-                  </Button>
-                  <Button type="submit" className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700">
-                    确认录入
-                  </Button>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">备注</label>
+                  <textarea className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm" rows={2} value={formData.note} onChange={e => setFormData({
+              ...formData,
+              note: e.target.value
+            })} placeholder="可选备注" />
                 </div>
               </div>
-            </form>
-          </div>
-        </div>}
-      
-      {/* 查看证书对话框 */}
-      {selectedCertificate && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-6 py-4 rounded-t-xl">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold" style={{
-              fontFamily: 'Noto Serif SC, serif'
-            }}>证书详情</h2>
-                <Button variant="ghost" className="text-white hover:bg-white/20" onClick={() => setSelectedCertificate(null)}>
-                  ✕
+              <div className="p-4 border-t border-gray-200 flex justify-end gap-2">
+                <Button onClick={() => setShowAddDialog(false)} variant="outline" className="px-4 py-2">
+                  取消
+                </Button>
+                <Button onClick={handleAddCertificate} disabled={uploading} className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2">
+                  {uploading ? '添加中...' : '添加'}
                 </Button>
               </div>
             </div>
-            
-            <div className="p-6">
-              <div className="space-y-4">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className={`p-3 rounded-lg ${getLevelColor(selectedCertificate.levelId)}`}>
-                    {React.createElement(getLevelIcon(selectedCertificate.levelId), {
-                  className: "h-8 w-8"
-                })}
+          </div>}
+
+        {/* 详情对话框 */}
+        {showDetailDialog && selectedCertificate && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
+              <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-800">证书详情</h3>
+                <Button onClick={() => {
+            setShowDetailDialog(false);
+            setSelectedCertificate(null);
+          }} variant="ghost" size="icon" className="h-8 w-8">
+                  <FileText className="w-4 h-4" />
+                </Button>
+              </div>
+              <div className="p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold">
+                    {selectedCertificate.studentName[0]}
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-900">{selectedCertificate.certificateName}</h3>
-                    <p className="text-gray-600">{selectedCertificate.levelName}</p>
+                    <p className="font-medium text-gray-800">{selectedCertificate.studentName}</p>
+                    <p className="text-sm text-gray-500">{MOCK_STUDENTS.find(s => s.id === selectedCertificate.studentId)?.studentId}</p>
                   </div>
                 </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-sm text-gray-500 mb-1">获得学生</p>
-                    <p className="text-lg font-semibold text-gray-900">{selectedCertificate.studentName}</p>
+                <div className="bg-gray-50 rounded-lg p-3 space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">证书名称</span>
+                    <span className="text-sm font-medium text-gray-800">{selectedCertificate.certificateName}</span>
                   </div>
-                  <div className="bg-emerald-50 rounded-lg p-4">
-                    <p className="text-sm text-emerald-600 mb-1">奖励积分</p>
-                    <p className="text-2xl font-bold text-emerald-600">+{selectedCertificate.points}</p>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">级别</span>
+                    <span className={`text-sm font-medium ${getLevelStyles(selectedCertificate.levelId).textColor}`}>
+                      {selectedCertificate.levelName}
+                    </span>
                   </div>
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-sm text-gray-500 mb-1">获得日期</p>
-                    <p className="text-lg font-semibold text-gray-900">{selectedCertificate.date}</p>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">积分</span>
+                    <span className={`text-sm font-medium ${selectedCertificate.points > 0 ? 'text-green-600' : 'text-gray-800'}`}>
+                      +{selectedCertificate.points}
+                    </span>
                   </div>
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-sm text-gray-500 mb-1">证书状态</p>
-                    <p className="text-lg font-semibold text-emerald-600">已录入</p>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">获得日期</span>
+                    <span className="text-sm text-gray-800">{selectedCertificate.date}</span>
                   </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">状态</span>
+                    <span className={`text-sm font-medium ${getStatusStyles(selectedCertificate.status).textColor}`}>
+                      {getStatusText(selectedCertificate.status)}
+                    </span>
+                  </div>
+                  {selectedCertificate.note && <div className="border-t border-gray-200 pt-2">
+                      <span className="text-sm text-gray-600">备注</span>
+                      <p className="text-sm text-gray-800 mt-1">{selectedCertificate.note}</p>
+                    </div>}
                 </div>
-                
-                {selectedCertificate.note && <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-sm text-gray-500 mb-2">备注</p>
-                    <p className="text-gray-900">{selectedCertificate.note}</p>
-                  </div>}
-                
-                {selectedCertificate.fileUrl ? <div className="bg-blue-50 rounded-lg p-4">
-                    <div className="flex items-center gap-2 text-blue-600 mb-3">
-                      <FileText className="h-5 w-5" />
-                      <span className="font-semibold">证书扫描件</span>
-                    </div>
-                    <Button onClick={() => handleDownloadCertificate(selectedCertificate)} className="w-full bg-blue-600 hover:bg-blue-700">
-                      <Download className="h-4 w-4 mr-2" />
-                      下载证书扫描件
-                    </Button>
-                  </div> : <div className="bg-gray-50 rounded-lg p-4 text-center text-gray-500">
-                    <FileText className="mx-auto h-10 w-10 mb-2 text-gray-300" />
-                    <p>未上传证书扫描件</p>
-                  </div>}
               </div>
             </div>
-          </div>
-        </div>}
-      
-      {/* TabBar */}
-      <TabBar />
-    </div>;
+          </div>}
+
+        {/* 导出对话框 */}
+        {showExportDialog && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
+              <div className="p-4 border-b border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-800">导出证书记录</h3>
+              </div>
+              <div className="p-4 space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">导出范围</label>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" name="exportRange" value="all" checked={exportRange === 'all'} onChange={e => setExportRange(e.target.value)} className="w-4 h-4 text-purple-600" />
+                      <span className="text-sm text-gray-700">全部记录</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" name="exportRange" value="current_month" checked={exportRange === 'current_month'} onChange={e => setExportRange(e.target.value)} className="w-4 h-4 text-purple-600" />
+                      <span className="text-sm text-gray-700">本月记录</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" name="exportRange" value="last_month" checked={exportRange === 'last_month'} onChange={e => setExportRange(e.target.value)} className="w-4 h-4 text-purple-600" />
+                      <span className="text-sm text-gray-700">上月记录</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div className="p-4 border-t border-gray-200 flex justify-end gap-2">
+                <Button onClick={() => setShowExportDialog(false)} variant="outline" className="px-4 py-2">
+                  取消
+                </Button>
+                <Button onClick={handleExportData} className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2">
+                  导出
+                </Button>
+              </div>
+            </div>
+          </div>}
+
+        {/* 底部导航栏 */}
+        <TabBar currentPage={currentPage} onPageChange={setCurrentPage} />
+      </div>;
 }

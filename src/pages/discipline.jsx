@@ -5,6 +5,7 @@ import { AlertTriangle, FileText, Search, Filter, Shield, ShieldAlert, Calendar,
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
 
+import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 
 // 处分级别预设数据（包含扣分分值）
@@ -104,19 +105,18 @@ const MOCK_STUDENTS = [{
   totalPoints: 135
 }];
 
-// 模拟处分历史数据
-const MOCK_DISCIPLINE_HISTORY = [{
+// 模拟处分记录数据
+const MOCK_RECORDS = [{
   id: 1,
   studentId: 2,
   studentName: '李四',
   levelId: 3,
   levelName: '警告',
-  reason: '上课期间玩手机被老师发现',
+  reason: '上课玩手机',
   pointsDeducted: -10,
-  date: '2025-02-28 14:30',
+  date: '2025-03-01 09:00',
   status: 'active',
-  // active, expired, revoked
-  expiryDate: '2025-03-30',
+  expiryDate: '2025-03-31',
   operator: '班主任',
   revokeRequests: []
 }, {
@@ -125,18 +125,16 @@ const MOCK_DISCIPLINE_HISTORY = [{
   studentName: '钱七',
   levelId: 4,
   levelName: '严重警告',
-  reason: '多次迟到并旷课',
+  reason: '打架斗殴',
   pointsDeducted: -15,
-  date: '2025-02-25 09:15',
+  date: '2025-02-28 15:30',
   status: 'active',
-  expiryDate: '2025-04-25',
-  operator: '班主任',
+  expiryDate: '2025-04-29',
+  operator: '德育主任',
   revokeRequests: [{
-    id: 1,
+    reason: '误判',
     requestDate: '2025-03-01',
-    reason: '已深刻认识错误并积极改正',
-    evidence: '悔过书.pdf',
-    status: 'pending' // pending, approved, rejected
+    status: 'pending'
   }]
 }, {
   id: 3,
@@ -157,21 +155,32 @@ const MOCK_DISCIPLINE_HISTORY = [{
   studentName: '孙八',
   levelId: 5,
   levelName: '记过',
-  reason: '考试作弊',
+  reason: '逃课上网',
   pointsDeducted: -20,
-  date: '2025-02-15 11:00',
+  date: '2025-02-15 14:00',
   status: 'revoked',
   expiryDate: '2025-05-15',
-  operator: '班主任',
+  operator: '德育主任',
   revokeRequests: [{
-    id: 2,
-    requestDate: '2025-03-02',
-    reason: '表现优秀，积极配合班级工作',
-    evidence: '证明材料.pdf',
+    reason: '家长申请',
+    requestDate: '2025-02-20',
     status: 'approved'
   }]
+}, {
+  id: 5,
+  studentId: 8,
+  studentName: '吴十',
+  levelId: 2,
+  levelName: '通报批评',
+  reason: '顶撞老师',
+  pointsDeducted: -5,
+  date: '2025-02-25 11:00',
+  status: 'active',
+  expiryDate: '2025-03-11',
+  operator: '班主任',
+  revokeRequests: []
 }];
-export default function Discipline(props) {
+export default function DisciplinePage(props) {
   const {
     $w
   } = props;
@@ -180,222 +189,306 @@ export default function Discipline(props) {
   } = useToast();
   const [currentPage, setCurrentPage] = useState('discipline');
   const [loading, setLoading] = useState(true);
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [showRevokeDialog, setShowRevokeDialog] = useState(false);
-  const [selectedDiscipline, setSelectedDiscipline] = useState(null);
+  const [records, setRecords] = useState([]);
   const [students, setStudents] = useState([]);
-  const [history, setHistory] = useState([]);
-  const [searchKeyword, setSearchKeyword] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [selectedStudent, setSelectedStudent] = useState(null);
-  const [selectedLevel, setSelectedLevel] = useState(null);
-  const [reason, setReason] = useState('');
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showDetailDialog, setShowDetailDialog] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [showRevokeDialog, setShowRevokeDialog] = useState(false);
   const [revokeReason, setRevokeReason] = useState('');
-  const [revokeEvidence, setRevokeEvidence] = useState(null);
+  const [showRevokeRequestDialog, setShowRevokeRequestDialog] = useState(false);
+  const [revokeRequestReason, setRevokeRequestReason] = useState('');
+  const [showHistoryDialog, setShowHistoryDialog] = useState(false);
+  const [selectedStudentHistory, setSelectedStudentHistory] = useState(null);
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  const [exportRange, setExportRange] = useState('all');
+  const [newRecord, setNewRecord] = useState({
+    studentId: '',
+    levelId: '',
+    reason: '',
+    date: new Date().toISOString().split('T')[0]
+  });
+
+  // 加载数据
   useEffect(() => {
-    loadDisciplineData();
+    loadData();
   }, []);
-  const loadDisciplineData = async () => {
+  const loadData = async () => {
     try {
       setLoading(true);
-
-      // 模拟数据加载（后续替换为真实数据源调用）
+      // 模拟数据加载
       await new Promise(resolve => setTimeout(resolve, 500));
+      setRecords(MOCK_RECORDS);
       setStudents(MOCK_STUDENTS);
-      setHistory(MOCK_DISCIPLINE_HISTORY);
     } catch (error) {
+      console.error('加载数据失败:', error);
       toast({
-        variant: 'destructive',
-        title: '加载数据失败',
-        description: error.message || '请稍后重试'
+        title: '加载失败',
+        description: '无法加载数据，请重试',
+        variant: 'destructive'
       });
     } finally {
       setLoading(false);
     }
   };
 
-  // 创建处分记录
-  const handleCreateDiscipline = async () => {
-    if (!selectedStudent || !selectedLevel || !reason.trim()) {
-      toast({
-        variant: 'destructive',
-        title: '请填写完整信息',
-        description: '请选择学生、处分级别并填写处分事由'
-      });
-      return;
-    }
-    try {
-      // 计算预计积分
-      const pointsChange = selectedLevel.points;
-      const newTotalPoints = selectedStudent.totalPoints + pointsChange;
-      const newRecord = {
-        id: Date.now(),
-        studentId: selectedStudent.id,
-        studentName: selectedStudent.name,
-        levelId: selectedLevel.id,
-        levelName: selectedLevel.name,
-        reason: reason,
-        pointsDeducted: pointsChange,
-        date: new Date().toLocaleString('zh-CN', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit'
-        }),
-        status: 'active',
-        expiryDate: calculateExpiryDate(selectedLevel.duration),
-        operator: '班主任',
-        revokeRequests: []
-      };
-
-      // 添加到历史记录
-      setHistory([newRecord, ...history]);
-
-      // 更新学生积分
-      const updatedStudents = students.map(s => s.id === selectedStudent.id ? {
-        ...s,
-        totalPoints: newTotalPoints
-      } : s);
-      setStudents(updatedStudents);
-      setShowCreateDialog(false);
-      setSelectedStudent(null);
-      setSelectedLevel(null);
-      setReason('');
-      toast({
-        title: '处分记录创建成功',
-        description: `已为 ${selectedStudent.name} 创建${selectedLevel.name}处分，扣除${pointsChange}分`
-      });
-
-      // 如果处分级别为警告及以上，发送评优限制提醒
-      if (selectedLevel.severity === 'medium' || selectedLevel.severity === 'high') {
-        setTimeout(() => {
-          toast({
-            variant: 'warning',
-            title: '评优资格限制提醒',
-            description: `${selectedStudent.name} 因受${selectedLevel.name}处分，评优资格已被限制`
-          });
-        }, 1000);
-      }
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: '创建失败',
-        description: error.message || '请稍后重试'
-      });
-    }
+  // 统计数据
+  const stats = {
+    total: records.length,
+    active: records.filter(r => r.status === 'active').length,
+    expired: records.filter(r => r.status === 'expired').length,
+    revoked: records.filter(r => r.status === 'revoked').length,
+    pendingReviews: records.filter(r => r.revokeRequests && r.revokeRequests.length > 0 && r.revokeRequests[0].status === 'pending').length
   };
 
-  // 计算过期日期
-  const calculateExpiryDate = days => {
-    const date = new Date();
-    date.setDate(date.getDate() + days);
-    return date.toLocaleDateString('zh-CN');
-  };
-
-  // 提交撤销申请
-  const handleSubmitRevokeRequest = async () => {
-    if (!revokeReason.trim()) {
-      toast({
-        variant: 'destructive',
-        title: '请填写撤销理由',
-        description: '请详细说明申请撤销的理由'
-      });
-      return;
-    }
-    try {
-      const newRequest = {
-        id: Date.now(),
-        requestDate: new Date().toLocaleDateString('zh-CN'),
-        reason: revokeReason,
-        evidence: revokeEvidence?.name || null,
-        status: 'pending'
-      };
-      const updatedHistory = history.map(record => record.id === selectedDiscipline.id ? {
-        ...record,
-        revokeRequests: [...record.revokeRequests, newRequest]
-      } : record);
-      setHistory(updatedHistory);
-      setShowRevokeDialog(false);
-      setSelectedDiscipline(null);
-      setRevokeReason('');
-      setRevokeEvidence(null);
-      toast({
-        title: '撤销申请已提交',
-        description: '班主任审核后将通知您结果'
-      });
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: '提交失败',
-        description: error.message || '请稍后重试'
-      });
-    }
-  };
-
-  // 审核撤销申请
-  const handleReviewRevokeRequest = (recordId, requestId, approved) => {
-    const updatedHistory = history.map(record => {
-      if (record.id === recordId) {
-        const updatedRequests = record.revokeRequests.map(req => req.id === requestId ? {
-          ...req,
-          status: approved ? 'approved' : 'rejected'
-        } : req);
-        return {
-          ...record,
-          revokeRequests: updatedRequests
-        };
-      }
-      return record;
-    });
-    setHistory(updatedHistory);
-    toast({
-      title: approved ? '撤销申请已批准' : '撤销申请已拒绝',
-      description: approved ? '该处分记录已标记为已撤销' : '该撤销申请未通过审核'
-    });
-  };
-
-  // 筛选后的历史记录
-  const filteredHistory = history.filter(record => {
-    const matchSearch = record.studentName.includes(searchKeyword) || record.reason.includes(searchKeyword);
-    const matchStatus = filterStatus === 'all' || record.status === filterStatus;
+  // 过滤记录
+  const filteredRecords = records.filter(record => {
+    const matchSearch = record.studentName.toLowerCase().includes(searchTerm.toLowerCase()) || record.levelName.toLowerCase().includes(searchTerm.toLowerCase()) || record.reason.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchStatus = statusFilter === 'all' || record.status === statusFilter;
     return matchSearch && matchStatus;
   });
 
-  // 统计数据
-  const stats = {
-    total: history.length,
-    active: history.filter(r => r.status === 'active').length,
-    expired: history.filter(r => r.status === 'expired').length,
-    revoked: history.filter(r => r.status === 'revoked').length,
-    pendingReviews: history.reduce((count, record) => count + record.revokeRequests.filter(r => r.status === 'pending').length, 0)
-  };
-
-  // 获取严重程度样式
-  const getSeverityStyle = severity => {
-    switch (severity) {
-      case 'low':
-        return 'bg-blue-100 text-blue-700 border-blue-200';
-      case 'medium':
-        return 'bg-orange-100 text-orange-700 border-orange-200';
-      case 'high':
-        return 'bg-red-100 text-red-700 border-red-200';
+  // 获取状态样式
+  const getStatusStyles = status => {
+    switch (status) {
+      case 'active':
+        return {
+          bgColor: 'bg-red-50',
+          textColor: 'text-red-700',
+          borderColor: 'border-red-200',
+          icon: AlertTriangle
+        };
+      case 'expired':
+        return {
+          bgColor: 'bg-gray-50',
+          textColor: 'text-gray-700',
+          borderColor: 'border-gray-200',
+          icon: Clock
+        };
+      case 'revoked':
+        return {
+          bgColor: 'bg-green-50',
+          textColor: 'text-green-700',
+          borderColor: 'border-green-200',
+          icon: CheckCircle
+        };
       default:
-        return 'bg-gray-100 text-gray-700 border-gray-200';
+        return {
+          bgColor: 'bg-gray-50',
+          textColor: 'text-gray-700',
+          borderColor: 'border-gray-200',
+          icon: FileText
+        };
     }
   };
 
-  // 获取状态样式
-  const getStatusStyle = status => {
-    switch (status) {
-      case 'active':
-        return 'bg-red-50 text-red-700 border-red-200';
-      case 'expired':
-        return 'bg-gray-50 text-gray-700 border-gray-200';
-      case 'revoked':
-        return 'bg-green-50 text-green-700 border-green-200';
+  // 获取严重程度样式
+  const getSeverityStyles = severity => {
+    switch (severity) {
+      case 'high':
+        return {
+          bgColor: 'bg-red-100',
+          textColor: 'text-red-700',
+          borderColor: 'border-red-300'
+        };
+      case 'medium':
+        return {
+          bgColor: 'bg-orange-100',
+          textColor: 'text-orange-700',
+          borderColor: 'border-orange-300'
+        };
+      case 'low':
       default:
-        return 'bg-gray-50 text-gray-700 border-gray-200';
+        return {
+          bgColor: 'bg-yellow-100',
+          textColor: 'text-yellow-700',
+          borderColor: 'border-yellow-300'
+        };
+    }
+  };
+
+  // 创建处分
+  const handleCreateRecord = async () => {
+    if (!newRecord.studentId || !newRecord.levelId || !newRecord.reason) {
+      toast({
+        title: '填写不完整',
+        description: '请填写所有必填项',
+        variant: 'destructive'
+      });
+      return;
+    }
+    try {
+      const student = students.find(s => s.id === parseInt(newRecord.studentId));
+      const level = DISCIPLINE_LEVELS.find(l => l.id === parseInt(newRecord.levelId));
+      const newId = Math.max(...records.map(r => r.id)) + 1;
+      const createdRecord = {
+        id: newId,
+        studentId: parseInt(newRecord.studentId),
+        studentName: student.name,
+        levelId: level.id,
+        levelName: level.name,
+        reason: newRecord.reason,
+        pointsDeducted: level.points,
+        date: newRecord.date,
+        status: 'active',
+        expiryDate: new Date(Date.now() + level.duration * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        operator: '班主任',
+        revokeRequests: []
+      };
+      setRecords([...records, createdRecord]);
+      setShowCreateDialog(false);
+      setNewRecord({
+        studentId: '',
+        levelId: '',
+        reason: '',
+        date: new Date().toISOString().split('T')[0]
+      });
+      toast({
+        title: '创建成功',
+        description: `已为 ${student.name} 创建 ${level.name}`
+      });
+    } catch (error) {
+      console.error('创建失败:', error);
+      toast({
+        title: '创建失败',
+        description: error.message,
+        variant: 'destructive'
+      });
+    }
+  };
+
+  // 查看详情
+  const handleViewDetail = record => {
+    setSelectedRecord(record);
+    setShowDetailDialog(true);
+  };
+
+  // 撤销处分
+  const handleRevokeRecord = async () => {
+    if (!revokeReason.trim()) {
+      toast({
+        title: '请填写撤销原因',
+        description: '撤销原因不能为空',
+        variant: 'destructive'
+      });
+      return;
+    }
+    try {
+      const updatedRecords = records.map(r => r.id === selectedRecord.id ? {
+        ...r,
+        status: 'revoked',
+        revokeReason,
+        revokedDate: new Date().toISOString()
+      } : r);
+      setRecords(updatedRecords);
+      setShowRevokeDialog(false);
+      setRevokeReason('');
+      setSelectedRecord(null);
+      toast({
+        title: '撤销成功',
+        description: '处分记录已撤销'
+      });
+    } catch (error) {
+      console.error('撤销失败:', error);
+      toast({
+        title: '撤销失败',
+        description: error.message,
+        variant: 'destructive'
+      });
+    }
+  };
+
+  // 申请撤销
+  const handleRequestRevoke = async () => {
+    if (!revokeRequestReason.trim()) {
+      toast({
+        title: '请填写申请原因',
+        description: '申请原因不能为空',
+        variant: 'destructive'
+      });
+      return;
+    }
+    try {
+      const updatedRecords = records.map(r => r.id === selectedRecord.id ? {
+        ...r,
+        revokeRequests: [{
+          reason: revokeRequestReason,
+          requestDate: new Date().toISOString(),
+          status: 'pending'
+        }]
+      } : r);
+      setRecords(updatedRecords);
+      setShowRevokeRequestDialog(false);
+      setRevokeRequestReason('');
+      setSelectedRecord(null);
+      toast({
+        title: '申请已提交',
+        description: '撤销申请已提交，等待审核'
+      });
+    } catch (error) {
+      console.error('申请失败:', error);
+      toast({
+        title: '申请失败',
+        description: error.message,
+        variant: 'destructive'
+      });
+    }
+  };
+
+  // 查看历史记录
+  const handleViewHistory = studentId => {
+    const student = students.find(s => s.id === studentId);
+    const historyRecords = records.filter(r => r.studentId === studentId);
+    setSelectedStudentHistory({
+      student,
+      records: historyRecords
+    });
+    setShowHistoryDialog(true);
+  };
+
+  // 导出数据
+  const handleExportData = async () => {
+    try {
+      let exportRecords = records;
+      if (exportRange === 'current_month') {
+        const now = new Date();
+        exportRecords = records.filter(r => {
+          const recordDate = new Date(r.date);
+          return recordDate.getMonth() === now.getMonth() && recordDate.getFullYear() === now.getFullYear();
+        });
+      } else if (exportRange === 'last_month') {
+        const now = new Date();
+        const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1);
+        exportRecords = records.filter(r => {
+          const recordDate = new Date(r.date);
+          return recordDate.getMonth() === lastMonth.getMonth() && recordDate.getFullYear() === lastMonth.getFullYear();
+        });
+      }
+      // 模拟导出
+      const csvContent = `学生姓名,学号,处分级别,扣分,原因,日期,状态,有效期\n${exportRecords.map(r => `${r.studentName},${students.find(s => s.id === r.studentId).studentId},${r.levelName},${r.pointsDeducted},${r.reason},${r.date},${r.status},${r.expiryDate}`).join('\n')}`;
+      const blob = new Blob([csvContent], {
+        type: 'text/csv;charset=utf-8;'
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `处分记录_${new Date().toISOString().split('T')[0]}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+      setShowExportDialog(false);
+      toast({
+        title: '导出成功',
+        description: '处分记录已导出'
+      });
+    } catch (error) {
+      console.error('导出失败:', error);
+      toast({
+        title: '导出失败',
+        description: error.message,
+        variant: 'destructive'
+      });
     }
   };
 
@@ -413,105 +506,50 @@ export default function Discipline(props) {
     }
   };
   if (loading) {
-    return <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-slate-600 text-sm">加载中...</div>
-      </div>;
+    return <div className="flex items-center justify-center min-h-screen bg-gray-50">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-orange-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+            <p className="text-gray-600 text-sm">加载中...</p>
+          </div>
+        </div>;
   }
   return <div className="min-h-screen bg-gray-50 pb-16">
-      {/* 顶部导航栏 */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
-              <div className="bg-gradient-to-br from-orange-500 to-amber-500 p-2 rounded-lg">
-                <ShieldAlert className="w-6 h-6 text-white" />
-              </div>
-              <h1 className="text-xl font-bold text-slate-800">学生处分管理</h1>
+        {/* 页面头部 - 紧凑 */}
+        <header className="bg-white border-b border-gray-200 p-3 sticky top-0 z-40">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-lg font-bold text-gray-900">处分管理</h1>
+              <p className="text-xs text-gray-500">学生违纪处分记录管理</p>
             </div>
-            <Button onClick={() => setShowCreateDialog(true)} className="bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 shadow-lg">
-              <Plus className="w-4 h-4 mr-2" />
-              新建处分
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
-        {/* 统计卡片 */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-600 mb-1">处分总数</p>
-                <p className="text-2xl font-bold text-slate-800">{stats.total}</p>
-              </div>
-              <div className="bg-slate-100 p-2 rounded-lg">
-                <FileText className="w-5 h-5 text-slate-600" />
-              </div>
+            <div className="flex gap-1">
+              <Button onClick={() => setShowExportDialog(true)} variant="outline" size="icon" className="h-8 w-8">
+                <Download className="w-4 h-4" />
+              </Button>
+              <Button onClick={() => setShowCreateDialog(true)} variant="outline" size="icon" className="h-8 w-8">
+                <Plus className="w-4 h-4" />
+              </Button>
             </div>
           </div>
+        </header>
 
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-600 mb-1">生效中</p>
-                <p className="text-2xl font-bold text-red-600">{stats.active}</p>
-              </div>
-              <div className="bg-red-50 p-2 rounded-lg">
-                <AlertTriangle className="w-5 h-5 text-red-600" />
-              </div>
-            </div>
+        <main className="px-3 py-2">
+          {/* 统计概览 - 紧凑 */}
+          <div className="grid grid-cols-3 gap-2 mb-3">
+            <StatCard title="处分总数" value={stats.total} icon={FileText} color="blue" />
+            <StatCard title="生效中" value={stats.active} icon={AlertTriangle} color="red" />
+            <StatCard title="已过期" value={stats.expired} icon={Clock} color="amber" />
+            <StatCard title="已撤销" value={stats.revoked} icon={CheckCircle} color="green" />
+            <StatCard title="待审核" value={stats.pendingReviews} icon={History} color="orange" className="col-span-2" />
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-600 mb-1">已过期</p>
-                <p className="text-2xl font-bold text-gray-600">{stats.expired}</p>
+          {/* 筛选栏 - 紧凑 */}
+          <div className="bg-white rounded-lg shadow-sm p-3 mb-3">
+            <div className="flex gap-2">
+              <div className="flex-1 relative">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                <input type="text" placeholder="搜索学生、处分级别、原因..." className="w-full pl-8 pr-3 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-xs" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
               </div>
-              <div className="bg-gray-100 p-2 rounded-lg">
-                <Clock className="w-5 h-5 text-gray-600" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-600 mb-1">已撤销</p>
-                <p className="text-2xl font-bold text-green-600">{stats.revoked}</p>
-              </div>
-              <div className="bg-green-50 p-2 rounded-lg">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-600 mb-1">待审核</p>
-                <p className="text-2xl font-bold text-amber-600">{stats.pendingReviews}</p>
-              </div>
-              <div className="bg-amber-50 p-2 rounded-lg">
-                <History className="w-5 h-5 text-amber-600" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 筛选栏 */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
-                <input type="text" placeholder="搜索学生姓名或处分事由..." value={searchKeyword} onChange={e => setSearchKeyword(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent" />
-              </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Filter className="w-5 h-5 text-slate-400" />
-              <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+              <select className="px-2 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-xs" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
                 <option value="all">全部状态</option>
                 <option value="active">生效中</option>
                 <option value="expired">已过期</option>
@@ -519,297 +557,341 @@ export default function Discipline(props) {
               </select>
             </div>
           </div>
-        </div>
 
-        {/* 处分历史列表 */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-200">
-            <h2 className="text-lg font-semibold text-slate-800">处分历史记录</h2>
-          </div>
-
-          {filteredHistory.length === 0 ? <div className="p-12 text-center text-slate-500">
-              <FileText className="w-16 h-16 mx-auto mb-4 text-slate-300" />
-              <p>暂无处分记录</p>
-            </div> : <div className="divide-y divide-slate-200">
-              {filteredHistory.map(record => <div key={record.id} className="p-6 hover:bg-slate-50 transition-colors">
-                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <User className="w-5 h-5 text-slate-400" />
-                        <span className="font-semibold text-slate-800">{record.studentName}</span>
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${getSeverityStyle(DISCIPLINE_LEVELS.find(l => l.id === record.levelId)?.severity)}`}>
-                          {record.levelName}
-                        </span>
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${getStatusStyle(record.status)}`}>
-                          {getStatusText(record.status)}
-                        </span>
+          {/* 处分记录列表 - 紧凑 */}
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-3">
+            <div className="bg-gray-50 px-3 py-2 border-b border-gray-200">
+              <h2 className="text-sm font-semibold text-gray-800 flex items-center gap-1.5">
+                <FileText className="w-4 h-4 text-orange-600" />
+                处分记录
+              </h2>
+            </div>
+            <div className="divide-y divide-gray-100">
+              {filteredRecords.length === 0 ? <div className="p-6 text-center text-gray-500 text-sm">
+                  暂无处分记录
+                </div> : filteredRecords.map(record => {
+            const statusStyles = getStatusStyles(record.status);
+            const StatusIcon = statusStyles.icon;
+            const level = DISCIPLINE_LEVELS.find(l => l.id === record.levelId);
+            const severityStyles = getSeverityStyles(level?.severity);
+            return <div key={record.id} className={`p-2.5 hover:bg-gray-50 transition-colors ${record.status === 'active' ? 'bg-red-50/50' : ''}`}>
+                    <div className="flex items-start gap-2">
+                      {/* 学生头像和基本信息 */}
+                      <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-amber-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                        {record.studentName[0]}
                       </div>
-                      <p className="text-slate-600 mb-3">{record.reason}</p>
-                      <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500">
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4" />
-                          <span>处分日期：{record.date}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          <h3 className="font-medium text-gray-800 text-sm">{record.studentName}</h3>
+                          <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-full ${severityStyles.bgColor} ${severityStyles.textColor} ${severityStyles.borderColor} border`}>
+                            {record.levelName}
+                          </span>
                         </div>
+                        <p className="text-xs text-gray-500 mb-1.5 truncate">{record.reason}</p>
                         <div className="flex items-center gap-2">
-                          <Clock className="w-4 h-4" />
-                          <span>有效期至：{record.expiryDate}</span>
+                          <span className={`inline-flex items-center gap-1 text-[10px] font-medium ${statusStyles.textColor}`}>
+                            <StatusIcon className="w-2.5 h-2.5" />
+                            {getStatusText(record.status)}
+                          </span>
+                          <span className="text-[10px] text-gray-400">
+                            {record.pointsDeducted}分
+                          </span>
+                          <span className="text-[10px] text-gray-400">
+                            {record.date}
+                          </span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <AlertTriangle className="w-4 h-4" />
-                          <span>扣分：{record.pointsDeducted}分</span>
-                        </div>
+                      </div>
+                      {/* 操作按钮 */}
+                      <div className="flex gap-1">
+                        <Button onClick={() => handleViewDetail(record)} variant="ghost" size="icon" className="h-7 w-7">
+                          <Eye className="w-3.5 h-3.5 text-gray-500" />
+                        </Button>
+                        {record.status === 'active' && <Button onClick={() => {
+                    setSelectedRecord(record);
+                    setShowRevokeDialog(true);
+                  }} variant="ghost" size="icon" className="h-7 w-7">
+                            <XCircle className="w-3.5 h-3.5 text-red-500" />
+                          </Button>}
+                        {record.revokeRequests && record.revokeRequests.length > 0 && record.revokeRequests[0].status === 'pending' && <Button onClick={() => handleViewDetail(record)} variant="ghost" size="icon" className="h-7 w-7">
+                            <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+                          </Button>}
                       </div>
                     </div>
-                    <div className="flex flex-col gap-2">
-                      {record.status === 'active' && <Button size="sm" variant="outline" onClick={() => {
-                  setSelectedDiscipline(record);
-                  setShowRevokeDialog(true);
-                }} className="text-orange-600 border-orange-300 hover:bg-orange-50">
-                          <FileText className="w-4 h-4 mr-2" />
-                          申请撤销
-                        </Button>}
-                      {record.revokeRequests.length > 0 && <Button size="sm" variant="outline" onClick={() => {
-                  // 显示撤销申请详情（可扩展）
-                  toast({
-                    title: '撤销申请详情',
-                    description: `该处分有 ${record.revokeRequests.length} 条撤销申请`
-                  });
-                }} className="text-blue-600 border-blue-300 hover:bg-blue-50">
-                          <Eye className="w-4 h-4 mr-2" />
-                          查看申请
-                        </Button>}
-                    </div>
-                  </div>
-
-                  {/* 撤销申请列表 */}
-                  {record.revokeRequests.length > 0 && <div className="mt-4 bg-slate-50 rounded-lg p-4">
-                      <h4 className="text-sm font-semibold text-slate-700 mb-3">撤销申请记录</h4>
-                      <div className="space-y-3">
-                        {record.revokeRequests.map(request => <div key={request.id} className="flex items-start justify-between gap-4">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="text-sm font-medium text-slate-700">
-                                  申请时间：{request.requestDate}
-                                </span>
-                                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${request.status === 'pending' ? 'bg-amber-100 text-amber-700' : request.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                                  {request.status === 'pending' ? '待审核' : request.status === 'approved' ? '已批准' : '已拒绝'}
-                                </span>
-                              </div>
-                              <p className="text-sm text-slate-600">{request.reason}</p>
-                              {request.evidence && <div className="flex items-center gap-2 mt-1">
-                                  <FileText className="w-4 h-4 text-slate-400" />
-                                  <span className="text-sm text-slate-500">附件：{request.evidence}</span>
-                                </div>}
-                            </div>
-                            {request.status === 'pending' && <div className="flex gap-2">
-                                <Button size="sm" variant="outline" onClick={() => handleReviewRevokeRequest(record.id, request.id, true)} className="text-green-600 border-green-300 hover:bg-green-50">
-                                  <CheckCircle className="w-4 h-4" />
-                                </Button>
-                                <Button size="sm" variant="outline" onClick={() => handleReviewRevokeRequest(record.id, request.id, false)} className="text-red-600 border-red-300 hover:bg-red-50">
-                                  <XCircle className="w-4 h-4" />
-                                </Button>
-                              </div>}
-                          </div>)}
-                      </div>
-                    </div>}
-                </div>)}
-            </div>}
-        </div>
-
-        {/* 说明信息 */}
-        <div className="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5" />
-            <div className="flex-1">
-              <h3 className="font-semibold text-amber-800 mb-2">注意事项</h3>
-              <ul className="text-sm text-amber-700 space-y-1">
-                <li>• 处分级别为警告及以上时，将自动限制学生评优资格</li>
-                <li>• 处分记录创建后，会自动在积分系统中扣除相应分数</li>
-                <li>• 学生可在处分有效期内提交撤销申请，需提供相关证明材料</li>
-                <li>• 处分有效期结束前，系统会自动提醒学生和家长</li>
-              </ul>
+                  </div>;
+          })}
             </div>
           </div>
-        </div>
-      </main>
+        </main>
 
-      {/* 新建处分对话框 */}
-      {showCreateDialog && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-slate-800">新建处分</h3>
-                <Button variant="ghost" size="sm" onClick={() => {
-              setShowCreateDialog(false);
-              setSelectedStudent(null);
-              setSelectedLevel(null);
-              setReason('');
-            }}>
-                  ✕
+        {/* 创建处分对话框 */}
+        {showCreateDialog && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
+              <div className="p-4 border-b border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-800">新建处分</h3>
+              </div>
+              <div className="p-4 space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">学生</label>
+                  <select className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm" value={newRecord.studentId} onChange={e => setNewRecord({
+              ...newRecord,
+              studentId: e.target.value
+            })}>
+                    <option value="">请选择学生</option>
+                    {students.map(student => <option key={student.id} value={student.id}>{student.name} ({student.studentId})</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">处分级别</label>
+                  <select className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm" value={newRecord.levelId} onChange={e => setNewRecord({
+              ...newRecord,
+              levelId: e.target.value
+            })}>
+                    <option value="">请选择处分级别</option>
+                    {DISCIPLINE_LEVELS.map(level => <option key={level.id} value={level.id}>{level.name} ({level.points}分, {level.duration}天)</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">处分原因</label>
+                  <textarea className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm" rows={3} value={newRecord.reason} onChange={e => setNewRecord({
+              ...newRecord,
+              reason: e.target.value
+            })} placeholder="请详细描述违纪原因..." />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">日期</label>
+                  <input type="date" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm" value={newRecord.date} onChange={e => setNewRecord({
+              ...newRecord,
+              date: e.target.value
+            })} />
+                </div>
+              </div>
+              <div className="p-4 border-t border-gray-200 flex justify-end gap-2">
+                <Button onClick={() => setShowCreateDialog(false)} variant="outline" className="px-4 py-2">
+                  取消
+                </Button>
+                <Button onClick={handleCreateRecord} className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2">
+                  创建
                 </Button>
               </div>
+            </div>
+          </div>}
 
-              <div className="space-y-4">
-                {/* 选择学生 */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    选择学生 <span className="text-red-500">*</span>
-                  </label>
-                  <select value={selectedStudent?.id || ''} onChange={e => {
-                const student = students.find(s => s.id === parseInt(e.target.value));
-                setSelectedStudent(student);
-              }} className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
-                    <option value="">请选择学生</option>
-                    {students.map(student => <option key={student.id} value={student.id}>
-                        {student.name} ({student.studentId}) - {student.group} - 当前积分：{student.totalPoints}
-                      </option>)}
-                  </select>
+        {/* 详情对话框 */}
+        {showDetailDialog && selectedRecord && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
+              <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-800">处分详情</h3>
+                <Button onClick={() => {
+            setShowDetailDialog(false);
+            setSelectedRecord(null);
+          }} variant="ghost" size="icon" className="h-8 w-8">
+                  <XCircle className="w-4 h-4" />
+                </Button>
+              </div>
+              <div className="p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-amber-500 rounded-full flex items-center justify-center text-white font-bold">
+                    {selectedRecord.studentName[0]}
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-800">{selectedRecord.studentName}</p>
+                    <p className="text-sm text-gray-500">{students.find(s => s.id === selectedRecord.studentId)?.studentId}</p>
+                  </div>
                 </div>
-
-                {/* 选择处分级别 */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    处分级别 <span className="text-red-500">*</span>
-                  </label>
-                  <select value={selectedLevel?.id || ''} onChange={e => {
-                const level = DISCIPLINE_LEVELS.find(l => l.id === parseInt(e.target.value));
-                setSelectedLevel(level);
-              }} className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
-                    <option value="">请选择处分级别</option>
-                    {DISCIPLINE_LEVELS.map(level => <option key={level.id} value={level.id}>
-                        {level.name} (扣{level.points}分，有效期{level.duration}天)
-                      </option>)}
-                  </select>
-                  {selectedLevel && <p className="mt-2 text-sm text-slate-600">{selectedLevel.description}</p>}
+                <div className="bg-gray-50 rounded-lg p-3 space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">处分级别</span>
+                    <span className="text-sm font-medium text-gray-800">{selectedRecord.levelName}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">扣分</span>
+                    <span className={`text-sm font-medium ${selectedRecord.pointsDeducted < 0 ? 'text-red-600' : 'text-gray-800'}`}>
+                      {selectedRecord.pointsDeducted}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">原因</span>
+                    <span className="text-sm font-medium text-gray-800 text-right">{selectedRecord.reason}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">日期</span>
+                    <span className="text-sm text-gray-800">{selectedRecord.date}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">状态</span>
+                    <span className={`text-sm font-medium ${getStatusStyles(selectedRecord.status).textColor}`}>
+                      {getStatusText(selectedRecord.status)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">有效期至</span>
+                    <span className="text-sm text-gray-800">{selectedRecord.expiryDate}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">操作人</span>
+                    <span className="text-sm text-gray-800">{selectedRecord.operator}</span>
+                  </div>
                 </div>
-
-                {/* 处分事由 */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    处分事由 <span className="text-red-500">*</span>
-                  </label>
-                  <textarea value={reason} onChange={e => setReason(e.target.value)} rows={4} placeholder="请详细描述违纪事实和具体情况..." className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none" />
-                </div>
-
-                {/* 预计积分变化 */}
-                {selectedStudent && selectedLevel && <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-                    <h4 className="font-semibold text-slate-800 mb-2">积分变化预览</h4>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-600">当前积分：</span>
-                      <span className="font-semibold text-slate-800">{selectedStudent.totalPoints}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-600">扣分：</span>
-                      <span className="font-semibold text-red-600">{selectedLevel.points}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm mt-2 pt-2 border-t border-slate-300">
-                      <span className="text-slate-600">预计总积分：</span>
-                      <span className={`font-bold ${selectedStudent.totalPoints + selectedLevel.points < 0 ? 'text-red-600' : 'text-slate-800'}`}>
-                        {selectedStudent.totalPoints + selectedLevel.points}
-                      </span>
-                    </div>
+                {selectedRecord.revokeRequests && selectedRecord.revokeRequests.length > 0 && <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                    <p className="text-sm font-medium text-amber-800 mb-2">撤销申请</p>
+                    {selectedRecord.revokeRequests.map((request, index) => <div key={index} className="text-xs text-amber-700">
+                        <p>原因：{request.reason}</p>
+                        <p>申请日期：{request.requestDate}</p>
+                        <p>状态：{request.status === 'pending' ? '待审核' : request.status === 'approved' ? '已批准' : '已拒绝'}</p>
+                      </div>)}
                   </div>}
               </div>
+              <div className="p-4 border-t border-gray-200">
+                {selectedRecord.status === 'active' && <Button onClick={() => {
+            setShowDetailDialog(false);
+            setShowRevokeDialog(true);
+          }} variant="outline" className="w-full">
+                    申请撤销
+                  </Button>}
+              </div>
+            </div>
+          </div>}
 
-              <div className="flex gap-3 mt-6">
-                <Button variant="outline" className="flex-1" onClick={() => {
-              setShowCreateDialog(false);
-              setSelectedStudent(null);
-              setSelectedLevel(null);
-              setReason('');
-            }}>
+        {/* 撤销对话框 */}
+        {showRevokeDialog && selectedRecord && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
+              <div className="p-4 border-b border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-800">撤销处分</h3>
+              </div>
+              <div className="p-4 space-y-3">
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <p className="text-sm text-gray-600 mb-1">处分信息</p>
+                  <p className="text-sm font-medium text-gray-800">{selectedRecord.studentName} - {selectedRecord.levelName}</p>
+                  <p className="text-xs text-gray-500">{selectedRecord.reason}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">撤销原因</label>
+                  <textarea className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm" rows={3} value={revokeReason} onChange={e => setRevokeReason(e.target.value)} placeholder="请填写撤销原因..." />
+                </div>
+              </div>
+              <div className="p-4 border-t border-gray-200 flex justify-end gap-2">
+                <Button onClick={() => {
+            setShowRevokeDialog(false);
+            setRevokeReason('');
+            setSelectedRecord(null);
+          }} variant="outline" className="px-4 py-2">
                   取消
                 </Button>
-                <Button className="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 text-white" onClick={handleCreateDiscipline}>
-                  确认创建
+                <Button onClick={handleRevokeRecord} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2">
+                  确认撤销
                 </Button>
               </div>
             </div>
-          </div>
-        </div>}
+          </div>}
 
-      {/* 申请撤销对话框 */}
-      {showRevokeDialog && selectedDiscipline && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-slate-800">申请撤销处分</h3>
-                <Button variant="ghost" size="sm" onClick={() => {
-              setShowRevokeDialog(false);
-              setSelectedDiscipline(null);
-              setRevokeReason('');
-              setRevokeEvidence(null);
-            }}>
-                  ✕
-                </Button>
+        {/* 撤销申请对话框 */}
+        {showRevokeRequestDialog && selectedRecord && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
+              <div className="p-4 border-b border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-800">申请撤销处分</h3>
               </div>
-
-              {/* 处分信息 */}
-              <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <User className="w-4 h-4 text-slate-500" />
-                  <span className="font-semibold text-slate-800">{selectedDiscipline.studentName}</span>
+              <div className="p-4 space-y-3">
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <p className="text-sm text-gray-600 mb-1">处分信息</p>
+                  <p className="text-sm font-medium text-gray-800">{selectedRecord.studentName} - {selectedRecord.levelName}</p>
+                  <p className="text-xs text-gray-500">{selectedRecord.reason}</p>
                 </div>
-                <div className="text-sm space-y-1">
-                  <div className="flex justify-between">
-                    <span className="text-slate-600">处分级别：</span>
-                    <span className="font-medium text-slate-800">{selectedDiscipline.levelName}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-600">处分事由：</span>
-                    <span className="font-medium text-slate-800">{selectedDiscipline.reason}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-600">有效期至：</span>
-                    <span className="font-medium text-slate-800">{selectedDiscipline.expiryDate}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                {/* 撤销理由 */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    撤销理由 <span className="text-red-500">*</span>
-                  </label>
-                  <textarea value={revokeReason} onChange={e => setRevokeReason(e.target.value)} rows={4} placeholder="请详细说明申请撤销的理由，如已认识错误、积极改正、表现良好等..." className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none" />
-                </div>
-
-                {/* 上传证明材料 */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    证明材料（可选）
-                  </label>
-                  <div className="border-2 border-dashed border-slate-300 rounded-lg p-4 text-center">
-                    <input type="file" onChange={e => setRevokeEvidence(e.target.files[0])} className="hidden" id="evidence-upload" />
-                    <label htmlFor="evidence-upload" className="cursor-pointer flex flex-col items-center gap-2">
-                      <Download className="w-8 h-8 text-slate-400" />
-                      <span className="text-sm text-slate-600">
-                        {revokeEvidence ? revokeEvidence.name : '点击上传悔过书、证明材料等'}
-                      </span>
-                      <span className="text-xs text-slate-400">支持 PDF、Word、图片格式</span>
-                    </label>
-                  </div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">申请原因</label>
+                  <textarea className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm" rows={3} value={revokeRequestReason} onChange={e => setRevokeRequestReason(e.target.value)} placeholder="请填写申请撤销的原因..." />
                 </div>
               </div>
-
-              <div className="flex gap-3 mt-6">
-                <Button variant="outline" className="flex-1" onClick={() => {
-              setShowRevokeDialog(false);
-              setSelectedDiscipline(null);
-              setRevokeReason('');
-              setRevokeEvidence(null);
-            }}>
+              <div className="p-4 border-t border-gray-200 flex justify-end gap-2">
+                <Button onClick={() => {
+            setShowRevokeRequestDialog(false);
+            setRevokeRequestReason('');
+            setSelectedRecord(null);
+          }} variant="outline" className="px-4 py-2">
                   取消
                 </Button>
-                <Button className="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 text-white" onClick={handleSubmitRevokeRequest}>
+                <Button onClick={handleRequestRevoke} className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2">
                   提交申请
                 </Button>
               </div>
             </div>
-          </div>
-        </div>}
+          </div>}
 
-      <TabBar currentPage={currentPage} />
-    </div>;
+        {/* 历史记录对话框 */}
+        {showHistoryDialog && selectedStudentHistory && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
+              <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-800">处分历史</h3>
+                <Button onClick={() => {
+            setShowHistoryDialog(false);
+            setSelectedStudentHistory(null);
+          }} variant="ghost" size="icon" className="h-8 w-8">
+                  <XCircle className="w-4 h-4" />
+                </Button>
+              </div>
+              <div className="p-4 space-y-3">
+                <div className="flex items-center gap-2 pb-3 border-b border-gray-200">
+                  <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-amber-500 rounded-full flex items-center justify-center text-white font-bold">
+                    {selectedStudentHistory.student.name[0]}
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-800">{selectedStudentHistory.student.name}</p>
+                    <p className="text-sm text-gray-500">{selectedStudentHistory.student.studentId}</p>
+                  </div>
+                </div>
+                {selectedStudentHistory.records.length === 0 ? <p className="text-center text-gray-500 py-4">暂无处分记录</p> : selectedStudentHistory.records.map(record => {
+            const statusStyles = getStatusStyles(record.status);
+            return <div key={record.id} className={`bg-gray-50 rounded-lg p-3 ${record.status === 'active' ? 'border-l-4 border-red-500' : ''}`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-800">{record.levelName}</span>
+                        <span className={`text-xs font-medium ${statusStyles.textColor}`}>
+                          {getStatusText(record.status)}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-600 mb-1">{record.reason}</p>
+                      <p className="text-xs text-gray-500">{record.date}</p>
+                    </div>;
+          })}
+              </div>
+            </div>
+          </div>}
+
+        {/* 导出对话框 */}
+        {showExportDialog && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
+              <div className="p-4 border-b border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-800">导出处分记录</h3>
+              </div>
+              <div className="p-4 space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">导出范围</label>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" name="exportRange" value="all" checked={exportRange === 'all'} onChange={e => setExportRange(e.target.value)} className="w-4 h-4 text-orange-600" />
+                      <span className="text-sm text-gray-700">全部记录</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" name="exportRange" value="current_month" checked={exportRange === 'current_month'} onChange={e => setExportRange(e.target.value)} className="w-4 h-4 text-orange-600" />
+                      <span className="text-sm text-gray-700">本月记录</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" name="exportRange" value="last_month" checked={exportRange === 'last_month'} onChange={e => setExportRange(e.target.value)} className="w-4 h-4 text-orange-600" />
+                      <span className="text-sm text-gray-700">上月记录</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div className="p-4 border-t border-gray-200 flex justify-end gap-2">
+                <Button onClick={() => setShowExportDialog(false)} variant="outline" className="px-4 py-2">
+                  取消
+                </Button>
+                <Button onClick={handleExportData} className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2">
+                  导出
+                </Button>
+              </div>
+            </div>
+          </div>}
+
+        {/* 底部导航栏 */}
+        <TabBar currentPage={currentPage} onPageChange={setCurrentPage} />
+      </div>;
 }

@@ -183,6 +183,7 @@ export default function VolunteerPage({
   const {
     toast
   } = useToast();
+  const [currentPage, setCurrentPage] = useState('volunteer');
   const [history, setHistory] = useState(MOCK_HISTORY);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStudent, setFilterStudent] = useState('all');
@@ -542,12 +543,6 @@ export default function VolunteerPage({
         </DialogContent>
       </Dialog>
 
-      <TabBar currentPage="volunteer" onPageChange={pageId => {
-      if (pageId === 'volunteer') return;
-      $w.utils.navigateTo({
-        pageId,
-        params: {}
-      });
-    }} />
+      <TabBar currentPage={currentPage} onPageChange={setCurrentPage} />
     </div>;
 }
