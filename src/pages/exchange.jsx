@@ -206,6 +206,7 @@ export default function ExchangePage({
   const {
     toast
   } = useToast();
+  const [currentPage, setCurrentPage] = useState('exchange');
   const [items, setItems] = useState(MOCK_ITEMS);
   const [biddings, setBiddings] = useState(MOCK_BIDDINGS);
   const [exchanges, setExchanges] = useState(MOCK_EXCHANGES);
