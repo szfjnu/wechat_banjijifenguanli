@@ -1,10 +1,11 @@
 // @ts-ignore;
 import React, { useState, useEffect } from 'react';
 // @ts-ignore;
-import { FileText, Upload, Search, Filter, Pin, Eye, Download, Calendar, Trash2, Edit2, Share2, Shield, Clock, AlertCircle, CheckCircle, XCircle, Plus } from 'lucide-react';
+import { FileText, Upload, Search, Filter, Pin, Eye, Download, Calendar, Trash2, Edit2, Share2, Shield, Clock, AlertCircle, CheckCircle, XCircle, Plus, Folder, ShieldCheck, AlertTriangle } from 'lucide-react';
 // @ts-ignore;
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, useToast, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui';
 
+import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 
 // 模拟文件数据
@@ -171,7 +172,7 @@ export default function DocumentsPage({
   const {
     toast
   } = useToast();
-
+  const [currentPage, setCurrentPage] = useState('documents');
   // 文件列表
   const [files, setFiles] = useState(MOCK_FILES);
   const [filteredFiles, setFilteredFiles] = useState(MOCK_FILES);
@@ -418,38 +419,11 @@ export default function DocumentsPage({
         </div>
         
         {/* 统计卡片 */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-emerald-100">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-600">文件总数</span>
-              <FileText className="w-5 h-5 text-emerald-600" />
-            </div>
-            <div className="text-2xl font-bold text-gray-800">{stats.totalFiles}</div>
-          </div>
-          
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-emerald-100">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-600">置顶文件</span>
-              <Pin className="w-5 h-5 text-emerald-600" />
-            </div>
-            <div className="text-2xl font-bold text-gray-800">{stats.pinnedFiles}</div>
-          </div>
-          
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-emerald-100">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-600">已过期</span>
-              <AlertCircle className="w-5 h-5 text-amber-600" />
-            </div>
-            <div className="text-2xl font-bold text-gray-800">{stats.expiredFiles}</div>
-          </div>
-          
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-emerald-100">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-600">总下载</span>
-              <Download className="w-5 h-5 text-emerald-600" />
-            </div>
-            <div className="text-2xl font-bold text-gray-800">{stats.totalDownloads}</div>
-          </div>
+        <div className="grid grid-cols-2 gap-2 mb-3">
+          <StatCard title="文件总数" value={stats.totalFiles} icon={FileText} color="blue" />
+          <StatCard title="置顶文件" value={stats.pinnedFiles} icon={Pin} color="green" />
+          <StatCard title="已过期" value={stats.expiredFiles} icon={AlertCircle} color="red" />
+          <StatCard title="总下载" value={stats.totalDownloads} icon={Download} color="amber" />
         </div>
         
         {/* 操作栏 */}
@@ -850,11 +824,6 @@ export default function DocumentsPage({
         </DialogContent>
       </Dialog>
       
-      <TabBar currentPage="documents" onPageChange={pageId => {
-      $w.utils.navigateTo({
-        pageId,
-        params: {}
-      });
-    }} />
+      <TabBar currentPage={currentPage} onPageChange={setCurrentPage} />
     </div>;
 }

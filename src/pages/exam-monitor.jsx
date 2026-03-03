@@ -5,6 +5,7 @@ import { GraduationCap, BookOpen, Award, TrendingUp, AlertCircle, CheckCircle, C
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
 
+import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 
 // 模拟转段考科目配置（可标记为转段考科目）
@@ -494,54 +495,11 @@ export default function ExamMonitorPage(props) {
 
       <div className="max-w-6xl mx-auto px-4 py-6">
         {/* 统计卡片 */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-xl shadow-sm p-5 border-l-4 border-indigo-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-500 mb-1">总学生数</p>
-                <p className="text-3xl font-bold text-gray-900">{totalStudents}</p>
-              </div>
-              <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
-                <GraduationCap className="w-6 h-6 text-indigo-600" />
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-xl shadow-sm p-5 border-l-4 border-green-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-500 mb-1">全部通过</p>
-                <p className="text-3xl font-bold text-gray-900">{passingStudents}</p>
-              </div>
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-green-600" />
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-xl shadow-sm p-5 border-l-4 border-orange-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-500 mb-1">转段考科目</p>
-                <p className="text-3xl font-bold text-gray-900">{examSubjectCount}</p>
-              </div>
-              <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                <BookOpen className="w-6 h-6 text-orange-600" />
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-xl shadow-sm p-5 border-l-4 border-cyan-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-500 mb-1">平均证书完成度</p>
-                <p className="text-3xl font-bold text-gray-900">{averageCertificateProgress}%</p>
-              </div>
-              <div className="w-12 h-12 bg-cyan-100 rounded-full flex items-center justify-center">
-                <Award className="w-6 h-6 text-cyan-600" />
-              </div>
-            </div>
-          </div>
+        <div className="grid grid-cols-2 gap-2 mb-3">
+          <StatCard title="总学生数" value={totalStudents} icon={GraduationCap} color="blue" />
+          <StatCard title="全部通过" value={passingStudents} icon={CheckCircle} color="green" />
+          <StatCard title="转段考科目" value={examSubjectCount} icon={BookOpen} color="orange" />
+          <StatCard title="证书完成度" value={`${averageCertificateProgress}%`} icon={Award} color="cyan" />
         </div>
 
         {/* 操作栏 */}

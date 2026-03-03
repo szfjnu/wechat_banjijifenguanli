@@ -5,6 +5,7 @@ import { Maximize2, RefreshCw, Save, UserPlus, UserMinus, Search, Filter, Downlo
 // @ts-ignore;
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, useToast } from '@/components/ui';
 
+import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 
 // 座位行和列定义
@@ -340,34 +341,10 @@ export default function SeatingChart(props) {
           </div>
           
           {/* 统计卡片 */}
-          <div className="grid grid-cols-3 gap-4 mt-4">
-            <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium opacity-90">总座位</p>
-                  <p className="text-3xl font-bold mt-1">{totalSeats}</p>
-                </div>
-                <Grid3X3 className="w-10 h-10 opacity-80" />
-              </div>
-            </div>
-            <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl p-4 text-white">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium opacity-90">已分配</p>
-                  <p className="text-3xl font-bold mt-1">{assignedCount}</p>
-                </div>
-                <Users className="w-10 h-10 opacity-80" />
-              </div>
-            </div>
-            <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-4 text-white">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium opacity-90">未分配</p>
-                  <p className="text-3xl font-bold mt-1">{unassignedStudents.length}</p>
-                </div>
-                <UserPlus className="w-10 h-10 opacity-80" />
-              </div>
-            </div>
+          <div className="grid grid-cols-3 gap-2 mt-3">
+            <StatCard title="总座位" value={totalSeats} icon={Grid3X3} color="blue" />
+            <StatCard title="已分配" value={assignedCount} icon={Users} color="green" />
+            <StatCard title="未分配" value={unassignedStudents.length} icon={UserPlus} color="orange" />
           </div>
         </div>
       </header>

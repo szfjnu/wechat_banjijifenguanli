@@ -5,6 +5,7 @@ import { Plus, Calendar, Clock, Search, Filter, Heart, TrendingUp, Users, Award,
 // @ts-ignore;
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, useToast } from '@/components/ui';
 
+import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 
 // 志愿服务活动预设数据
@@ -284,48 +285,13 @@ export default function VolunteerPage({
   };
   return <div className={`min-h-screen bg-gray-50 pb-16 ${className}`} style={style}>
       {/* 统计卡片区域 */}
-      <div className="px-4 pt-6 pb-4">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4 font-['Playfair_Display']">志愿服务管理</h1>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-rose-100">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center">
-                <Heart className="w-4 h-4 text-rose-500" strokeWidth={2.5} />
-              </div>
-              <span className="text-xs text-gray-500">总记录数</span>
-            </div>
-            <p className="text-2xl font-bold text-gray-800 font-['Space_Mono']">{stats.totalRecords}</p>
-          </div>
-
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-pink-100">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="w-8 h-8 rounded-lg bg-pink-100 flex items-center justify-center">
-                <Clock className="w-4 h-4 text-pink-500" strokeWidth={2.5} />
-              </div>
-              <span className="text-xs text-gray-500">总时长</span>
-            </div>
-            <p className="text-2xl font-bold text-gray-800 font-['Space_Mono']">{stats.totalHours}<span className="text-sm font-normal text-gray-500 ml-1">小时</span></p>
-          </div>
-
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-amber-100">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 text-amber-500" strokeWidth={2.5} />
-              </div>
-              <span className="text-xs text-gray-500">奖励积分</span>
-            </div>
-            <p className="text-2xl font-bold text-gray-800 font-['Space_Mono']">{stats.totalPoints}</p>
-          </div>
-
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-orange-100">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center">
-                <Users className="w-4 h-4 text-orange-500" strokeWidth={2.5} />
-              </div>
-              <span className="text-xs text-gray-500">参与人数</span>
-            </div>
-            <p className="text-2xl font-bold text-gray-800 font-['Space_Mono']">{stats.uniqueStudents}</p>
-          </div>
+      <div className="px-4 pt-4 pb-3">
+        <h1 className="text-xl font-bold text-gray-800 mb-3 font-['Playfair_Display']">志愿服务管理</h1>
+        <div className="grid grid-cols-2 gap-2">
+          <StatCard title="总记录数" value={stats.totalRecords} icon={Heart} color="blue" />
+          <StatCard title="总时长" value={`${stats.totalHours}h`} subtitle="小时" icon={Clock} color="amber" />
+          <StatCard title="奖励积分" value={stats.totalPoints} icon={TrendingUp} color="orange" />
+          <StatCard title="参与人数" value={stats.uniqueStudents} icon={Users} color="green" />
         </div>
       </div>
 
