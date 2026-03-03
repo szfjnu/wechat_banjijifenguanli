@@ -76,6 +76,7 @@ export default function AIReviewPage(props) {
   const {
     navigateTo
   } = props.$w.utils;
+  const [currentPage, setCurrentPage] = useState('ai-review');
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [isClassReview, setIsClassReview] = useState(false);
   const [selectedTimeRange, setSelectedTimeRange] = useState('semester');
