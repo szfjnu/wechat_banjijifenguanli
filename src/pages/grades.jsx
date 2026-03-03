@@ -371,7 +371,7 @@ export default function GradesPage({
       <div className="min-h-screen bg-gray-50 pb-16">
         {/* 页面头部 */}
         <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 shadow-lg">
-          <h1 className="text-base font-bold mb-2">成绩管理</h1>
+          <h1 className="text-2xl font-bold mb-2">成绩管理</h1>
           <p className="text-indigo-100">录入和管理学生成绩，自动计算GPA</p>
         </div>
         
@@ -381,7 +381,7 @@ export default function GradesPage({
             <div className="bg-white rounded-xl shadow-md p-4 border-l-4 border-indigo-500">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-base font-bold text-indigo-600">{stats.totalGrades}</p>
+                  <p className="text-2xl font-bold text-indigo-600">{stats.totalGrades}</p>
                   <p className="text-xs text-gray-500 mt-1">总成绩数</p>
                 </div>
                 <BookOpen className="w-8 h-8 text-indigo-500" />
@@ -391,7 +391,7 @@ export default function GradesPage({
             <div className="bg-white rounded-xl shadow-md p-4 border-l-4 border-green-500">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-base font-bold text-green-600">{stats.passingCount}</p>
+                  <p className="text-2xl font-bold text-green-600">{stats.passingCount}</p>
                   <p className="text-xs text-gray-500 mt-1">及格数</p>
                 </div>
                 <CheckCircle className="w-8 h-8 text-green-500" />
@@ -401,7 +401,7 @@ export default function GradesPage({
             <div className="bg-white rounded-xl shadow-md p-4 border-l-4 border-red-500">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-base font-bold text-red-600">{stats.failingCount}</p>
+                  <p className="text-2xl font-bold text-red-600">{stats.failingCount}</p>
                   <p className="text-xs text-gray-500 mt-1">不及格数</p>
                 </div>
                 <AlertCircle className="w-8 h-8 text-red-500" />
@@ -411,7 +411,7 @@ export default function GradesPage({
             <div className="bg-white rounded-xl shadow-md p-4 border-l-4 border-purple-500">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-base font-bold text-purple-600">{stats.avgGPA}</p>
+                  <p className="text-2xl font-bold text-purple-600">{stats.avgGPA}</p>
                   <p className="text-xs text-gray-500 mt-1">平均GPA</p>
                 </div>
                 <Calculator className="w-8 h-8 text-purple-500" />
@@ -421,7 +421,7 @@ export default function GradesPage({
             <div className="bg-white rounded-xl shadow-md p-4 border-l-4 border-amber-500">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-base font-bold text-amber-600">{stats.highScoreCount}</p>
+                  <p className="text-2xl font-bold text-amber-600">{stats.highScoreCount}</p>
                   <p className="text-xs text-gray-500 mt-1">90分以上</p>
                 </div>
                 <Award className="w-8 h-8 text-amber-500" />
@@ -541,7 +541,7 @@ export default function GradesPage({
       
       {/* 新增成绩对话框 */}
       {showAddDialog && <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <h2 className="text-xl font-bold mb-4 flex items-center">
                 <Plus className="w-5 h-5 mr-2 text-indigo-600" />
@@ -632,7 +632,7 @@ export default function GradesPage({
       
       {/* 成绩详情对话框 */}
       {showDetailDialog && selectedGrade && <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <h2 className="text-xl font-bold mb-4 flex items-center">
                 <FileText className="w-5 h-5 mr-2 text-indigo-600" />

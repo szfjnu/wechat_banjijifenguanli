@@ -375,7 +375,7 @@ export default function ExchangeAdmin({
                   <ShoppingBag className="w-6 h-6 text-yellow-300" />
                 </div>
                 <div>
-                  <h1 className="text-lg font-bold text-white mb-1" style={{
+                  <h1 className="text-3xl font-bold text-white mb-1" style={{
                   fontFamily: 'Noto Serif SC, serif'
                 }}>积分商城管理</h1>
                   <p className="text-indigo-100 text-sm">管理可兑换物品及兑换记录</p>
@@ -395,28 +395,28 @@ export default function ExchangeAdmin({
                 <span className="text-indigo-100 text-xs">物品总数</span>
                 <Package className="w-4 h-4 text-yellow-300" />
               </div>
-              <div className="text-base font-bold text-white">{stats.totalItems}</div>
+              <div className="text-2xl font-bold text-white">{stats.totalItems}</div>
             </div>
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-indigo-100 text-xs">可兑换</span>
                 <CheckCircle2 className="w-4 h-4 text-green-300" />
               </div>
-              <div className="text-base font-bold text-white">{stats.availableItems}</div>
+              <div className="text-2xl font-bold text-white">{stats.availableItems}</div>
             </div>
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-indigo-100 text-xs">投标中</span>
                 <TrendingUp className="w-4 h-4 text-pink-300" />
               </div>
-              <div className="text-base font-bold text-white">{stats.biddingItems}</div>
+              <div className="text-2xl font-bold text-white">{stats.biddingItems}</div>
             </div>
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-indigo-100 text-xs">总兑换</span>
                 <DollarSign className="w-4 h-4 text-blue-300" />
               </div>
-              <div className="text-base font-bold text-white">{stats.totalExchanges}</div>
+              <div className="text-2xl font-bold text-white">{stats.totalExchanges}</div>
             </div>
           </div>
         </div>

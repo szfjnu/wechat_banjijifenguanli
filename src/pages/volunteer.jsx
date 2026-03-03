@@ -284,7 +284,7 @@ export default function VolunteerPage({
   return <div className={`min-h-screen bg-gray-50 pb-16 ${className}`} style={style}>
       {/* 统计卡片区域 */}
       <div className="px-4 pt-6 pb-4">
-        <h1 className="text-base font-bold text-gray-800 mb-4 font-['Playfair_Display']">志愿服务管理</h1>
+        <h1 className="text-2xl font-bold text-gray-800 mb-4 font-['Playfair_Display']">志愿服务管理</h1>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-rose-100">
             <div className="flex items-center gap-2 mb-1">
@@ -293,7 +293,7 @@ export default function VolunteerPage({
               </div>
               <span className="text-xs text-gray-500">总记录数</span>
             </div>
-            <p className="text-base font-bold text-gray-800 font-['Space_Mono']">{stats.totalRecords}</p>
+            <p className="text-2xl font-bold text-gray-800 font-['Space_Mono']">{stats.totalRecords}</p>
           </div>
 
           <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-pink-100">
@@ -303,7 +303,7 @@ export default function VolunteerPage({
               </div>
               <span className="text-xs text-gray-500">总时长</span>
             </div>
-            <p className="text-base font-bold text-gray-800 font-['Space_Mono']">{stats.totalHours}<span className="text-sm font-normal text-gray-500 ml-1">小时</span></p>
+            <p className="text-2xl font-bold text-gray-800 font-['Space_Mono']">{stats.totalHours}<span className="text-sm font-normal text-gray-500 ml-1">小时</span></p>
           </div>
 
           <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-amber-100">
@@ -313,7 +313,7 @@ export default function VolunteerPage({
               </div>
               <span className="text-xs text-gray-500">奖励积分</span>
             </div>
-            <p className="text-base font-bold text-gray-800 font-['Space_Mono']">{stats.totalPoints}</p>
+            <p className="text-2xl font-bold text-gray-800 font-['Space_Mono']">{stats.totalPoints}</p>
           </div>
 
           <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-orange-100">
@@ -323,7 +323,7 @@ export default function VolunteerPage({
               </div>
               <span className="text-xs text-gray-500">参与人数</span>
             </div>
-            <p className="text-base font-bold text-gray-800 font-['Space_Mono']">{stats.uniqueStudents}</p>
+            <p className="text-2xl font-bold text-gray-800 font-['Space_Mono']">{stats.uniqueStudents}</p>
           </div>
         </div>
       </div>
@@ -501,7 +501,7 @@ export default function VolunteerPage({
                     <span className="text-sm text-gray-500">#{selectedRecord.studentId}</span>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold text-amber-600 font-['Space_Mono'] text-base">+{selectedRecord.points}</div>
+                    <div className="font-bold text-amber-600 font-['Space_Mono'] text-2xl">+{selectedRecord.points}</div>
                     <div className="text-xs text-gray-500">获得积分</div>
                   </div>
                 </div>

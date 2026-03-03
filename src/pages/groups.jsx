@@ -505,7 +505,7 @@ export default function Groups(props) {
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* 页面标题 */}
         <div className="mb-6">
-          <h1 className="text-lg font-bold text-gray-800 mb-2" style={{
+          <h1 className="text-3xl font-bold text-gray-800 mb-2" style={{
           fontFamily: 'Georgia, serif'
         }}>学生分组管理</h1>
           <p className="text-gray-600">创建和管理学习小组，选举组长，记录分组历史</p>
@@ -517,7 +517,7 @@ export default function Groups(props) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs text-gray-500 mb-1">总分组数</p>
-                <p className="text-base font-bold text-gray-800">{stats.totalGroups}</p>
+                <p className="text-2xl font-bold text-gray-800">{stats.totalGroups}</p>
               </div>
               <div className="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center">
                 <Users className="w-5 h-5 text-rose-600" />
@@ -529,7 +529,7 @@ export default function Groups(props) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs text-gray-500 mb-1">当前学期</p>
-                <p className="text-base font-bold text-gray-800">{stats.currentGroups}</p>
+                <p className="text-2xl font-bold text-gray-800">{stats.currentGroups}</p>
               </div>
               <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center">
                 <GraduationCap className="w-5 h-5 text-pink-600" />
@@ -541,7 +541,7 @@ export default function Groups(props) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs text-gray-500 mb-1">总人数</p>
-                <p className="text-base font-bold text-gray-800">{stats.totalMembers}</p>
+                <p className="text-2xl font-bold text-gray-800">{stats.totalMembers}</p>
               </div>
               <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
                 <User className="w-5 h-5 text-orange-600" />

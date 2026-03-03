@@ -316,11 +316,11 @@ export default function SeatingChart(props) {
   const unassignedStudents = filterStudents();
   return <div className="min-h-screen bg-gray-50 pb-16">
       {/* Header */}
-      <header className="bg-white/90 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-40">
+      <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-40">
         <div className="px-4 py-4 max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-base font-bold text-slate-800 font-serif">教室座位管理</h1>
+              <h1 className="text-2xl font-bold text-slate-800 font-serif">教室座位管理</h1>
               <p className="text-sm text-slate-600 mt-1">拖拽学生到座位 · 可视化管理</p>
             </div>
             <div className="flex items-center gap-2">
@@ -345,7 +345,7 @@ export default function SeatingChart(props) {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium opacity-90">总座位</p>
-                  <p className="text-lg font-bold mt-1">{totalSeats}</p>
+                  <p className="text-3xl font-bold mt-1">{totalSeats}</p>
                 </div>
                 <Grid3X3 className="w-10 h-10 opacity-80" />
               </div>
@@ -354,7 +354,7 @@ export default function SeatingChart(props) {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium opacity-90">已分配</p>
-                  <p className="text-lg font-bold mt-1">{assignedCount}</p>
+                  <p className="text-3xl font-bold mt-1">{assignedCount}</p>
                 </div>
                 <Users className="w-10 h-10 opacity-80" />
               </div>
@@ -363,7 +363,7 @@ export default function SeatingChart(props) {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium opacity-90">未分配</p>
-                  <p className="text-lg font-bold mt-1">{unassignedStudents.length}</p>
+                  <p className="text-3xl font-bold mt-1">{unassignedStudents.length}</p>
                 </div>
                 <UserPlus className="w-10 h-10 opacity-80" />
               </div>
@@ -510,7 +510,7 @@ export default function SeatingChart(props) {
           </DialogHeader>
           {selectedStudent && <div className="space-y-4">
               <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-base ${selectedStudent.gender === '男' ? 'bg-blue-500' : 'bg-pink-500'}`}>
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-2xl ${selectedStudent.gender === '男' ? 'bg-blue-500' : 'bg-pink-500'}`}>
                   {selectedStudent.name.charAt(0)}
                 </div>
                 <div>
@@ -552,7 +552,7 @@ export default function SeatingChart(props) {
             {/* 讲台指示 */}
             <div className="mb-6 bg-gradient-to-r from-slate-100 to-slate-200 rounded-lg p-4">
               <div className="text-center py-6 px-8 bg-white rounded-lg border-2 border-dashed border-slate-300">
-                <p className="text-base font-bold text-slate-700">📚 讲台</p>
+                <p className="text-2xl font-bold text-slate-700">📚 讲台</p>
               </div>
             </div>
             

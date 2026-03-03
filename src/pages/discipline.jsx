@@ -419,7 +419,7 @@ export default function Discipline(props) {
   }
   return <div className="min-h-screen bg-gray-50 pb-16">
       {/* 顶部导航栏 */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-40">
+      <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
@@ -443,7 +443,7 @@ export default function Discipline(props) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-600 mb-1">处分总数</p>
-                <p className="text-base font-bold text-slate-800">{stats.total}</p>
+                <p className="text-2xl font-bold text-slate-800">{stats.total}</p>
               </div>
               <div className="bg-slate-100 p-2 rounded-lg">
                 <FileText className="w-5 h-5 text-slate-600" />
@@ -455,7 +455,7 @@ export default function Discipline(props) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-600 mb-1">生效中</p>
-                <p className="text-base font-bold text-red-600">{stats.active}</p>
+                <p className="text-2xl font-bold text-red-600">{stats.active}</p>
               </div>
               <div className="bg-red-50 p-2 rounded-lg">
                 <AlertTriangle className="w-5 h-5 text-red-600" />
@@ -467,7 +467,7 @@ export default function Discipline(props) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-600 mb-1">已过期</p>
-                <p className="text-base font-bold text-gray-600">{stats.expired}</p>
+                <p className="text-2xl font-bold text-gray-600">{stats.expired}</p>
               </div>
               <div className="bg-gray-100 p-2 rounded-lg">
                 <Clock className="w-5 h-5 text-gray-600" />
@@ -479,7 +479,7 @@ export default function Discipline(props) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-600 mb-1">已撤销</p>
-                <p className="text-base font-bold text-green-600">{stats.revoked}</p>
+                <p className="text-2xl font-bold text-green-600">{stats.revoked}</p>
               </div>
               <div className="bg-green-50 p-2 rounded-lg">
                 <CheckCircle className="w-5 h-5 text-green-600" />
@@ -491,7 +491,7 @@ export default function Discipline(props) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-600 mb-1">待审核</p>
-                <p className="text-base font-bold text-amber-600">{stats.pendingReviews}</p>
+                <p className="text-2xl font-bold text-amber-600">{stats.pendingReviews}</p>
               </div>
               <div className="bg-amber-50 p-2 rounded-lg">
                 <History className="w-5 h-5 text-amber-600" />
@@ -635,7 +635,7 @@ export default function Discipline(props) {
 
       {/* 新建处分对话框 */}
       {showCreateDialog && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold text-slate-800">新建处分</h3>
@@ -730,7 +730,7 @@ export default function Discipline(props) {
 
       {/* 申请撤销对话框 */}
       {showRevokeDialog && selectedDiscipline && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold text-slate-800">申请撤销处分</h3>

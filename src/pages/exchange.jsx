@@ -1,9 +1,9 @@
 // @ts-ignore;
 import React, { useState, useEffect } from 'react';
 // @ts-ignore;
-import { Gift, Search, Filter, TrendingUp, Clock, AlertCircle, Trophy, CheckCircle, XCircle, Users, Calendar, Eye, Tag } from 'lucide-react';
+import { Gift, Search, Filter, TrendingUp, Clock, AlertCircle, Trophy, CheckCircle, XCircle, Users, Calendar, Eye, Tag, Download } from 'lucide-react';
 // @ts-ignore;
-import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, useToast, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui';
+import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, useToast, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, StatCard } from '@/components/ui';
 
 import { TabBar } from '@/components/TabBar';
 
@@ -462,11 +462,37 @@ export default function ExchangePage({
     });
   };
   return <div className="min-h-screen bg-gray-50 pb-16">
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* 页面头部 */}
-        <div className="mb-6">
-          <h1 className="text-lg font-bold text-gray-900 mb-2">积分兑换中心</h1>
-          <p className="text-gray-600">使用积分兑换心仪的物品，或参与投标竞拍</p>
+      {/* 头部 - 紧凑 */}
+      <header className="bg-white border-b border-gray-200 p-3 sticky top-0 z-40">
+        <div className="flex items-center justify-between">
+          <h1 className="text-lg font-bold text-gray-900">积分兑换中心</h1>
+          <Button onClick={handleExport} variant="outline" size="icon" className="h-8 w-8">
+            <Download className="w-4 h-4" />
+          </Button>
+        </div>
+      </header>
+
+      <div className="px-3 py-2">
+        {/* 学生信息卡片 - 紧凑 */}
+        <div className="bg-gradient-to-r from-amber-400 to-orange-500 rounded-lg p-3 text-white mb-3 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm font-semibold mb-0.5">{currentStudent.name}</div>
+              <div className="text-xs opacity-90">学号：{currentStudent.studentId}</div>
+            </div>
+            <div className="text-right">
+              <div className="text-xs opacity-90 mb-0.5">可用积分</div>
+              <div className="text-2xl font-bold">{currentStudent.totalPoints}</div>
+            </div>
+          </div>
+        </div>
+        
+        {/* 统计卡片 - 紧凑 */}
+        <div className="grid grid-cols-2 gap-2 mb-3">
+          <StatCard title="可兑换物品" value={filteredItems.length} icon={Gift} color="orange" />
+          <StatCard title="投标物品" value={filteredItems.filter(i => i.mode === 'bidding').length} icon={Trophy} color="amber" />
+          <StatCard title="投标记录" value={filteredBiddings.length} icon={Users} color="blue" />
+          <StatCard title="兑换成功" value={filteredExchanges.length} icon={CheckCircle} color="green" />
         </div>
         
         {/* 学生信息卡片 */}
@@ -488,44 +514,44 @@ export default function ExchangePage({
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-2">
               <Gift className="w-8 h-8 text-orange-500" />
-              <span className="text-base font-bold text-gray-900">{filteredItems.length}</span>
+              <span className="text-2xl font-bold text-gray-900">{filteredItems.length}</span>
             </div>
             <div className="text-sm text-gray-600">可兑换物品</div>
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-2">
               <Trophy className="w-8 h-8 text-purple-500" />
-              <span className="text-base font-bold text-gray-900">{filteredItems.filter(i => i.mode === 'bidding').length}</span>
+              <span className="text-2xl font-bold text-gray-900">{filteredItems.filter(i => i.mode === 'bidding').length}</span>
             </div>
             <div className="text-sm text-gray-600">投标物品</div>
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-2">
               <Users className="w-8 h-8 text-blue-500" />
-              <span className="text-base font-bold text-gray-900">{filteredBiddings.length}</span>
+              <span className="text-2xl font-bold text-gray-900">{filteredBiddings.length}</span>
             </div>
             <div className="text-sm text-gray-600">投标记录</div>
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-2">
               <CheckCircle className="w-8 h-8 text-green-500" />
-              <span className="text-base font-bold text-gray-900">{filteredExchanges.length}</span>
+              <span className="text-2xl font-bold text-gray-900">{filteredExchanges.length}</span>
             </div>
             <div className="text-sm text-gray-600">兑换成功</div>
           </div>
         </div>
         
-        {/* 物品列表部分 */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900">可兑换物品</h2>
-            <div className="flex items-center gap-2">
+        {/* 物品列表 - 紧凑 */}
+        <div className="">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-bold text-gray-900">可兑换物品</h2>
+            <div className="flex items-center gap-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input type="text" placeholder="搜索物品..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent w-48" />
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                <input type="text" placeholder="搜索..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-8 pr-3 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-xs w-32" />
               </div>
               <Select value={selectedMode} onValueChange={setSelectedMode}>
-                <SelectTrigger className="w-36">
+                <SelectTrigger className="w-24 h-7">
                   <SelectValue placeholder="模式" />
                 </SelectTrigger>
                 <SelectContent>
@@ -535,7 +561,7 @@ export default function ExchangePage({
                 </SelectContent>
               </Select>
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-36">
+                <SelectTrigger className="w-24 h-7">
                   <SelectValue placeholder="分类" />
                 </SelectTrigger>
                 <SelectContent>

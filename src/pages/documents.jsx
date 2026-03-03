@@ -409,7 +409,7 @@ export default function DocumentsPage({
       <div className="max-w-6xl mx-auto px-4 pt-4">
         {/* 页面标题 */}
         <div className="mb-6">
-          <h1 className="text-lg font-bold text-gray-800 mb-2" style={{
+          <h1 className="text-3xl font-bold text-gray-800 mb-2" style={{
           fontFamily: 'Noto Serif SC, serif'
         }}>
             制度文件管理
@@ -424,7 +424,7 @@ export default function DocumentsPage({
               <span className="text-sm text-gray-600">文件总数</span>
               <FileText className="w-5 h-5 text-emerald-600" />
             </div>
-            <div className="text-base font-bold text-gray-800">{stats.totalFiles}</div>
+            <div className="text-2xl font-bold text-gray-800">{stats.totalFiles}</div>
           </div>
           
           <div className="bg-white rounded-xl p-4 shadow-sm border border-emerald-100">
@@ -432,7 +432,7 @@ export default function DocumentsPage({
               <span className="text-sm text-gray-600">置顶文件</span>
               <Pin className="w-5 h-5 text-emerald-600" />
             </div>
-            <div className="text-base font-bold text-gray-800">{stats.pinnedFiles}</div>
+            <div className="text-2xl font-bold text-gray-800">{stats.pinnedFiles}</div>
           </div>
           
           <div className="bg-white rounded-xl p-4 shadow-sm border border-emerald-100">
@@ -440,7 +440,7 @@ export default function DocumentsPage({
               <span className="text-sm text-gray-600">已过期</span>
               <AlertCircle className="w-5 h-5 text-amber-600" />
             </div>
-            <div className="text-base font-bold text-gray-800">{stats.expiredFiles}</div>
+            <div className="text-2xl font-bold text-gray-800">{stats.expiredFiles}</div>
           </div>
           
           <div className="bg-white rounded-xl p-4 shadow-sm border border-emerald-100">
@@ -448,7 +448,7 @@ export default function DocumentsPage({
               <span className="text-sm text-gray-600">总下载</span>
               <Download className="w-5 h-5 text-emerald-600" />
             </div>
-            <div className="text-base font-bold text-gray-800">{stats.totalDownloads}</div>
+            <div className="text-2xl font-bold text-gray-800">{stats.totalDownloads}</div>
           </div>
         </div>
         

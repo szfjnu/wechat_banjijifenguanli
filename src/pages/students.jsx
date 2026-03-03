@@ -381,7 +381,7 @@ export default function Students(props) {
 
       {/* Student Detail Modal */}
       {showDetails && selectedStudent && <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center">
-          <div className="bg-white w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-t-lg sm:rounded-lg p-6 animate-in slide-in-from-bottom-10 sm:animate-in sm:fade-in sm:zoom-in-95">
+          <div className="bg-white w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-t-3xl sm:rounded-2xl p-6 animate-in slide-in-from-bottom-10 sm:animate-in sm:fade-in sm:zoom-in-95">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold font-serif">学生档案</h2>
               <Button variant="ghost" size="icon" onClick={() => setShowDetails(false)}>
@@ -391,7 +391,7 @@ export default function Students(props) {
 
             {/* Basic Info */}
             <div className="flex items-center gap-4 mb-6">
-              <div className={`w-16 h-16 rounded-full flex items-center justify-center text-base font-bold bg-gradient-to-br from-blue-400 to-blue-600 text-white`}>
+              <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold bg-gradient-to-br from-blue-400 to-blue-600 text-white`}>
                 {selectedStudent.name.charAt(0)}
               </div>
               <div>
@@ -411,15 +411,15 @@ export default function Students(props) {
             {/* Points Stats */}
             <div className="grid grid-cols-3 gap-3 mb-6">
               <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-3 text-center">
-                <p className="text-base font-bold text-green-600 font-mono">{selectedStudent.totalPoints}</p>
+                <p className="text-2xl font-bold text-green-600 font-mono">{selectedStudent.totalPoints}</p>
                 <p className="text-xs text-gray-600">总积分</p>
               </div>
               <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-3 text-center">
-                <p className="text-base font-bold text-blue-600 font-mono">{selectedStudent.dailyPoints}</p>
+                <p className="text-2xl font-bold text-blue-600 font-mono">{selectedStudent.dailyPoints}</p>
                 <p className="text-xs text-gray-600">日常积分</p>
               </div>
               <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-3 text-center">
-                <p className="text-base font-bold text-amber-600 font-mono">{selectedStudent.dormPoints}</p>
+                <p className="text-2xl font-bold text-amber-600 font-mono">{selectedStudent.dormPoints}</p>
                 <p className="text-xs text-gray-600">宿舍积分</p>
               </div>
             </div>

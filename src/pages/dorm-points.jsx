@@ -501,20 +501,39 @@ export default function DormPointsPage(props) {
     setShowSettingsModal(false);
   };
   if (loading) {
-    return <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-white to-amber-50">
+    return <div className="flex items-center justify-center min-h-screen bg-gray-50">
           <div className="text-center">
-            <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-gray-600">加载中...</p>
+            <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+            <p className="text-gray-600 text-sm">加载中...</p>
           </div>
         </div>;
   }
   return <div className="min-h-screen bg-gray-50 pb-16">
+        {/* 页面头部 - 紧凑 */}
+        <header className="bg-white border-b border-gray-200 p-3 sticky top-0 z-40">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-lg font-bold text-gray-900">宿舍积分管理</h1>
+              <p className="text-xs text-gray-500">仅管理住宿生宿舍积分</p>
+            </div>
+            <div className="flex gap-1">
+              <Button onClick={() => setShowSettingsModal(true)} variant="outline" size="icon" className="h-8 w-8">
+                <Settings className="w-4 h-4" />
+              </Button>
+              <Button onClick={() => setShowResetConfirm(true)} variant="outline" size="icon" className="h-8 w-8">
+                <RefreshCw className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        </header>
+
+        <main className="px-3 py-2">
         {/* 页面头部 */}
-        <header className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 py-3 shadow-sm">
+        <header className="bg-gradient-to-r from-blue-600 to-blue-700 text-white pt-12 pb-6 px-4 shadow-lg">
           <div className="max-w-6xl mx-auto">
             <div className="flex justify-between items-start">
               <div>
-                <h1 className="text-lg font-bold mb-2" style={{
+                <h1 className="text-3xl font-bold mb-2" style={{
               fontFamily: 'Noto Serif SC, serif'
             }}>宿舍积分管理</h1>
                 <p className="text-blue-100 text-sm">仅管理住宿生宿舍积分与折算</p>
@@ -533,14 +552,13 @@ export default function DormPointsPage(props) {
           </div>
         </header>
 
-        <main className="max-w-6xl mx-auto px-4 py-6">
           {/* 统计概览 */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-2 gap-2 mb-3">
             <div className="bg-white rounded-xl p-4 shadow-md border-l-4 border-blue-500">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs text-gray-500 mb-1">住宿生总数</p>
-                  <p className="text-base font-bold text-gray-800">{students.length}</p>
+                  <p className="text-2xl font-bold text-gray-800">{students.length}</p>
                 </div>
                 <Bed className="w-8 h-8 text-blue-500" />
               </div>
@@ -549,7 +567,7 @@ export default function DormPointsPage(props) {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs text-gray-500 mb-1">正常状态</p>
-                  <p className="text-base font-bold text-gray-800">{students.filter(s => s.dormPoints >= 60).length}</p>
+                  <p className="text-2xl font-bold text-gray-800">{students.filter(s => s.dormPoints >= 60).length}</p>
                 </div>
                 <Shield className="w-8 h-8 text-green-500" />
               </div>
@@ -558,7 +576,7 @@ export default function DormPointsPage(props) {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs text-gray-500 mb-1">留宿察看</p>
-                  <p className="text-base font-bold text-gray-800">{students.filter(s => s.dormPoints < 60 && s.dormPoints >= 40).length}</p>
+                  <p className="text-2xl font-bold text-gray-800">{students.filter(s => s.dormPoints < 60 && s.dormPoints >= 40).length}</p>
                 </div>
                 <AlertTriangle className="w-8 h-8 text-orange-500" />
               </div>
@@ -567,7 +585,7 @@ export default function DormPointsPage(props) {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs text-gray-500 mb-1">勒令退宿</p>
-                  <p className="text-base font-bold text-gray-800">{students.filter(s => s.dormPoints < 40).length}</p>
+                  <p className="text-2xl font-bold text-gray-800">{students.filter(s => s.dormPoints < 40).length}</p>
                 </div>
                 <ShieldAlert className="w-8 h-8 text-red-500" />
               </div>
@@ -883,8 +901,7 @@ export default function DormPointsPage(props) {
           </div>}
 
         <TabBar currentPage={currentPage} onPageChange={setCurrentPage} />
-      pageId,
-      params: {}
-    })} />
-      </div>;
-}
+      </div>
+      </div>
+    </div>
+  }

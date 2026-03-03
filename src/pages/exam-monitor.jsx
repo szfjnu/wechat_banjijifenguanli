@@ -486,7 +486,7 @@ export default function ExamMonitorPage(props) {
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center gap-3 mb-2">
             <GraduationCap className="w-8 h-8" />
-            <h1 className="text-lg font-bold">转段考监控</h1>
+            <h1 className="text-3xl font-bold">转段考监控</h1>
           </div>
           <p className="text-blue-100 ml-11">监控转段考成绩，检查技能证书进度，管理学生转段资格</p>
         </div>
@@ -499,7 +499,7 @@ export default function ExamMonitorPage(props) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500 mb-1">总学生数</p>
-                <p className="text-lg font-bold text-gray-900">{totalStudents}</p>
+                <p className="text-3xl font-bold text-gray-900">{totalStudents}</p>
               </div>
               <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
                 <GraduationCap className="w-6 h-6 text-indigo-600" />
@@ -511,7 +511,7 @@ export default function ExamMonitorPage(props) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500 mb-1">全部通过</p>
-                <p className="text-lg font-bold text-gray-900">{passingStudents}</p>
+                <p className="text-3xl font-bold text-gray-900">{passingStudents}</p>
               </div>
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
                 <CheckCircle className="w-6 h-6 text-green-600" />
@@ -523,7 +523,7 @@ export default function ExamMonitorPage(props) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500 mb-1">转段考科目</p>
-                <p className="text-lg font-bold text-gray-900">{examSubjectCount}</p>
+                <p className="text-3xl font-bold text-gray-900">{examSubjectCount}</p>
               </div>
               <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
                 <BookOpen className="w-6 h-6 text-orange-600" />
@@ -535,7 +535,7 @@ export default function ExamMonitorPage(props) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500 mb-1">平均证书完成度</p>
-                <p className="text-lg font-bold text-gray-900">{averageCertificateProgress}%</p>
+                <p className="text-3xl font-bold text-gray-900">{averageCertificateProgress}%</p>
               </div>
               <div className="w-12 h-12 bg-cyan-100 rounded-full flex items-center justify-center">
                 <Award className="w-6 h-6 text-cyan-600" />
