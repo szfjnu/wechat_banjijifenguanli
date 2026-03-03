@@ -381,7 +381,7 @@ export default function PointsPage(props) {
 
       <div className="max-w-4xl mx-auto px-4 -mt-4">
         {/* 快捷操作卡片 */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-4">
+        <div className="bg-white rounded-lg shadow-md p-3 mb-3">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-gray-800">快捷操作</h2>
             <Button onClick={() => setShowAddModal(true)} className="bg-gradient-to-r from-blue-500 to-amber-500 text-white hover:shadow-lg transition-all">
@@ -415,7 +415,7 @@ export default function PointsPage(props) {
         </div>
 
         {/* 积分历史记录 */}
-        {showHistory && <div className="bg-white rounded-2xl shadow-lg p-6 mb-4">
+        {showHistory && <div className="bg-white rounded-lg shadow-md p-3 mb-3">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-gray-800">积分历史</h2>
               <div className="flex gap-2">

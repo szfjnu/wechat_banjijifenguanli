@@ -377,7 +377,7 @@ export default function SeatingChart(props) {
         <div className="grid lg:grid-cols-3 gap-6">
           {/* 学生列表 - 左侧 */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
               {/* 搜索和筛选 */}
               <div className="p-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-blue-50">
                 <h3 className="text-lg font-semibold text-slate-800 mb-3 flex items-center">
@@ -421,7 +421,7 @@ export default function SeatingChart(props) {
           
           {/* 座位图 - 右侧 */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
               <div className="p-4 border-b border-slate-200 bg-gradient-to-r from-blue-50 to-indigo-50 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Grid3X3 className="w-5 h-5 text-slate-700" />

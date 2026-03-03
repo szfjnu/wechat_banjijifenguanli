@@ -467,7 +467,7 @@ export default function DutyRoster(props) {
         </div>
       </div>;
   }
-  return <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pb-24">
+  return <div className="min-h-screen bg-gray-50 pb-16">
       {/* 头部统计 */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 pb-8">
         <h1 className="text-2xl font-bold mb-2 flex items-center">

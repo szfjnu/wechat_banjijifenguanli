@@ -508,7 +508,7 @@ export default function DormPointsPage(props) {
           </div>
         </div>;
   }
-  return <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-amber-50 pb-24">
+  return <div className="min-h-screen bg-gray-50 pb-16">
         {/* 页面头部 */}
         <header className="bg-gradient-to-r from-blue-600 to-blue-700 text-white pt-12 pb-6 px-4 shadow-lg">
           <div className="max-w-6xl mx-auto">

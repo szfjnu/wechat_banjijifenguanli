@@ -241,7 +241,7 @@ export default function SemesterPage(props) {
       <main className="max-w-6xl mx-auto px-4 py-6 pb-24">
         {/* 统计卡片 */}
         <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-3">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-500 mb-1">学期总数</p>
@@ -253,7 +253,7 @@ export default function SemesterPage(props) {
             </div>
           </div>
           
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-3">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-500 mb-1">当前学期</p>
@@ -285,7 +285,7 @@ export default function SemesterPage(props) {
             month: '2-digit',
             day: '2-digit'
           });
-          return <div key={semester.id} className={`bg-white rounded-2xl shadow-sm border-2 p-5 transition-all ${semester.isCurrent ? 'border-indigo-400 bg-indigo-50/30' : 'border-slate-200 hover:border-slate-300'}`}>
+          return <div key={semester.id} className={`bg-white rounded-lg shadow-sm border-2 p-3 transition-all ${semester.isCurrent ? 'border-indigo-400 bg-indigo-50/30' : 'border-slate-200 hover:border-slate-300'}`}>
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
@@ -351,7 +351,7 @@ export default function SemesterPage(props) {
 
       {/* 创建学期对话框 */}
       {showCreateDialog && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
             <div className="p-6 border-b border-slate-200">
               <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
                 <Plus className="w-6 h-6 text-indigo-600" strokeWidth={2.5} />
@@ -398,7 +398,7 @@ export default function SemesterPage(props) {
 
       {/* 编辑学期对话框 */}
       {showEditDialog && editingSemester && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
             <div className="p-6 border-b border-slate-200">
               <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
                 <Edit3 className="w-6 h-6 text-indigo-600" strokeWidth={2.5} />

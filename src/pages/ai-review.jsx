@@ -253,7 +253,7 @@ ${name}同学在本学期表现优异，总积分达到${data.totalPoints}分，
         </div>
 
         {/* 点评范围选择 */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+        <div className="bg-white rounded-lg shadow-md p-4 mb-3">
           <div className="flex items-center gap-2 mb-4">
             <Users className="w-5 h-5 text-amber-600" />
             <h2 className="text-lg font-semibold text-gray-800">点评范围</h2>
@@ -321,7 +321,7 @@ ${name}同学在本学期表现优异，总积分达到${data.totalPoints}分，
         </div>
 
         {/* 时间范围选择 */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+        <div className="bg-white rounded-lg shadow-md p-4 mb-3">
           <div className="flex items-center gap-2 mb-4">
             <Calendar className="w-5 h-5 text-amber-600" />
             <h2 className="text-lg font-semibold text-gray-800">时间范围</h2>
@@ -348,7 +348,7 @@ ${name}同学在本学期表现优异，总积分达到${data.totalPoints}分，
           </div>}
 
         {/* 点评结果展示 */}
-        {reviewContent && <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+        {reviewContent && <div className="bg-white rounded-lg shadow-md p-4 mb-3">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-amber-600" />
@@ -379,7 +379,7 @@ ${name}同学在本学期表现优异，总积分达到${data.totalPoints}分，
           </div>}
 
         {/* 历史记录 */}
-        {savedReviews.length > 0 && <div className="bg-white rounded-2xl shadow-lg p-6">
+        {savedReviews.length > 0 && <div className="bg-white rounded-lg shadow-md p-4">
             <div className="flex items-center gap-2 mb-4">
               <FileText className="w-5 h-5 text-amber-600" />
               <h2 className="text-lg font-semibold text-gray-800">历史记录</h2>

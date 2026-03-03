@@ -427,7 +427,7 @@ export default function Subjects(props) {
       
       {/* 添加科目对话框 */}
       {showAddDialog && <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl w-full max-w-md p-6">
+          <div className="bg-white rounded-xl w-full max-w-md p-4">
             <h3 className="text-xl font-bold text-gray-800 mb-4">添加新科目</h3>
             
             <div className="space-y-4">
@@ -482,7 +482,7 @@ export default function Subjects(props) {
       
       {/* 编辑科目对话框 */}
       {showEditDialog && <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl w-full max-w-md p-6">
+          <div className="bg-white rounded-xl w-full max-w-md p-4">
             <h3 className="text-xl font-bold text-gray-800 mb-4">编辑科目</h3>
             
             <div className="space-y-4">
@@ -538,7 +538,7 @@ export default function Subjects(props) {
       
       {/* 删除确认对话框 */}
       {showDeleteDialog && <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl w-full max-w-md p-6">
+          <div className="bg-white rounded-xl w-full max-w-md p-4">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
                 <AlertTriangle className="w-6 h-6 text-red-500" />
