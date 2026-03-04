@@ -485,7 +485,7 @@ export default function ExamMonitorPage(props) {
       {/* 顶部标题栏 */}
       <div className="bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-600 px-6 py-8 text-white shadow-lg">
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-2 mb-1">
             <GraduationCap className="w-8 h-8" />
             <h1 className="text-3xl font-bold">转段考监控</h1>
           </div>
@@ -495,7 +495,7 @@ export default function ExamMonitorPage(props) {
 
       <div className="max-w-6xl mx-auto px-4 py-6">
         {/* 统计卡片 */}
-        <div className="grid grid-cols-2 gap-2 mb-3">
+        <div className="grid grid-cols-2 gap-2 mb-2">
           <StatCard title="总学生数" value={totalStudents} icon={GraduationCap} color="blue" />
           <StatCard title="全部通过" value={passingStudents} icon={CheckCircle} color="green" />
           <StatCard title="转段考科目" value={examSubjectCount} icon={BookOpen} color="orange" />
@@ -503,7 +503,7 @@ export default function ExamMonitorPage(props) {
         </div>
 
         {/* 操作栏 */}
-        <div className="bg-white rounded-xl shadow-sm p-4 mb-6 flex flex-wrap items-center gap-4">
+        <div className="bg-white rounded-xl shadow-sm p-3 mb-4 flex flex-wrap items-center gap-3">
           <div className="flex-1 min-w-[200px]">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -543,7 +543,7 @@ export default function ExamMonitorPage(props) {
         </div>
 
         {/* 学生转段状态列表 */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
           <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
             <Target className="w-5 h-5" />
             学生转段状态
@@ -555,9 +555,9 @@ export default function ExamMonitorPage(props) {
             const certProgress = getCertificateProgress(student);
             const eligibility = checkPromotionEligibility(student);
             const StatusIcon = examStatus.icon;
-            return <div key={student.id} className={`${eligibility.eligible ? 'bg-gradient-to-r from-green-50 to-emerald-50' : 'bg-gradient-to-r from-orange-50 to-red-50'} rounded-lg p-5 border ${eligibility.eligible ? 'border-green-200' : 'border-orange-200'} hover:shadow-md transition-shadow`}>
+            return <div key={student.id} className={`${eligibility.eligible ? 'bg-gradient-to-r from-green-50 to-emerald-50' : 'bg-gradient-to-r from-orange-50 to-red-50'} rounded-lg p-3 border ${eligibility.eligible ? 'border-green-200' : 'border-orange-200'} hover:shadow-md transition-shadow`}>
                     {/* 学生基本信息 */}
-                    <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-4">
                         <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold ${eligibility.eligible ? 'bg-green-500 text-white' : 'bg-orange-500 text-white'}`}>
                           {student.name[0]}
@@ -577,7 +577,7 @@ export default function ExamMonitorPage(props) {
                     </div>
                     
                     {/* 详细状态信息 */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       {/* 转段考成绩状态 */}
                       <div className="bg-white rounded-lg p-3">
                         <div className="flex items-center gap-2 mb-2">
@@ -595,12 +595,12 @@ export default function ExamMonitorPage(props) {
                           <span className="text-sm font-medium text-gray-700">技能证书</span>
                         </div>
                         <p className={`text-lg font-bold ${certProgress.progress >= 100 ? 'text-green-600' : 'text-orange-600'}`}>{certProgress.obtained}/{certProgress.required}</p>
-                        <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                        <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
                           <div className={`${certProgress.progress >= 100 ? 'bg-green-500' : 'bg-orange-500'} h-2 rounded-full`} style={{
                       width: `${certProgress.progress}%`
                     }}></div>
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">完成度 {certProgress.progress}%</p>
+                        <p className="text-[10px] text-gray-500 mt-0.5">完成度 {certProgress.progress}%</p>
                       </div>
                       
                       {/* 综合指标 */}
@@ -623,7 +623,7 @@ export default function ExamMonitorPage(props) {
                     </div>
                     
                     {/* 缺失证书提示 */}
-                    {certProgress.missingCertificates.length > 0 && <div className="mt-3 bg-orange-50 border border-orange-200 rounded-lg p-3">
+                    {certProgress.missingCertificates.length > 0 && <div className="mt-2 bg-orange-50 border border-orange-200 rounded-lg p-2">
                         <p className="text-sm text-orange-700 font-medium flex items-center gap-2">
                           <AlertCircle className="w-4 h-4" />
                           缺少必备证书：
@@ -632,7 +632,7 @@ export default function ExamMonitorPage(props) {
                       </div>}
                     
                     {/* 查看详情按钮 */}
-                    <div className="mt-4 flex gap-2">
+                    <div className="mt-3 flex gap-2">
                       <Button onClick={() => setViewingStudent(student)} variant="outline" className="text-sm">
                         <FileText className="w-4 h-4 mr-1" />
                         查看详情
@@ -644,12 +644,12 @@ export default function ExamMonitorPage(props) {
         </div>
 
         {/* 说明区域 */}
-        <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl p-6 border border-indigo-100">
-          <h3 className="text-lg font-bold text-indigo-900 mb-3 flex items-center gap-2">
+        <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl p-4 border border-indigo-100">
+          <h3 className="text-base font-bold text-indigo-900 mb-2 flex items-center gap-2">
             <Info className="w-5 h-5" />
             转段条件说明
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-700">
             <div className="flex items-start gap-2">
               <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
               <p><strong>转段考成绩：</strong>所有转段考科目均需达到及格分数（≥60分）</p>
@@ -747,8 +747,8 @@ export default function ExamMonitorPage(props) {
       {viewingStudent && <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                   <FileText className="w-5 h-5" />
                   {viewingStudent.name} - 转段详情
                 </h2>
@@ -759,9 +759,9 @@ export default function ExamMonitorPage(props) {
               
               <div className="space-y-6">
                 {/* 基本信息 */}
-                <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg p-4">
-                  <h3 className="font-bold text-gray-900 mb-3">基本信息</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg p-3">
+                  <h3 className="font-bold text-gray-900 mb-2 text-sm">基本信息</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
                     <div>
                       <p className="text-gray-500">学号</p>
                       <p className="font-medium">{viewingStudent.studentId}</p>
@@ -790,7 +790,7 @@ export default function ExamMonitorPage(props) {
                   <div className="bg-white border rounded-lg overflow-hidden">
                     {examSubjects.filter(s => s.isExamSubject).map(subject => {
                   const grade = examGrades.find(g => g.studentId === viewingStudent.studentId && g.subjectId === subject.id);
-                  return <div key={subject.id} className={`flex items-center justify-between p-3 ${grade && grade.isPassing ? 'bg-green-50' : grade && !grade.isPassing ? 'bg-red-50' : 'bg-gray-50'}`}>
+                  return <div key={subject.id} className={`flex items-center justify-between p-2 ${grade && grade.isPassing ? 'bg-green-50' : grade && !grade.isPassing ? 'bg-red-50' : 'bg-gray-50'}`}>
                           <div className="flex items-center gap-3">
                             <span className="font-medium">{subject.name}</span>
                             {grade && <span className={`text-xs px-2 py-0.5 rounded ${grade.isPassing ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
@@ -814,7 +814,7 @@ export default function ExamMonitorPage(props) {
                   <div className="space-y-2">
                     {CERTIFICATE_REQUIREMENTS.filter(c => c.required).map(req => {
                   const hasCertificate = (viewingStudent.certificates || []).some(cert => cert.name === req.name);
-                  return <div key={req.id} className={`flex items-center justify-between p-3 rounded-lg ${hasCertificate ? 'bg-green-50 border border-green-200' : 'bg-orange-50 border border-orange-200'}`}>
+                  return <div key={req.id} className={`flex items-center justify-between p-2 rounded-lg ${hasCertificate ? 'bg-green-50 border border-green-200' : 'bg-orange-50 border border-orange-200'}`}>
                           <div className="flex items-center gap-2">
                             {hasCertificate ? <CheckCircle className="w-5 h-5 text-green-600" /> : <AlertCircle className="w-5 h-5 text-orange-600" />}
                             <span className="font-medium">{req.name}</span>
@@ -830,17 +830,17 @@ export default function ExamMonitorPage(props) {
                 
                 {/* 其他证书 */}
                 {viewingStudent.certificates && viewingStudent.certificates.length > 0 && <div>
-                    <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                    <h3 className="font-bold text-gray-900 mb-2 text-sm flex items-center gap-2">
                       <Award className="w-4 h-4" />
                       其他证书
                     </h3>
                     <div className="space-y-2">
-                      {viewingStudent.certificates.filter(cert => !CERTIFICATE_REQUIREMENTS.some(req => req.required && req.name === cert.name)).map((cert, index) => <div key={index} className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      {viewingStudent.certificates.filter(cert => !CERTIFICATE_REQUIREMENTS.some(req => req.required && req.name === cert.name)).map((cert, index) => <div key={index} className="bg-blue-50 border border-blue-200 rounded-lg p-2">
                             <div className="flex items-center justify-between">
                               <span className="font-medium">{cert.name}</span>
                               <span className="text-xs text-gray-500">({cert.level})</span>
                             </div>
-                            <p className="text-xs text-gray-500 mt-1">获得日期：{formatDate(cert.date)}</p>
+                            <p className="text-[10px] text-gray-500 mt-0.5">获得日期：{formatDate(cert.date)}</p>
                           </div>)}
                     </div>
                   </div>}
@@ -858,8 +858,8 @@ export default function ExamMonitorPage(props) {
                 转段考科目设置
               </h2>
               
-              <div className="space-y-3 mb-6">
-                {examSubjects.map(subject => <div key={subject.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div className="space-y-2 mb-4">
+                {examSubjects.map(subject => <div key={subject.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
                     <div className="flex items-center gap-3">
                       <input type="checkbox" checked={subject.isExamSubject} onChange={() => toggleExamSubject(subject.id)} className="w-5 h-5 text-indigo-600 rounded" />
                       <span className="font-medium">{subject.name}</span>

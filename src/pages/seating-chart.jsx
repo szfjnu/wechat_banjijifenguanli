@@ -341,7 +341,7 @@ export default function SeatingChart(props) {
           </div>
           
           {/* 统计卡片 */}
-          <div className="grid grid-cols-3 gap-2 mt-3">
+          <div className="grid grid-cols-3 gap-2 mt-2">
             <StatCard title="总座位" value={totalSeats} icon={Grid3X3} color="blue" />
             <StatCard title="已分配" value={assignedCount} icon={Users} color="green" />
             <StatCard title="未分配" value={unassignedStudents.length} icon={UserPlus} color="orange" />
@@ -351,13 +351,13 @@ export default function SeatingChart(props) {
       
       {/* Main Content */}
       <main className="px-4 py-6 max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-3 gap-3">
           {/* 学生列表 - 左侧 */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
               {/* 搜索和筛选 */}
-              <div className="p-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-blue-50">
-                <h3 className="text-lg font-semibold text-slate-800 mb-3 flex items-center">
+              <div className="p-3 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-blue-50">
+                <h3 className="text-base font-semibold text-slate-800 mb-2 flex items-center">
                   <Users className="w-5 h-5 mr-2" />
                   未分配学生
                 </h3>
@@ -376,12 +376,12 @@ export default function SeatingChart(props) {
               </div>
               
               {/* 学生列表 */}
-              <div className="p-4 max-h-[600px] overflow-y-auto">
+              <div className="p-3 max-h-[400px] overflow-y-auto">
                 {unassignedStudents.length === 0 ? <div className="text-center py-8 text-slate-500">
-                    <UserPlus className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                    <UserPlus className="w-8 h-8 mx-auto mb-2 opacity-50" />
                     <p>所有学生都已分配座位</p>
                   </div> : <div className="space-y-2">
-                    {unassignedStudents.map(student => <div key={student.id} draggable={true} onDragStart={() => handleDragStart(student)} onClick={() => handleStudentClick(student)} className="flex items-center gap-3 p-3 bg-gradient-to-r from-slate-50 to-blue-50 border border-slate-200 rounded-xl cursor-move hover:border-blue-400 hover:shadow-md transition-all group">
+                    {unassignedStudents.map(student => <div key={student.id} draggable={true} onDragStart={() => handleDragStart(student)} onClick={() => handleStudentClick(student)} className="flex items-center gap-2 p-2 bg-gradient-to-r from-slate-50 to-blue-50 border border-slate-200 rounded-lg cursor-move hover:border-blue-400 hover:shadow-md transition-all group">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm ${student.gender === '男' ? 'bg-blue-500' : 'bg-pink-500'}`}>
                           {student.name.charAt(0)}
                         </div>
@@ -399,7 +399,7 @@ export default function SeatingChart(props) {
           {/* 座位图 - 右侧 */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
-              <div className="p-4 border-b border-slate-200 bg-gradient-to-r from-blue-50 to-indigo-50 flex items-center justify-between">
+              <div className="p-3 border-b border-slate-200 bg-gradient-to-r from-blue-50 to-indigo-50 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Grid3X3 className="w-5 h-5 text-slate-700" />
                   <h3 className="text-lg font-semibold text-slate-800">座位图</h3>
@@ -412,7 +412,7 @@ export default function SeatingChart(props) {
               </div>
               
               {/* 讲台指示 */}
-              <div className="p-4 bg-gradient-to-r from-slate-100 to-slate-200 border-b border-slate-300">
+              <div className="p-3 bg-gradient-to-r from-slate-100 to-slate-200 border-b border-slate-300">
                 <div className="text-center py-4 px-8 bg-white rounded-lg border-2 border-dashed border-slate-300">
                   <p className="text-lg font-bold text-slate-700">📚 讲台</p>
                 </div>
@@ -433,12 +433,12 @@ export default function SeatingChart(props) {
                       const seatId = `${row}${col}`;
                       const student = seats[seatId];
                       return <div key={col} onDragOver={handleDragOver} onDrop={() => handleDrop(seatId)} onClick={() => handleSeatClick(seatId)} className={`relative flex-1 aspect-square rounded-xl border-2 transition-all cursor-pointer ${student ? 'bg-gradient-to-br from-emerald-50 to-green-50 border-emerald-300 hover:border-emerald-500 hover:shadow-lg' : 'bg-gradient-to-br from-slate-50 to-gray-50 border-slate-300 hover:border-blue-400 hover:shadow-md'}`}>
-                              <div className="absolute top-1 left-1 text-xs font-semibold text-slate-500">
+                              <div className="absolute top-0.5 left-0.5 text-[10px] font-semibold text-slate-500">
                                 {col}
                               </div>
                               
-                              {student ? <div className="absolute inset-0 flex flex-col items-center justify-center p-1">
-                                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-lg mb-1 ${student.gender === '男' ? 'bg-blue-500' : 'bg-pink-500'}`}>
+                              {student ? <div className="absolute inset-0 flex flex-col items-center justify-center p-0.5">
+                                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold text-xs mb-0.5 ${student.gender === '男' ? 'bg-blue-500' : 'bg-pink-500'}`}>
                                     {student.name.charAt(0)}
                                   </div>
                                   <p className="text-xs font-semibold text-slate-800 truncate w-full text-center">{student.name}</p>

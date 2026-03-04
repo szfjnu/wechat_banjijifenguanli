@@ -291,8 +291,8 @@ export default function Subjects(props) {
   }
   return <div className="min-h-screen bg-gray-50 pb-16">
       {/* 顶部导航栏 */}
-      <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white p-6 pb-12">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white p-4 pb-8">
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <ArrowLeft className="w-6 h-6 cursor-pointer hover:scale-110 transition-transform" onClick={() => $w.utils.navigateTo({
             pageId: 'home',
@@ -313,8 +313,8 @@ export default function Subjects(props) {
       </div>
       
       {/* 统计卡片 */}
-      <div className="px-4 -mt-8">
-        <div className="grid grid-cols-3 gap-3">
+      <div className="px-4 -mt-6">
+        <div className="grid grid-cols-2 gap-2">
           <StatCard title="总科目数" value={totalSubjects} icon={BookOpen} color="blue" />
           <StatCard title="转段考" value={examSubjectsCount} icon={GraduationCap} color="purple" />
           <StatCard title="平均学分" value={averageCredits} icon={Calculator} color="amber" />
@@ -323,8 +323,8 @@ export default function Subjects(props) {
       
       {/* 搜索和筛选 */}
       <div className="px-4 mt-6">
-        <div className="bg-white rounded-xl p-4 shadow-sm">
-          <div className="flex gap-3 mb-3">
+        <div className="bg-white rounded-xl p-3 shadow-sm">
+          <div className="flex gap-2 mb-2">
             <div className="flex-1 relative">
               <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input type="text" placeholder="搜索科目名称..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm" />
@@ -346,7 +346,7 @@ export default function Subjects(props) {
       </div>
       
       {/* 操作按钮 */}
-      <div className="px-4 mt-4">
+      <div className="px-4 mt-3">
         <div className="flex gap-3">
           <Button onClick={() => {
           setFormData({
@@ -367,9 +367,9 @@ export default function Subjects(props) {
       
       {/* 科目列表 */}
       <div className="px-4 mt-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-3">科目列表</h2>
-        {filteredSubjects.length === 0 ? <div className="bg-white rounded-xl p-8 text-center shadow-sm">
-            <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+        <h2 className="text-base font-semibold text-gray-800 mb-2">科目列表</h2>
+        {filteredSubjects.length === 0 ? <div className="bg-white rounded-xl p-6 text-center shadow-sm">
+            <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-500">暂无科目数据</p>
             <Button onClick={() => {
           setFormData({
@@ -383,9 +383,9 @@ export default function Subjects(props) {
               添加第一个科目
             </Button>
           </div> : <div className="space-y-3">
-            {filteredSubjects.map(subject => <div key={subject.id} className={`bg-white rounded-xl p-4 shadow-sm border-l-4 ${subject.isExamSubject ? 'border-l-purple-500' : 'border-l-gray-300'} hover:shadow-md transition-shadow`}>
+            {filteredSubjects.map(subject => <div key={subject.id} className={`bg-white rounded-xl p-3 shadow-sm border-l-4 ${subject.isExamSubject ? 'border-l-purple-500' : 'border-l-gray-300'} hover:shadow-md transition-shadow`}>
                 <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-3 flex-1">
+                  <div className="flex items-start gap-2 flex-1">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold ${subject.isExamSubject ? 'bg-gradient-to-br from-purple-500 to-pink-500' : 'bg-gradient-to-br from-blue-500 to-cyan-500'}`}>
                       {subject.name.charAt(0)}
                     </div>
@@ -397,7 +397,7 @@ export default function Subjects(props) {
                             转段考
                           </span>}
                       </div>
-                      <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                      <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-600">
                         <span className="flex items-center gap-1">
                           <Calculator className="w-4 h-4" />
                           {subject.credits} 学分
@@ -428,7 +428,7 @@ export default function Subjects(props) {
       {/* 添加科目对话框 */}
       {showAddDialog && <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl w-full max-w-md p-4">
-            <h3 className="text-xl font-bold text-gray-800 mb-4">添加新科目</h3>
+            <h3 className="text-lg font-bold text-gray-800 mb-3">添加新科目</h3>
             
             <div className="space-y-4">
               <div>
@@ -483,7 +483,7 @@ export default function Subjects(props) {
       {/* 编辑科目对话框 */}
       {showEditDialog && <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl w-full max-w-md p-4">
-            <h3 className="text-xl font-bold text-gray-800 mb-4">编辑科目</h3>
+            <h3 className="text-lg font-bold text-gray-800 mb-3">编辑科目</h3>
             
             <div className="space-y-4">
               <div>
@@ -539,18 +539,18 @@ export default function Subjects(props) {
       {/* 删除确认对话框 */}
       {showDeleteDialog && <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl w-full max-w-md p-4">
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-3 mb-3">
               <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
                 <AlertTriangle className="w-6 h-6 text-red-500" />
               </div>
               <h3 className="text-xl font-bold text-gray-800">确认删除</h3>
             </div>
             
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 mb-3">
               确定要删除科目「{selectedSubject?.name}」吗？此操作不可撤销。
             </p>
             
-            {selectedSubject?.isExamSubject && <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+            {selectedSubject?.isExamSubject && <div className="bg-red-50 border border-red-200 rounded-lg p-2 mb-3">
                 <p className="text-sm text-red-600">
                   ⚠️ 该科目是转段考科目，删除后将影响转段考试统计。
                 </p>

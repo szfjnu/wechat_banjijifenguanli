@@ -469,13 +469,13 @@ export default function DutyRoster(props) {
   }
   return <div className="min-h-screen bg-gray-50 pb-16">
       {/* 头部统计 */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 pb-8">
-        <h1 className="text-2xl font-bold mb-2 flex items-center">
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 pb-5">
+        <h1 className="text-xl font-bold mb-1.5 flex items-center">
           <CalendarDays className="mr-2" />
           卫生值日表
         </h1>
-        <p className="text-blue-100 text-sm mb-6">管理班级值日任务，支持自动分配、评分与提醒</p>
-        <div className="grid grid-cols-4 gap-3">
+        <p className="text-blue-100 text-xs mb-4">管理班级值日任务，支持自动分配、评分与提醒</p>
+        <div className="grid grid-cols-2 gap-2">
           <StatCard title="本周任务" value={pendingTasks.length + completedTasks.length} icon={Calendar} color="blue" subtitle="总共" />
           <StatCard title="待完成" value={pendingTasks.length} icon={Clock} color="amber" subtitle="值日任务" />
           <StatCard title="已完成" value={completedTasks.length} icon={CheckCircle} color="green" subtitle="值日任务" />
@@ -484,8 +484,8 @@ export default function DutyRoster(props) {
       </div>
 
       {/* 筛选栏 */}
-      <div className="px-4 py-3 bg-white shadow-sm sticky top-0 z-10">
-        <div className="flex gap-3 items-center">
+      <div className="px-3 py-2 bg-white shadow-sm sticky top-0 z-10">
+        <div className="flex gap-2 items-center">
           <span className="text-sm text-gray-600 font-medium">筛选:</span>
           <Select value={selectedWeek} onValueChange={setSelectedWeek}>
             <SelectTrigger className="w-32">
@@ -530,13 +530,13 @@ export default function DutyRoster(props) {
 
       {/* 待提醒任务通知 */}
       {notifications.length > 0 && <div className="px-4 py-3">
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-            <div className="flex items-start gap-3">
-              <Bell className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-2">
+            <div className="flex items-start gap-2">
+              <Bell className="w-4 h-4 text-orange-600 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
-                <h3 className="font-semibold text-orange-800 mb-2">待提醒任务</h3>
+                <h3 className="font-semibold text-orange-800 mb-1 text-sm">待提醒任务</h3>
                 <div className="space-y-2">
-                  {notifications.map(notification => <div key={notification.id} className="bg-white rounded p-3 text-sm">
+                  {notifications.map(notification => <div key={notification.id} className="bg-white rounded p-2 text-xs">
                       <p className="text-gray-700">{notification.message}</p>
                       <p className="text-gray-400 text-xs mt-1">{notification.time}</p>
                     </div>)}
@@ -549,22 +549,22 @@ export default function DutyRoster(props) {
       {/* 值日任务列表 */}
       <div className="px-4 py-3">
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
+          <div className="p-2 bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
             <h2 className="text-lg font-semibold text-gray-800">值日任务清单</h2>
-            <p className="text-sm text-gray-600 mt-1">{getWeekRange()} · 第{getWeekNumber(new Date())}周</p>
+            <p className="text-xs text-gray-600 mt-0.5">{getWeekRange()} · 第{getWeekNumber(new Date())}周</p>
           </div>
           <div className="divide-y">
-            {filteredTasks.map(task => <div key={task.id} className={`p-4 hover:bg-gray-50 transition-colors ${task.status === 'completed' ? 'bg-green-50/30' : ''}`}>
-                <div className="flex items-start gap-4">
+            {filteredTasks.map(task => <div key={task.id} className={`p-2 hover:bg-gray-50 transition-colors ${task.status === 'completed' ? 'bg-green-50/30' : ''}`}>
+                <div className="flex items-start gap-3">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex items-center gap-2 mb-1">
                       <span className="text-2xl">{task.taskIcon}</span>
                       <div>
                         <h3 className="font-semibold text-gray-800">{task.taskName}</h3>
                         <p className="text-sm text-gray-500">{task.studentName} · {task.studentNo}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
+                    <div className="flex items-center gap-3 text-xs text-gray-600">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-4 h-4" />
                         {formatDate(task.date)}
@@ -575,14 +575,14 @@ export default function DutyRoster(props) {
                       </span>
                       {task.isCustom && <Badge variant="secondary" className="text-xs">自定义</Badge>}
                     </div>
-                    {task.status === 'completed' && <div className="mt-2">
-                        <div className="flex items-center gap-2 text-sm">
+                    {task.status === 'completed' && <div className="mt-1.5">
+                        <div className="flex items-center gap-2 text-xs">
                           <span className="text-green-600 font-medium">已评分：</span>
                           <span className="text-yellow-500 font-bold">{task.score}分</span>
                           <span className="text-gray-500">/ {task.points}分</span>
                         </div>
-                        {task.comment && <p className="text-sm text-gray-600 mt-1 bg-gray-50 rounded p-2">评价：{task.comment}</p>}
-                        {task.images && task.images.length > 0 && <div className="mt-2 flex gap-2">
+                        {task.comment && <p className="text-xs text-gray-600 mt-1 bg-gray-50 rounded p-1.5">评价：{task.comment}</p>}
+                        {task.images && task.images.length > 0 && <div className="mt-1.5 flex gap-2">
                             {task.images.map((img, idx) => <button key={idx} onClick={() => {
                       setPreviewImage(img.url);
                       setShowImagePreview(true);
@@ -616,8 +616,8 @@ export default function DutyRoster(props) {
                   </div>
                 </div>
               </div>)}
-            {filteredTasks.length === 0 && <div className="p-8 text-center text-gray-500">
-                <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+            {filteredTasks.length === 0 && <div className="p-6 text-center text-gray-500">
+                <Calendar className="w-10 h-10 mx-auto mb-2 text-gray-400" />
                 <p>暂无值日任务</p>
               </div>}
           </div>
@@ -632,7 +632,7 @@ export default function DutyRoster(props) {
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">选择学生</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">选择学生</label>
               <Select value={newTask.studentId} onValueChange={val => setNewTask({
               ...newTask,
               studentId: val
@@ -648,7 +648,7 @@ export default function DutyRoster(props) {
               </Select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">任务类型</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">任务类型</label>
               <div className="space-y-2">
                 <Button onClick={() => setIsCustomTask(false)} variant={!isCustomTask ? 'default' : 'outline'} className="w-full justify-start">
                   <Calendar className="w-4 h-4 mr-2" />
@@ -685,14 +685,14 @@ export default function DutyRoster(props) {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">值日日期</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">值日日期</label>
               <Input type="date" value={newTask.date} onChange={e => setNewTask({
               ...newTask,
               date: e.target.value
             })} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">任务积分</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">任务积分</label>
               <Input type="number" value={newTask.points} onChange={e => setNewTask({
               ...newTask,
               points: parseInt(e.target.value)
@@ -714,7 +714,7 @@ export default function DutyRoster(props) {
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">任务评分（满分{selectedTask?.points || 5}分）</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">任务评分（满分{selectedTask?.points || 5}分）</label>
               <div className="flex gap-2">
                 {[1, 2, 3, 4, 5].map(score => <Button key={score} onClick={() => setCheckForm({
                 ...checkForm,
@@ -725,23 +725,23 @@ export default function DutyRoster(props) {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">评价备注</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">评价备注</label>
               <Textarea value={checkForm.comment} onChange={e => setCheckForm({
               ...checkForm,
               comment: e.target.value
             })} placeholder="请输入评价备注（可选）" rows={3} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">上传证据图片（可选）</label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">上传证据图片（可选）</label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-gray-400 transition-colors">
                 <input type="file" multiple accept="image/*" onChange={handleImageUpload} className="hidden" id="task-images" />
                 <label htmlFor="task-images" className="cursor-pointer">
-                  <Camera className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                  <Camera className="w-6 h-6 text-gray-400 mx-auto mb-1.5" />
                   <p className="text-sm text-gray-600">点击上传图片</p>
-                  <p className="text-xs text-gray-400 mt-1">支持jpg、png格式，最多5张</p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">支持jpg、png格式，最多5张</p>
                 </label>
               </div>
-              {checkForm.images.length > 0 && <div className="grid grid-cols-5 gap-2 mt-3">
+              {checkForm.images.length > 0 && <div className="grid grid-cols-5 gap-1.5 mt-2">
                   {checkForm.images.map(img => <div key={img.id} className="relative">
                       <img src={img.url} alt="预览" className="w-full h-20 object-cover rounded" />
                       <button onClick={() => removeImage(img.id)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center hover:bg-red-600 text-xs">
@@ -765,14 +765,14 @@ export default function DutyRoster(props) {
             <DialogTitle>发送值日提醒</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="bg-blue-50 rounded-lg p-3">
+            <div className="bg-blue-50 rounded-lg p-2">
               <p className="text-sm text-blue-800">
                 <strong>{reminderForm.studentName}</strong> 将收到任务提醒
               </p>
-              <p className="text-xs text-blue-600 mt-1">任务：{reminderForm.taskName}</p>
+              <p className="text-[10px] text-blue-600 mt-0.5">任务：{reminderForm.taskName}</p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">提醒消息</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">提醒消息</label>
               <Textarea value={reminderForm.message} onChange={e => setReminderForm({
               ...reminderForm,
               message: e.target.value
