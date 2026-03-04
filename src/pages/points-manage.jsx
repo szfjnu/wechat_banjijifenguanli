@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 // @ts-ignore;
 import { Settings2, Target, Home, ShoppingBag, Bed, TrendingUp, ChevronRight, Plus, TrendingDown, Users, Award, BookOpen, Star } from 'lucide-react';
 
+import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 export default function PointsManage({
   $w,
@@ -138,51 +139,11 @@ export default function PointsManage({
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Quick Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-xl shadow-md p-4 border-l-4 border-blue-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-gray-500 mb-1">积分项目</p>
-                <p className="text-2xl font-bold text-gray-800">{stats.totalProjects}</p>
-              </div>
-              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                <Target className="w-5 h-5 text-blue-600" />
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl shadow-md p-4 border-l-4 border-amber-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-gray-500 mb-1">住宿学生</p>
-                <p className="text-2xl font-bold text-gray-800">{stats.totalStudents}</p>
-              </div>
-              <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
-                <Bed className="w-5 h-5 text-amber-600" />
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl shadow-md p-4 border-l-4 border-purple-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-gray-500 mb-1">兑换物品</p>
-                <p className="text-2xl font-bold text-gray-800">{stats.totalItems}</p>
-              </div>
-              <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
-                <ShoppingBag className="w-5 h-5 text-purple-600" />
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl shadow-md p-4 border-l-4 border-green-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-gray-500 mb-1">平均积分</p>
-                <p className="text-2xl font-bold text-gray-800">{stats.avgPoints}</p>
-              </div>
-              <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-green-600" />
-              </div>
-            </div>
-          </div>
+        <div className="grid grid-cols-2 gap-2 mb-4">
+          <StatCard title="积分项目" value={stats.totalProjects} icon={Target} color="blue" />
+          <StatCard title="住宿学生" value={stats.totalStudents} icon={Bed} color="amber" />
+          <StatCard title="兑换物品" value={stats.totalItems} icon={ShoppingBag} color="purple" />
+          <StatCard title="平均积分" value={stats.avgPoints} icon={TrendingUp} color="green" />
         </div>
 
         {/* Menu Items */}
@@ -261,6 +222,7 @@ export default function PointsManage({
         </div>
       </div>
 
+      {/* 底部导航栏 */}
       <TabBar currentPage={currentPage} onPageChange={setCurrentPage} />
     </div>;
 }

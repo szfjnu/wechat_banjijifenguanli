@@ -3,8 +3,9 @@ import React, { useState, useEffect } from 'react';
 // @ts-ignore;
 import { useToast } from '@/components/ui';
 // @ts-ignore;
-import { Settings2, Target, Plus, Edit2, Trash2, Save, X, TrendingUp, Star, Shield, BookOpen, Heart, Award, Zap, ChevronUp, ChevronDown } from 'lucide-react';
+import { Settings2, Target, Plus, Edit2, Trash2, Save, X, TrendingUp, Star, Shield, BookOpen, Heart, Award, Zap, ChevronUp, ChevronDown, CheckCircle, Database } from 'lucide-react';
 
+import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 export default function PointsSettings({
   $w,
@@ -368,23 +369,11 @@ export default function PointsSettings({
           </div>
           
           {/* Stats Cards */}
-          <div className="grid grid-cols-4 gap-3">
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3">
-              <div className="text-2xl font-bold">{stats.total}</div>
-              <div className="text-xs text-white/80">项目总数</div>
-            </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3">
-              <div className="text-2xl font-bold">{stats.enabled}</div>
-              <div className="text-xs text-white/80">已启用</div>
-            </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3">
-              <div className="text-2xl font-bold">{stats.positive}</div>
-              <div className="text-xs text-white/80">加分项</div>
-            </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3">
-              <div className="text-2xl font-bold">{stats.totalUsage}</div>
-              <div className="text-xs text-white/80">使用次数</div>
-            </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <StatCard title="项目总数" value={stats.total} icon={Database} color="teal" />
+            <StatCard title="已启用" value={stats.enabled} icon={CheckCircle} color="green" />
+            <StatCard title="加分项" value={stats.positive} icon={TrendingUp} color="amber" />
+            <StatCard title="使用次数" value={stats.totalUsage} icon={Shield} color="blue" />
           </div>
         </div>
       </div>
@@ -598,7 +587,8 @@ export default function PointsSettings({
       
       {/* 底部导航栏 */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
-        <TabBar currentPage={currentPage} onPageChange={setCurrentPage} />
+        {/* 底部导航栏 */}
+      <TabBar currentPage={currentPage} onPageChange={setCurrentPage} />
       </div>
     </div>;
 }

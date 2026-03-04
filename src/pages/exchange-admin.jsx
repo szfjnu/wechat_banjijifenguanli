@@ -5,6 +5,7 @@ import { useToast } from '@/components/ui';
 // @ts-ignore;
 import { Package, ShoppingBag, Clock, CheckCircle2, XCircle, AlertTriangle, Plus, Edit2, Trash2, TrendingUp, Users, DollarSign, Eye, MoreHorizontal, Filter, Search, Calendar, Camera, X, Settings2, Award, Trophy } from 'lucide-react';
 
+import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 export default function ExchangeAdmin({
   $w,
@@ -389,35 +390,11 @@ export default function ExchangeAdmin({
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-indigo-100 text-xs">物品总数</span>
-                <Package className="w-4 h-4 text-yellow-300" />
-              </div>
-              <div className="text-2xl font-bold text-white">{stats.totalItems}</div>
-            </div>
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-indigo-100 text-xs">可兑换</span>
-                <CheckCircle2 className="w-4 h-4 text-green-300" />
-              </div>
-              <div className="text-2xl font-bold text-white">{stats.availableItems}</div>
-            </div>
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-indigo-100 text-xs">投标中</span>
-                <TrendingUp className="w-4 h-4 text-pink-300" />
-              </div>
-              <div className="text-2xl font-bold text-white">{stats.biddingItems}</div>
-            </div>
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-indigo-100 text-xs">总兑换</span>
-                <DollarSign className="w-4 h-4 text-blue-300" />
-              </div>
-              <div className="text-2xl font-bold text-white">{stats.totalExchanges}</div>
-            </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-4">
+            <StatCard title="物品总数" value={stats.totalItems} icon={Package} color="purple" />
+            <StatCard title="可兑换" value={stats.availableItems} icon={CheckCircle2} color="green" />
+            <StatCard title="投标中" value={stats.biddingItems} icon={TrendingUp} color="pink" />
+            <StatCard title="总兑换" value={stats.totalExchanges} icon={DollarSign} color="blue" />
           </div>
         </div>
       </div>

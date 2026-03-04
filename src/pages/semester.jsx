@@ -5,6 +5,7 @@ import { Plus, Calendar, Clock, CheckCircle, Edit3, Trash2, Flag, CalendarDays, 
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
 
+import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 
 // 模拟学期数据
@@ -240,35 +241,14 @@ export default function SemesterPage(props) {
       {/* 主内容区 */}
       <main className="max-w-6xl mx-auto px-4 py-6 pb-24">
         {/* 统计卡片 */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-500 mb-1">学期总数</p>
-                <p className="text-3xl font-bold text-slate-800">{totalSemesters}</p>
-              </div>
-              <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
-                <CalendarDays className="w-6 h-6 text-blue-600" strokeWidth={2.5} />
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-500 mb-1">当前学期</p>
-                <p className="text-lg font-semibold text-slate-800 truncate">{currentSemester ? currentSemester.name : '未设置'}</p>
-              </div>
-              <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
-                <Flag className="w-6 h-6 text-green-600" strokeWidth={2.5} />
-              </div>
-            </div>
-          </div>
+        <div className="grid grid-cols-2 gap-2 mb-4">
+          <StatCard title="学期总数" value={totalSemesters} icon={CalendarDays} color="blue" />
+          <StatCard title="当前学期" value={currentSemester ? currentSemester.name : '未设置'} icon={Flag} color="green" />
         </div>
 
         {/* 操作栏 */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-semibold text-slate-800">学期列表</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-base font-semibold text-slate-800">学期列表</h2>
           <Button onClick={() => setShowCreateDialog(true)} className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium">
             <Plus className="w-4 h-4 mr-2" strokeWidth={2.5} />
             新建学期
@@ -443,6 +423,7 @@ export default function SemesterPage(props) {
           </div>
         </div>}
 
+      {/* 底部导航栏 */}
       {/* 底部导航栏 */}
       <TabBar currentPage={currentPage} onPageChange={setCurrentPage} />
     </div>;
