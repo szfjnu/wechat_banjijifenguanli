@@ -510,38 +510,6 @@ export default function ExchangePage({
           </div>
         </div>
         
-        {/* 统计卡片 */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between mb-2">
-              <Gift className="w-8 h-8 text-orange-500" />
-              <span className="text-2xl font-bold text-gray-900">{filteredItems.length}</span>
-            </div>
-            <div className="text-sm text-gray-600">可兑换物品</div>
-          </div>
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between mb-2">
-              <Trophy className="w-8 h-8 text-purple-500" />
-              <span className="text-2xl font-bold text-gray-900">{filteredItems.filter(i => i.mode === 'bidding').length}</span>
-            </div>
-            <div className="text-sm text-gray-600">投标物品</div>
-          </div>
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between mb-2">
-              <Users className="w-8 h-8 text-blue-500" />
-              <span className="text-2xl font-bold text-gray-900">{filteredBiddings.length}</span>
-            </div>
-            <div className="text-sm text-gray-600">投标记录</div>
-          </div>
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between mb-2">
-              <CheckCircle className="w-8 h-8 text-green-500" />
-              <span className="text-2xl font-bold text-gray-900">{filteredExchanges.length}</span>
-            </div>
-            <div className="text-sm text-gray-600">兑换成功</div>
-          </div>
-        </div>
-        
         {/* 物品列表 - 紧凑 */}
         <div className="">
           <div className="flex items-center justify-between mb-3">
