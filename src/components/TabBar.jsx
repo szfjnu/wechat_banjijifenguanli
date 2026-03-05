@@ -120,6 +120,16 @@ const CATEGORIES = [{
     label: '违纪记录',
     icon: ShieldAlert
   }]
+}, {
+  id: 'parent',
+  label: '家长端',
+  icon: Heart,
+  color: 'green',
+  items: [{
+    id: 'parent-view',
+    label: '家长查看',
+    icon: User
+  }]
 }];
 
 // 获取颜色样式
