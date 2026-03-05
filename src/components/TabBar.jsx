@@ -14,6 +14,10 @@ const CATEGORIES = [{
     label: '学生档案',
     icon: Users
   }, {
+    id: 'students-manage',
+    label: '基础信息',
+    icon: User
+  }, {
     id: 'grades',
     label: '成绩管理',
     icon: BookOpen
@@ -95,10 +99,6 @@ const CATEGORIES = [{
     id: 'exam-monitor',
     label: '转段考',
     icon: GraduationCap
-  }, {
-    id: 'student-manage',
-    label: '学生信息管理',
-    icon: FileText
   }, {
     id: 'ai-review',
     label: 'AI点评',
