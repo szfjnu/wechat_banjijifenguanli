@@ -22,6 +22,10 @@ const CATEGORIES = [{
     label: '成长轨迹',
     icon: Activity
   }, {
+    id: 'parent-view',
+    label: '家长查看',
+    icon: Users
+  }, {
     id: 'grades',
     label: '成绩管理',
     icon: BookOpen

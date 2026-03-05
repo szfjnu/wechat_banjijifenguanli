@@ -6,3 +6,6 @@ export * from './StudentForm.jsx';
 export * from './StudentDetail.jsx';
 export * from './GrowthChart.jsx';
 export * from './GrowthTimeline.jsx';
+export * from './StudentComparison.jsx';
+export * from './ExcelExport.jsx';
+export * from './ReportGenerator.jsx';

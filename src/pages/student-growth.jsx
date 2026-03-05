@@ -25,6 +25,8 @@ export default function StudentGrowth(props) {
   const [filterType, setFilterType] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [sortOrder, setSortOrder] = useState('desc');
+  const [semesters, setSemesters] = useState([]);
+  const [selectedSemester, setSelectedSemester] = useState('');
 
   // 加载学生列表
   const loadStudents = async () => {
@@ -32,8 +34,20 @@ export default function StudentGrowth(props) {
       setLoading(true);
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
+
+      // 加载学生列表
       const result = await db.collection('students').get();
       setStudents(result.data || []);
+
+      // 加载学期列表
+      const semesterResult = await db.collection('semesters').get();
+      const semesterList = semesterResult.data || [];
+      setSemesters(semesterList);
+
+      // 默认选中第一个学期
+      if (semesterList.length > 0) {
+        setSelectedSemester(semesterList[0]._id);
+      }
     } catch (error) {
       console.error('加载学生列表失败:', error);
       toast({
@@ -56,8 +70,10 @@ export default function StudentGrowth(props) {
     try {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
+      const _ = db.command;
       const result = await db.collection('score_records').where({
         student_id: student.student_id,
+        semester_id: selectedSemester,
         approval_status: '已通过'
       }).orderBy('created_at', 'asc').get();
       setScoreRecords(result.data || []);
@@ -78,7 +94,7 @@ export default function StudentGrowth(props) {
     if (selectedStudent) {
       loadStudentRecords(selectedStudent);
     }
-  }, [selectedStudent]);
+  }, [selectedStudent, selectedSemester]);
 
   // 筛选和排序记录
   useEffect(() => {
