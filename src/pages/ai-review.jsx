@@ -423,6 +423,6 @@ ${name}同学在本学期表现优异，总积分达到${data.totalPoints}分，
       </div>
 
       {/* 底部导航栏 */}
-      <TabBar currentPage={currentPage} onPageChange={setCurrentPage} />
+      <TabBar currentPage={currentPage} onPageChange={handlePageChange} />
     </div>;
 }

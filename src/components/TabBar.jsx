@@ -1,7 +1,7 @@
 // @ts-ignore;
 import React, { useState, useEffect } from 'react';
 // @ts-ignore;
-import { Home, Users, TrendingUp, Gift, ShieldAlert, Award, BookOpen, UsersRound, Grid3X3, Heart, FileText, Brain, CalendarDays, GraduationCap, CalendarCheck, Calculator, ChevronUp, ChevronDown, Bed, Star, Settings, LayoutGrid, Grid2x2 } from 'lucide-react';
+import { Home, Users, TrendingUp, Gift, ShieldAlert, Award, BookOpen, UsersRound, Grid3X3, Heart, FileText, Brain, CalendarDays, GraduationCap, CalendarCheck, Calculator, ChevronUp, ChevronDown, Bed, Star, Settings, LayoutGrid } from 'lucide-react';
 
 // 分类定义 - 按功能归类
 const CATEGORIES = [{
@@ -111,26 +111,26 @@ const getColorStyles = (color, isActive) => {
   const colorMap = {
     blue: {
       active: 'bg-blue-500 text-white',
-      inactive: 'text-gray-600 hover:text-blue-600 hover:bg-blue-50',
-      bg: 'bg-white border border-gray-200',
+      inactive: 'text-gray-500 hover:text-blue-500',
+      bg: 'hover:bg-blue-50',
       hex: '#3b82f6'
     },
     green: {
       active: 'bg-green-500 text-white',
-      inactive: 'text-gray-600 hover:text-green-600 hover:bg-green-50',
-      bg: 'bg-white border border-gray-200',
+      inactive: 'text-gray-500 hover:text-green-500',
+      bg: 'hover:bg-green-50',
       hex: '#22c55e'
     },
     purple: {
       active: 'bg-purple-500 text-white',
-      inactive: 'text-gray-600 hover:text-purple-600 hover:bg-purple-50',
-      bg: 'bg-white border border-gray-200',
+      inactive: 'text-gray-500 hover:text-purple-500',
+      bg: 'hover:bg-purple-50',
       hex: '#a855f7'
     },
     orange: {
       active: 'bg-orange-500 text-white',
-      inactive: 'text-gray-600 hover:text-orange-600 hover:bg-orange-50',
-      bg: 'bg-white border border-gray-200',
+      inactive: 'text-gray-500 hover:text-orange-500',
+      bg: 'hover:bg-orange-50',
       hex: '#f97316'
     }
   };
@@ -138,13 +138,12 @@ const getColorStyles = (color, isActive) => {
 };
 
 /**
- * TabBar 组件 - 底部导航栏（横向布局）
- *
+ * TabBar 组件 - 底部导航栏
+ * 
  * 功能：
  * - 首页快速入口
  * - 分类导航（学生管理、积分管理、班级事务、综合管理）
- * - 横向排列的主导航按钮
- * - 点击展开下拉子菜单
+ * - 下拉式子菜单
  * - 页面切换
  */
 export function TabBar({
@@ -219,23 +218,23 @@ export function TabBar({
       return () => document.removeEventListener('click', handleClickOutside);
     }
   }, [expandedCategory]);
-  return <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-2 py-1.5 z-50 shadow-lg">
+  return <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-1 py-1 z-50 shadow-lg">
       <div className="max-w-7xl mx-auto">
-        {/* 底部主导航 - 横向排列 */}
-        <div className="flex justify-between items-center gap-1">
+        {/* 底部主导航 */}
+        <div className="flex justify-around items-center py-0.5">
           {/* 首页按钮 */}
-          <button onClick={() => handlePageChange('home')} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all duration-200 text-xs ${currentPage === 'home' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'}`}>
-            <Home className="w-4 h-4" strokeWidth={2.5} />
-            <span className="font-medium">首页</span>
+          <button onClick={() => handlePageChange('home')} className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg transition-all duration-200 ${currentPage === 'home' ? 'bg-blue-500 text-white' : 'text-gray-500 hover:text-blue-500 hover:bg-blue-50'}`}>
+            <Home className="w-4.5 h-4.5" strokeWidth={2.5} />
+            <span className="text-[9px] font-medium leading-tight">首页</span>
           </button>
 
-          {/* 分类按钮 - 横向排列 */}
+          {/* 分类按钮 */}
           {CATEGORIES.map(category => {
           const Icon = category.icon;
           const isExpanded = expandedCategory === category.id;
           const isActive = activeCategory === category.id;
           const styles = getColorStyles(category.color, isActive);
-          return <div key={category.id} className="relative" onClick={e => e.stopPropagation()}>
+          return <div key={category.id} className="relative">
                 <button onClick={e => {
               e.stopPropagation();
               if (category.items && category.items.length > 0) {
@@ -243,26 +242,28 @@ export function TabBar({
               } else {
                 handlePageChange(category.id);
               }
-            }} className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-all duration-200 text-xs ${isActive && !isExpanded ? styles.active : styles.inactive}`}>
-                  <Icon className="w-4 h-4" strokeWidth={2.5} />
-                  <span className="font-medium">{category.label}</span>
-                  {isActive && !isExpanded && <span className="ml-0.5 w-1.5 h-1.5 bg-red-500 rounded-full"></span>}
+            }} className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg transition-all duration-200 ${isActive && !isExpanded ? styles.active : styles.inactive} ${styles.bg}`}>
+                  <div className="relative">
+                    <Icon className="w-4.5 h-4.5" strokeWidth={2.5} />
+                    {isActive && !isExpanded && <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>}
+                  </div>
+                  <span className="text-[9px] font-medium leading-tight">{category.label}</span>
                 </button>
 
                 {/* 展开的子菜单 */}
                 {isExpanded && <div className={`absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 
                     bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden 
-                    min-w-[280px] animate-in slide-in-from-bottom-2 duration-200 z-[100]
+                    min-w-[320px] animate-in slide-in-from-bottom-2 duration-200 z-[100]
                   `}>
-                    <div className="p-2">
+                    <div className="p-2.5">
                       <div className="flex items-center gap-2 mb-2 pb-2 border-b border-gray-100">
                         <Icon className="w-4 h-4" style={{
                     color: styles.hex
                   }} />
-                        <span className="text-xs font-semibold text-gray-700">{category.label}</span>
-                        <span className="ml-auto text-[10px] text-gray-400">{category.items.length} 项</span>
+                        <span className="text-sm font-semibold text-gray-700">{category.label}</span>
+                        <span className="ml-auto text-xs text-gray-400">{category.items.length} 项</span>
                       </div>
-                      <div className="grid grid-cols-2 gap-1">
+                      <div className="grid grid-cols-3 gap-1.5">
                         {category.items && category.items.map(item => {
                     const ItemIcon = item.icon;
                     const isItemActive = currentPage === item.id;
@@ -270,17 +271,16 @@ export function TabBar({
                     return <button key={item.id} onClick={e => {
                       e.stopPropagation();
                       handlePageChange(item.id);
-                    }} className={`flex items-center gap-1.5 p-2 rounded-lg transition-all duration-200 text-xs ${isItemActive ? itemStyles.active : 'text-gray-600 hover:bg-gray-50'}`}>
-                              <ItemIcon className="w-3.5 h-3.5" strokeWidth={2.5} />
-                              <span className="font-medium">{item.label}</span>
+                    }} className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all duration-200 ${isItemActive ? itemStyles.active : 'text-gray-600 hover:bg-gray-50'}`}>
+                              <ItemIcon className="w-4 h-4" strokeWidth={2.5} />
+                              <span className="text-[9px] font-medium">{item.label}</span>
                             </button>;
                   })}
                       </div>
                     </div>
                     {/* 三角形箭头 */}
-                    <div className={`absolute bottom-[-6px] left-1/2 transform -translate-x-1/2 
-                      w-3 h-3 bg-white border-r border-b border-gray-200 rotate-45 z-[-1]
-                    `}>
+                    <div className="absolute bottom-[-6px] left-1/2 transform -translate-x-1/2 
+                      w-3 h-3 bg-white border-r border-b border-gray-200 rotate-45 z-[-1]">
                     </div>
                   </div>}
               </div>;

@@ -892,6 +892,6 @@ export default function DisciplinePage(props) {
           </div>}
 
         {/* 底部导航栏 */}
-        <TabBar currentPage={currentPage} onPageChange={setCurrentPage} />
+        <TabBar currentPage={currentPage} onPageChange={handlePageChange} />
       </div>;
 }

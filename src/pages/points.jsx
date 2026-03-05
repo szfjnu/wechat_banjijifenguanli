@@ -203,6 +203,13 @@ export default function PointsPage(props) {
     toast
   } = useToast();
   const [currentPage, setCurrentPage] = useState('points');
+  const handlePageChange = pageId => {
+    setCurrentPage(pageId);
+    $w.utils.navigateTo({
+      pageId,
+      params: {}
+    });
+  };
   const [showAddModal, setShowAddModal] = useState(false);
   const [showHistory, setShowHistory] = useState(true);
   const [filterCategory, setFilterCategory] = useState('all');
@@ -564,6 +571,6 @@ export default function PointsPage(props) {
         </div>}
 
       {/* 底部导航栏 */}
-      <TabBar currentPage={currentPage} onPageChange={setCurrentPage} />
+      <TabBar currentPage={currentPage} onPageChange={handlePageChange} />
     </div>;
 }

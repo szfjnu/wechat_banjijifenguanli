@@ -230,6 +230,13 @@ export default function GradesPage(props) {
     toast
   } = useToast();
   const [currentPage, setCurrentPage] = useState('grades');
+  const handlePageChange = pageId => {
+    setCurrentPage(pageId);
+    $w.utils.navigateTo({
+      pageId,
+      params: {}
+    });
+  };
   const [loading, setLoading] = useState(true);
   const [grades, setGrades] = useState([]);
   const [students, setStudents] = useState([]);
@@ -697,7 +704,7 @@ export default function GradesPage(props) {
           </div>}
 
         {/* 底部导航栏 */}
-        <TabBar currentPage={currentPage} onPageChange={setCurrentPage} />
+        <TabBar currentPage={currentPage} onPageChange={handlePageChange} />
       </div>
     </div>;
 }

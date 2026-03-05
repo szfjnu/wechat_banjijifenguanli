@@ -1053,6 +1053,6 @@ export default function DormPointsPage(props) {
               </div>
             </div>}
 
-        <TabBar currentPage={currentPage} onPageChange={setCurrentPage} />
+        <TabBar currentPage={currentPage} onPageChange={handlePageChange} />
       </div>;
 }

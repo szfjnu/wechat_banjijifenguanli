@@ -175,6 +175,13 @@ export default function CertificatesPage(props) {
     toast
   } = useToast();
   const [currentPage, setCurrentPage] = useState('certificates');
+  const handlePageChange = pageId => {
+    setCurrentPage(pageId);
+    $w.utils.navigateTo({
+      pageId,
+      params: {}
+    });
+  };
   const [certificates, setCertificates] = useState([]);
   const [filteredCertificates, setFilteredCertificates] = useState([]);
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -704,6 +711,6 @@ export default function CertificatesPage(props) {
           </div>}
 
         {/* 底部导航栏 */}
-        <TabBar currentPage={currentPage} onPageChange={setCurrentPage} />
+        <TabBar currentPage={currentPage} onPageChange={handlePageChange} />
       </div>;
 }

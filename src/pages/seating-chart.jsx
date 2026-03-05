@@ -126,6 +126,13 @@ export default function SeatingChart(props) {
     toast
   } = useToast();
   const [currentPage, setCurrentPage] = useState('seating-chart');
+  const handlePageChange = pageId => {
+    setCurrentPage(pageId);
+    $w.utils.navigateTo({
+      pageId,
+      params: {}
+    });
+  };
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState([]);
   const [seats, setSeats] = useState({});
@@ -568,6 +575,6 @@ export default function SeatingChart(props) {
         </DialogContent>
       </Dialog>
       
-      <TabBar currentPage={currentPage} onPageChange={setCurrentPage} />
+      <TabBar currentPage={currentPage} onPageChange={handlePageChange} />
     </div>;
 }

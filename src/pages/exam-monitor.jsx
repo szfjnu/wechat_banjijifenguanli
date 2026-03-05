@@ -878,6 +878,6 @@ export default function ExamMonitorPage(props) {
         </div>}
 
       {/* 底部导航栏 */}
-      <TabBar currentPage={currentPage} onPageChange={pageId => setCurrentPage(pageId)} />
+      <TabBar currentPage={currentPage} onPageChange={handlePageChange} />
     </div>;
 }

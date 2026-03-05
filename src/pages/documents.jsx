@@ -824,6 +824,6 @@ export default function DocumentsPage({
         </DialogContent>
       </Dialog>
       
-      <TabBar currentPage={currentPage} onPageChange={setCurrentPage} />
+      <TabBar currentPage={currentPage} onPageChange={handlePageChange} />
     </div>;
 }

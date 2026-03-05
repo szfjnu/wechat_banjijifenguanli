@@ -572,7 +572,7 @@ export default function Subjects(props) {
       
       {/* 底部导航栏 */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
-        <TabBar currentPage={currentPage} onPageChange={setCurrentPage} />
+        <TabBar currentPage={currentPage} onPageChange={handlePageChange} />
       </div>
     </div>;
 }

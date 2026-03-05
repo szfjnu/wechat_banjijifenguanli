@@ -584,6 +584,6 @@ export default function GroupsPage(props) {
           </div>}
 
         {/* 底部导航栏 */}
-        <TabBar currentPage={currentPage} onPageChange={setCurrentPage} />
+        <TabBar currentPage={currentPage} onPageChange={handlePageChange} />
       </div>;
 }

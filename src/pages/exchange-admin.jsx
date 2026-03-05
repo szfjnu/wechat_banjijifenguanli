@@ -666,6 +666,6 @@ export default function ExchangeAdmin({
           </div>
         </div>}
 
-      <TabBar currentPage={currentPage} onPageChange={setCurrentPage} />
+      <TabBar currentPage={currentPage} onPageChange={handlePageChange} />
     </div>;
 }

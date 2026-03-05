@@ -207,6 +207,10 @@ export default function Students(props) {
   };
   const handlePageChange = pageId => {
     setCurrentPage(pageId);
+    $w.utils.navigateTo({
+      pageId,
+      params: {}
+    });
   };
   const handleViewDetails = student => {
     setSelectedStudent(student);
