@@ -172,6 +172,7 @@ export default function DormPointsPage(props) {
   const [newConversionRate, setNewConversionRate] = useState(CONVERSION_RATE);
   const [deductionItems, setDeductionItems] = useState([...DEDUCTION_ITEMS]);
   const [editingItem, setEditingItem] = useState(null);
+  const [showAddForm, setShowAddForm] = useState(false);
   const [itemFormData, setItemFormData] = useState({
     id: null,
     name: '',
@@ -189,6 +190,7 @@ export default function DormPointsPage(props) {
   // 项目管理函数
   const handleAddItem = () => {
     setEditingItem(null);
+    setShowAddForm(true);
     setItemFormData({
       id: null,
       name: '',
@@ -198,6 +200,7 @@ export default function DormPointsPage(props) {
   };
   const handleEditItem = item => {
     setEditingItem(item);
+    setShowAddForm(false);
     setItemFormData({
       ...item
     });
@@ -234,6 +237,7 @@ export default function DormPointsPage(props) {
       });
     }
     setEditingItem(null);
+    setShowAddForm(false);
     setItemFormData({
       id: null,
       name: '',
@@ -971,7 +975,7 @@ export default function DormPointsPage(props) {
                     </Button>
                   </div>
 
-                  {editingItem !== null && <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-4">
+                  {(editingItem !== null || showAddForm) && <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-4">
                       <h4 className="font-semibold text-gray-800 mb-3">{editingItem ? '编辑项目' : '添加新项目'}</h4>
                       <div className="space-y-3">
                         <div>
@@ -1000,7 +1004,10 @@ export default function DormPointsPage(props) {
                           </select>
                         </div>
                         <div className="flex gap-2">
-                          <Button onClick={() => setEditingItem(null)} className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors">
+                          <Button onClick={() => {
+                  setEditingItem(null);
+                  setShowAddForm(false);
+                }} className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors">
                             取消
                           </Button>
                           <Button onClick={handleSaveItem} className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors">
