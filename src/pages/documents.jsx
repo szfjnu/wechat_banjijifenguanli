@@ -173,6 +173,13 @@ export default function DocumentsPage({
     toast
   } = useToast();
   const [currentPage, setCurrentPage] = useState('documents');
+  const handlePageChange = pageId => {
+    setCurrentPage(pageId);
+    $w.utils.navigateTo({
+      pageId,
+      params: {}
+    });
+  };
   // 文件列表
   const [files, setFiles] = useState(MOCK_FILES);
   const [filteredFiles, setFilteredFiles] = useState(MOCK_FILES);

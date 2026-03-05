@@ -155,6 +155,13 @@ export default function DormPointsPage(props) {
     toast
   } = useToast();
   const [currentPage, setCurrentPage] = useState('dorm-points');
+  const handlePageChange = pageId => {
+    setCurrentPage(pageId);
+    $w.utils.navigateTo({
+      pageId,
+      params: {}
+    });
+  };
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);

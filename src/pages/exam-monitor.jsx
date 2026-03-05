@@ -265,6 +265,13 @@ export default function ExamMonitorPage(props) {
     navigateTo
   } = props.$w.utils;
   const [currentPage, setCurrentPage] = useState('exam-monitor');
+  const handlePageChange = pageId => {
+    setCurrentPage(pageId);
+    $w.utils.navigateTo({
+      pageId,
+      params: {}
+    });
+  };
 
   // 数据状态
   const [students] = useState(MOCK_STUDENTS);

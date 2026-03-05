@@ -15,6 +15,13 @@ export default function DutyRoster(props) {
     toast
   } = useToast();
   const [currentPage, setCurrentPage] = useState('duty-roster');
+  const handlePageChange = pageId => {
+    setCurrentPage(pageId);
+    $w.utils.navigateTo({
+      pageId,
+      params: {}
+    });
+  };
   const [loading, setLoading] = useState(true);
   const [tasks, setTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);

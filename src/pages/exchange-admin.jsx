@@ -16,6 +16,13 @@ export default function ExchangeAdmin({
     toast
   } = useToast();
   const [currentPage, setCurrentPage] = useState('exchange-admin');
+  const handlePageChange = pageId => {
+    setCurrentPage(pageId);
+    $w.utils.navigateTo({
+      pageId,
+      params: {}
+    });
+  };
   const [items, setItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');

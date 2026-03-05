@@ -132,6 +132,13 @@ export default function GroupsPage(props) {
     toast
   } = useToast();
   const [currentPage, setCurrentPage] = useState('groups');
+  const handlePageChange = pageId => {
+    setCurrentPage(pageId);
+    $w.utils.navigateTo({
+      pageId,
+      params: {}
+    });
+  };
   const [loading, setLoading] = useState(true);
   const [groups, setGroups] = useState([]);
   const [students, setStudents] = useState([]);

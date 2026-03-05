@@ -15,6 +15,13 @@ export default function Subjects(props) {
     toast
   } = useToast();
   const [currentPage, setCurrentPage] = useState('subjects');
+  const handlePageChange = pageId => {
+    setCurrentPage(pageId);
+    $w.utils.navigateTo({
+      pageId,
+      params: {}
+    });
+  };
   const [loading, setLoading] = useState(true);
   const [subjects, setSubjects] = useState([]);
   const [filteredSubjects, setFilteredSubjects] = useState([]);

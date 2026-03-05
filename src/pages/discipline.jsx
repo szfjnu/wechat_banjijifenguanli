@@ -188,6 +188,13 @@ export default function DisciplinePage(props) {
     toast
   } = useToast();
   const [currentPage, setCurrentPage] = useState('discipline');
+  const handlePageChange = pageId => {
+    setCurrentPage(pageId);
+    $w.utils.navigateTo({
+      pageId,
+      params: {}
+    });
+  };
   const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState([]);
   const [students, setStudents] = useState([]);

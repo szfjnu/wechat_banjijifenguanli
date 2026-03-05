@@ -207,6 +207,13 @@ export default function ExchangePage({
     toast
   } = useToast();
   const [currentPage, setCurrentPage] = useState('exchange');
+  const handlePageChange = pageId => {
+    setCurrentPage(pageId);
+    $w.utils.navigateTo({
+      pageId,
+      params: {}
+    });
+  };
   const [items, setItems] = useState(MOCK_ITEMS);
   const [biddings, setBiddings] = useState(MOCK_BIDDINGS);
   const [exchanges, setExchanges] = useState(MOCK_EXCHANGES);

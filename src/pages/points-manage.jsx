@@ -11,6 +11,13 @@ export default function PointsManage({
   style
 }) {
   const [currentPage, setCurrentPage] = useState('points-manage');
+  const handlePageChange = pageId => {
+    setCurrentPage(pageId);
+    $w.utils.navigateTo({
+      pageId,
+      params: {}
+    });
+  };
   const stats = {
     totalProjects: 10,
     totalStudents: 35,
