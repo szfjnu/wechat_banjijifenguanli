@@ -16,6 +16,13 @@ export default function PointsSettings({
     toast
   } = useToast();
   const [currentPage, setCurrentPage] = useState('points-settings');
+  const handlePageChange = pageId => {
+    setCurrentPage(pageId);
+    $w.utils.navigateTo({
+      pageId,
+      params: {}
+    });
+  };
 
   // 数据状态
   const [items, setItems] = useState([]);
