@@ -18,6 +18,7 @@ import SUBJECTS from '../pages/subjects.jsx';
 import EXCHANGE_ADMIN from '../pages/exchange-admin.jsx';
 import POINTS_MANAGE from '../pages/points-manage.jsx';
 import POINTS_SETTINGS from '../pages/points-settings.jsx';
+import SCHEDULE_MANAGE from '../pages/schedule-manage.jsx';
 export const routers = [{
   id: "home",
   component: HOME
@@ -78,4 +79,7 @@ export const routers = [{
 }, {
   id: "points-settings",
   component: POINTS_SETTINGS
+}, {
+  id: "schedule-manage",
+  component: SCHEDULE_MANAGE
 }]

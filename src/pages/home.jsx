@@ -8,6 +8,7 @@ import { Button, useToast } from '@/components/ui';
 import { TabBar } from '@/components/TabBar';
 import { StatCard } from '@/components/StatCard';
 import { PointsChart } from '@/components/PointsChart';
+import { TeacherScheduleReminder } from '@/components/TeacherScheduleReminder';
 export default function Home(props) {
   const {
     $w
@@ -308,6 +309,9 @@ export default function Home(props) {
               </div>}
           </div>
         </div>
+
+        {/* Teacher Schedule Reminder - New */}
+        <TeacherScheduleReminder $w={$w} />
 
         {/* Quick Stats - Compact Grid */}
         <div className="grid grid-cols-3 gap-2">
