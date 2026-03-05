@@ -20,6 +20,7 @@ import POINTS_MANAGE from '../pages/points-manage.jsx';
 import POINTS_SETTINGS from '../pages/points-settings.jsx';
 import SCHEDULE_MANAGE from '../pages/schedule-manage.jsx';
 import STUDENTS_MANAGE from '../pages/students-manage.jsx';
+import STUDENT_GROWTH from '../pages/student-growth.jsx';
 export const routers = [{
   id: "home",
   component: HOME
@@ -86,4 +87,7 @@ export const routers = [{
 }, {
   id: "students-manage",
   component: STUDENTS_MANAGE
+}, {
+  id: "student-growth",
+  component: STUDENT_GROWTH
 }]

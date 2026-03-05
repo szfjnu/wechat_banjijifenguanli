@@ -1,7 +1,7 @@
 // @ts-ignore;
 import React, { useState, useEffect } from 'react';
 // @ts-ignore;
-import { Home, Users, User, TrendingUp, Gift, ShieldAlert, Award, BookOpen, UsersRound, Grid3X3, Heart, FileText, Brain, CalendarDays, GraduationCap, CalendarCheck, Calculator, ChevronUp, ChevronDown, Bed, Star, Settings, LayoutGrid, Clock } from 'lucide-react';
+import { Home, Users, User, Activity, TrendingUp, Gift, ShieldAlert, Award, BookOpen, UsersRound, Grid3X3, Heart, FileText, Brain, CalendarDays, GraduationCap, CalendarCheck, Calculator, ChevronUp, ChevronDown, Bed, Star, Settings, LayoutGrid, Clock } from 'lucide-react';
 
 // 分类定义 - 按功能归类
 const CATEGORIES = [{
@@ -17,6 +17,10 @@ const CATEGORIES = [{
     id: 'students-manage',
     label: '基础信息',
     icon: User
+  }, {
+    id: 'student-growth',
+    label: '成长轨迹',
+    icon: Activity
   }, {
     id: 'grades',
     label: '成绩管理',
