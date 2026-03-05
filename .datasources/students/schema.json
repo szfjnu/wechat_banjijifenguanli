@@ -1,0 +1,185 @@
+{
+  "name": "students",
+  "title": "学生基础信息",
+  "schemas": [
+    {
+      "name": "student_id",
+      "title": "学号",
+      "type": "String"
+    },
+    {
+      "name": "name",
+      "title": "姓名",
+      "type": "String"
+    },
+    {
+      "name": "gender",
+      "title": "性别",
+      "type": "String"
+    },
+    {
+      "name": "class_name",
+      "title": "班级名称",
+      "type": "String"
+    },
+    {
+      "name": "group_id",
+      "title": "所属小组ID",
+      "type": "String"
+    },
+    {
+      "name": "is_boarding",
+      "title": "是否住宿生",
+      "type": "Boolean"
+    },
+    {
+      "name": "position",
+      "title": "班干部职务",
+      "type": "String"
+    },
+    {
+      "name": "student_record_id",
+      "title": "学籍信息ID",
+      "type": "String"
+    },
+    {
+      "name": "current_score",
+      "title": "当前总积分",
+      "type": "Number"
+    },
+    {
+      "name": "initial_score",
+      "title": "学期初始分",
+      "type": "Number"
+    },
+    {
+      "name": "id_card_number",
+      "title": "身份证号",
+      "type": "String"
+    },
+    {
+      "name": "date_of_birth",
+      "title": "出生日期",
+      "type": "Date"
+    },
+    {
+      "name": "phone_number",
+      "title": "个人手机号",
+      "type": "String"
+    },
+    {
+      "name": "parent_phone_number",
+      "title": "家长手机号",
+      "type": "String"
+    },
+    {
+      "name": "home_address",
+      "title": "家庭住址",
+      "type": "String"
+    },
+    {
+      "name": "ethnicity",
+      "title": "民族",
+      "type": "String"
+    },
+    {
+      "name": "native_place",
+      "title": "籍贯",
+      "type": "String"
+    },
+    {
+      "name": "political_status",
+      "title": "政治面貌",
+      "type": "String"
+    },
+    {
+      "name": "postal_code",
+      "title": "邮政编码",
+      "type": "String"
+    },
+    {
+      "name": "enrollment_date",
+      "title": "入学日期",
+      "type": "Date"
+    },
+    {
+      "name": "graduated_from",
+      "title": "毕业学校",
+      "type": "String"
+    },
+    {
+      "name": "health_status",
+      "title": "健康状况",
+      "type": "String"
+    },
+    {
+      "name": "height",
+      "title": "身高(cm)",
+      "type": "Number"
+    },
+    {
+      "name": "family_members",
+      "title": "家庭主要成员",
+      "type": "Array",
+      "items": {
+        "type": "Object"
+      }
+    },
+    {
+      "name": "resume",
+      "title": "个人简历",
+      "type": "Array",
+      "items": {
+        "type": "Object"
+      }
+    },
+    {
+      "name": "awards_and_punishments",
+      "title": "奖惩情况",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "head_teacher_opinion",
+      "title": "班主任意见",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "school_opinion",
+      "title": "学校意见",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "score_level",
+      "title": "积分等级",
+      "type": "String"
+    },
+    {
+      "name": "dorm_info",
+      "title": "住宿信息",
+      "type": "Object"
+    },
+    {
+      "name": "dorm_score",
+      "title": "住宿积分",
+      "type": "Number"
+    },
+    {
+      "name": "dorm_initial_score",
+      "title": "住宿初始分",
+      "type": "Number"
+    },
+    {
+      "name": "dorm_converted_score",
+      "title": "已折算到总积分的宿舍积分",
+      "type": "Number"
+    },
+    {
+      "name": "operation_history",
+      "title": "操作历史",
+      "type": "Array",
+      "items": {
+        "type": "Object"
+      }
+    }
+  ]
+}

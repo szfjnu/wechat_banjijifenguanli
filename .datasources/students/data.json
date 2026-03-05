@@ -1,0 +1,400 @@
+[
+  {
+    "_id": "1",
+    "student_id": "2024001",
+    "name": "张三",
+    "gender": "男",
+    "class_name": "高三(1)班",
+    "group_id": "group001",
+    "is_boarding": true,
+    "position": "班长",
+    "student_record_id": "rec001",
+    "current_score": 125,
+    "initial_score": 100,
+    "id_card_number": "3101************1234",
+    "date_of_birth": "2006-05-15",
+    "phone_number": "13800138001",
+    "parent_phone_number": "13900139001",
+    "home_address": "上海市浦东新区张江镇科技园路123号",
+    "ethnicity": "汉族",
+    "native_place": "上海市",
+    "political_status": "共青团员",
+    "postal_code": "201203",
+    "enrollment_date": "2021-09-01",
+    "graduated_from": "上海市第一初级中学",
+    "health_status": "良好",
+    "height": 175,
+    "family_members": [
+      {
+        "title": "父亲",
+        "name": "张建国",
+        "age": 45,
+        "work_unit": "上海交通大学",
+        "position": "教授",
+        "phone": "13900139001"
+      },
+      {
+        "title": "母亲",
+        "name": "李梅",
+        "age": 43,
+        "work_unit": "复旦大学附属中山医院",
+        "position": "副主任医师",
+        "phone": "13800138002"
+      }
+    ],
+    "resume": [
+      {
+        "start_end_date": "2018-09-2021-06",
+        "description": "上海市第一初级中学 学生会主席",
+        "witness": "王老师"
+      },
+      {
+        "start_end_date": "2021-09-至今",
+        "description": "上海市XX中学 高三(1)班 班长",
+        "witness": "李老师"
+      }
+    ],
+    "awards_and_punishments": "2023年度优秀学生干部\n2022年度三好学生",
+    "head_teacher_opinion": "学习刻苦，团结同学，有较强的组织能力，推荐评为优秀学生干部。",
+    "school_opinion": "同意班主任意见。",
+    "score_level": "A",
+    "dorm_info": {
+      "building": "A栋",
+      "room": "301",
+      "bed": "1"
+    },
+    "dorm_score": 95,
+    "dorm_initial_score": 100,
+    "dorm_converted_score": 0,
+    "operation_history": [
+      {
+        "operation_type": "创建",
+        "operation_details": "初始创建学生记录",
+        "operation_by": "admin",
+        "created_at": 1704067200000
+      }
+    ],
+    "created_at": 1704067200000,
+    "updated_at": 1704153600000,
+    "created_by": "admin",
+    "updated_by": "admin"
+  },
+  {
+    "_id": "2",
+    "student_id": "2024002",
+    "name": "李四",
+    "gender": "女",
+    "class_name": "高三(1)班",
+    "group_id": "group001",
+    "is_boarding": false,
+    "position": "学习委员",
+    "student_record_id": "rec002",
+    "current_score": 118,
+    "initial_score": 100,
+    "id_card_number": "3101************5678",
+    "date_of_birth": "2006-08-22",
+    "phone_number": "13800138003",
+    "parent_phone_number": "13900139002",
+    "home_address": "上海市黄浦区南京东路456号",
+    "ethnicity": "汉族",
+    "native_place": "江苏省苏州市",
+    "political_status": "共青团员",
+    "postal_code": "200001",
+    "enrollment_date": "2021-09-01",
+    "graduated_from": "苏州市第一中学",
+    "health_status": "良好",
+    "height": 165,
+    "family_members": [
+      {
+        "title": "父亲",
+        "name": "李明",
+        "age": 48,
+        "work_unit": "上海市政府办公厅",
+        "position": "处长",
+        "phone": "13900139002"
+      },
+      {
+        "title": "母亲",
+        "name": "王芳",
+        "age": 46,
+        "work_unit": "上海外国语大学",
+        "position": "副教授",
+        "phone": "13800138004"
+      }
+    ],
+    "resume": [
+      {
+        "start_end_date": "2018-09-2021-06",
+        "description": "苏州市第一中学 学习委员",
+        "witness": "陈老师"
+      },
+      {
+        "start_end_date": "2021-09-至今",
+        "description": "上海市XX中学 高三(1)班 学习委员",
+        "witness": "李老师"
+      }
+    ],
+    "awards_and_punishments": "2023年度三好学生\n2022年度优秀团员",
+    "head_teacher_opinion": "学习成绩优异，乐于助人，是同学们学习的榜样。",
+    "school_opinion": "同意班主任意见。",
+    "score_level": "A",
+    "dorm_info": null,
+    "dorm_score": null,
+    "dorm_initial_score": null,
+    "dorm_converted_score": null,
+    "operation_history": [
+      {
+        "operation_type": "创建",
+        "operation_details": "初始创建学生记录",
+        "operation_by": "admin",
+        "created_at": 1704067200000
+      }
+    ],
+    "created_at": 1704067200000,
+    "updated_at": 1704153600000,
+    "created_by": "admin",
+    "updated_by": "admin"
+  },
+  {
+    "_id": "3",
+    "student_id": "2024003",
+    "name": "王五",
+    "gender": "男",
+    "class_name": "高三(2)班",
+    "group_id": "group002",
+    "is_boarding": true,
+    "position": "",
+    "student_record_id": "rec003",
+    "current_score": 98,
+    "initial_score": 100,
+    "id_card_number": "3101************9012",
+    "date_of_birth": "2006-03-10",
+    "phone_number": "13800138005",
+    "parent_phone_number": "13900139003",
+    "home_address": "上海市徐汇区华山路789号",
+    "ethnicity": "汉族",
+    "native_place": "浙江省杭州市",
+    "political_status": "群众",
+    "postal_code": "200030",
+    "enrollment_date": "2021-09-01",
+    "graduated_from": "杭州市第二中学",
+    "health_status": "良好",
+    "height": 180,
+    "family_members": [
+      {
+        "title": "父亲",
+        "name": "王强",
+        "age": 50,
+        "work_unit": "上海汽车集团股份有限公司",
+        "position": "工程师",
+        "phone": "13900139003"
+      },
+      {
+        "title": "母亲",
+        "name": "刘红",
+        "age": 48,
+        "work_unit": "家畜公司",
+        "position": "财务主管",
+        "phone": "13800138006"
+      }
+    ],
+    "resume": [
+      {
+        "start_end_date": "2018-09-2021-06",
+        "description": "杭州市第二中学 学生",
+        "witness": "张老师"
+      },
+      {
+        "start_end_date": "2021-09-至今",
+        "description": "上海市XX中学 高三(2)班 学生",
+        "witness": "赵老师"
+      }
+    ],
+    "awards_and_punishments": "2023年校级运动会100米第二名",
+    "head_teacher_opinion": "体育方面表现突出，学习还需加强努力。",
+    "school_opinion": "同意班主任意见。",
+    "score_level": "B",
+    "dorm_info": {
+      "building": "B栋",
+      "room": "205",
+      "bed": "2"
+    },
+    "dorm_score": 88,
+    "dorm_initial_score": 100,
+    "dorm_converted_score": 0,
+    "operation_history": [
+      {
+        "operation_type": "创建",
+        "operation_details": "初始创建学生记录",
+        "operation_by": "admin",
+        "created_at": 1704067200000
+      }
+    ],
+    "created_at": 1704067200000,
+    "updated_at": 1704153600000,
+    "created_by": "admin",
+    "updated_by": "admin"
+  },
+  {
+    "_id": "4",
+    "student_id": "2024004",
+    "name": "赵六",
+    "gender": "女",
+    "class_name": "高三(1)班",
+    "group_id": "group001",
+    "is_boarding": true,
+    "position": "团支书",
+    "student_record_id": "rec004",
+    "current_score": 110,
+    "initial_score": 100,
+    "id_card_number": "3101************3456",
+    "date_of_birth": "2006-11-28",
+    "phone_number": "13800138007",
+    "parent_phone_number": "13900139004",
+    "home_address": "上海市静安区南京西路678号",
+    "ethnicity": "汉族",
+    "native_place": "上海市",
+    "political_status": "共青团员",
+    "postal_code": "200040",
+    "enrollment_date": "2021-09-01",
+    "graduated_from": "上海市第三中学",
+    "health_status": "良好",
+    "height": 168,
+    "family_members": [
+      {
+        "title": "父亲",
+        "name": "赵伟",
+        "age": 47,
+        "work_unit": "上海市工商银行",
+        "position": "支行行长",
+        "phone": "13900139004"
+      },
+      {
+        "title": "母亲",
+        "name": "陈丽",
+        "age": 45,
+        "work_unit": "上海市第一人民医院",
+        "position": "护士长",
+        "phone": "13800138008"
+      }
+    ],
+    "resume": [
+      {
+        "start_end_date": "2018-09-2021-06",
+        "description": "上海市第三中学 团支书",
+        "witness": "刘老师"
+      },
+      {
+        "start_end_date": "2021-09-至今",
+        "description": "上海市XX中学 高三(1)班 团支书",
+        "witness": "李老师"
+      }
+    ],
+    "awards_and_punishments": "2023年度优秀团干部\n2022年度优秀学生",
+    "head_teacher_opinion": "责任心强，团结同学，积极组织团日活动。",
+    "school_opinion": "同意班主任意见。",
+    "score_level": "A",
+    "dorm_info": {
+      "building": "A栋",
+      "room": "301",
+      "bed": "3"
+    },
+    "dorm_score": 92,
+    "dorm_initial_score": 100,
+    "dorm_converted_score": 0,
+    "operation_history": [
+      {
+        "operation_type": "创建",
+        "operation_details": "初始创建学生记录",
+        "operation_by": "admin",
+        "created_at": 1704067200000
+      }
+    ],
+    "created_at": 1704067200000,
+    "updated_at": 1704153600000,
+    "created_by": "admin",
+    "updated_by": "admin"
+  },
+  {
+    "_id": "5",
+    "student_id": "2024005",
+    "name": "孙七",
+    "gender": "男",
+    "class_name": "高三(3)班",
+    "group_id": "group003",
+    "is_boarding": false,
+    "position": "",
+    "student_record_id": "rec005",
+    "current_score": 85,
+    "initial_score": 100,
+    "id_card_number": "3101************7890",
+    "date_of_birth": "2006-07-05",
+    "phone_number": "13800138009",
+    "parent_phone_number": "13900139005",
+    "home_address": "上海市长宁区虹桥路890号",
+    "ethnicity": "汉族",
+    "native_place": "江苏省南京市",
+    "political_status": "群众",
+    "postal_code": "200051",
+    "enrollment_date": "2021-09-01",
+    "graduated_from": "南京市第一中学",
+    "health_status": "良好",
+    "height": 172,
+    "family_members": [
+      {
+        "title": "父亲",
+        "name": "孙海",
+        "age": 52,
+        "work_unit": "上海铁路局",
+        "position": "司机",
+        "phone": "13900139005"
+      },
+      {
+        "title": "母亲",
+        "name": "张敏",
+        "age": 50,
+        "work_unit": "上海虹桥机场",
+        "position": "安检员",
+        "phone": "13800138010"
+      }
+    ],
+    "resume": [
+      {
+        "start_end_date": "2018-09-2021-06",
+        "description": "南京市第一中学 学生",
+        "witness": "周老师"
+      },
+      {
+        "start_end_date": "2021-09-至今",
+        "description": "上海市XX中学 高三(3)班 学生",
+        "witness": "吴老师"
+      }
+    ],
+    "awards_and_punishments": "2022年晚自习违纪一次，已批评教育",
+    "head_teacher_opinion": "需要加强纪律意识，提高学习成绩。",
+    "school_opinion": "同意班主任意见，多关注该生表现。",
+    "score_level": "C",
+    "dorm_info": null,
+    "dorm_score": null,
+    "dorm_initial_score": null,
+    "dorm_converted_score": null,
+    "operation_history": [
+      {
+        "operation_type": "创建",
+        "operation_details": "初始创建学生记录",
+        "operation_by": "admin",
+        "created_at": 1704067200000
+      },
+      {
+        "operation_type": "更新",
+        "operation_details": "更新学生信息",
+        "operation_by": "teacher01",
+        "created_at": 1704240000000
+      }
+    ],
+    "created_at": 1704067200000,
+    "updated_at": 1704240000000,
+    "created_by": "admin",
+    "updated_by": "teacher01"
+  }
+]

@@ -96,6 +96,10 @@ const CATEGORIES = [{
     label: '转段考',
     icon: GraduationCap
   }, {
+    id: 'student-manage',
+    label: '学生信息管理',
+    icon: FileText
+  }, {
     id: 'ai-review',
     label: 'AI点评',
     icon: Brain
