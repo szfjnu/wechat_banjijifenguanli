@@ -1,7 +1,7 @@
 // @ts-ignore;
 import React, { useState, useEffect } from 'react';
 // @ts-ignore;
-import { Home, Users, TrendingUp, Gift, ShieldAlert, Award, BookOpen, UsersRound, Grid3X3, Heart, FileText, Brain, CalendarDays, GraduationCap, CalendarCheck, Calculator, ChevronUp, ChevronDown, Bed, Star } from 'lucide-react';
+import { Home, Users, TrendingUp, Gift, ShieldAlert, Award, BookOpen, UsersRound, Grid3X3, Heart, FileText, Brain, CalendarDays, GraduationCap, CalendarCheck, Calculator, ChevronUp, ChevronDown, Bed, Star, Settings, LayoutGrid } from 'lucide-react';
 
 // 分类定义 - 按功能归类
 const CATEGORIES = [{
@@ -43,6 +43,18 @@ const CATEGORIES = [{
     id: 'exchange',
     label: '积分兑换',
     icon: Gift
+  }, {
+    id: 'points-manage',
+    label: '积分管理',
+    icon: Settings
+  }, {
+    id: 'exchange-admin',
+    label: '兑换管理',
+    icon: Star
+  }, {
+    id: 'points-settings',
+    label: '积分设置',
+    icon: Calculator
   }]
 }, {
   id: 'class',
@@ -65,11 +77,15 @@ const CATEGORIES = [{
     id: 'subjects',
     label: '科目设置',
     icon: Calculator
+  }, {
+    id: 'semester',
+    label: '学期计划',
+    icon: CalendarDays
   }]
 }, {
-  id: 'other',
-  label: '其他功能',
-  icon: FileText,
+  id: 'comprehensive',
+  label: '综合管理',
+  icon: LayoutGrid,
   color: 'orange',
   items: [{
     id: 'exam-monitor',
@@ -83,10 +99,6 @@ const CATEGORIES = [{
     id: 'documents',
     label: '文件资料',
     icon: FileText
-  }, {
-    id: 'semester',
-    label: '学期计划',
-    icon: CalendarDays
   }, {
     id: 'discipline',
     label: '违纪记录',
@@ -130,7 +142,7 @@ const getColorStyles = (color, isActive) => {
  * 
  * 功能：
  * - 首页快速入口
- * - 分类导航（学生管理、积分管理、班级事务、其他功能）
+ * - 分类导航（学生管理、积分管理、班级事务、综合管理）
  * - 下拉式子菜单
  * - 页面切换
  */
@@ -161,16 +173,16 @@ export function TabBar({
     console.log('[TabBar] 切换到页面:', pageId);
     setExpandedCategory(null);
 
-    // 验证页面 ID 是否有效（包括所有已存在的管理页面）
+    // 验证页面 ID 是否有效
     const validPageIds = ['home',
     // 学生管理
     'students', 'grades', 'certificates', 'volunteer',
     // 积分管理
     'points', 'dorm-points', 'exchange', 'points-manage', 'exchange-admin', 'points-settings',
     // 班级事务
-    'seating-chart', 'groups', 'duty-roster', 'subjects',
-    // 其他功能
-    'exam-monitor', 'ai-review', 'documents', 'semester', 'discipline'];
+    'seating-chart', 'groups', 'duty-roster', 'subjects', 'semester',
+    // 综合管理
+    'exam-monitor', 'ai-review', 'documents', 'discipline'];
     if (!validPageIds.includes(pageId)) {
       console.error('[TabBar] 无效的页面 ID:', pageId, '有效页面列表:', validPageIds);
       return;
@@ -195,6 +207,17 @@ export function TabBar({
       setExpandedCategory(categoryId);
     }
   };
+
+  // 点击外部关闭展开的分类
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setExpandedCategory(null);
+    };
+    if (expandedCategory) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [expandedCategory]);
   return <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-1 py-1 z-50 shadow-lg">
       <div className="max-w-7xl mx-auto">
         {/* 底部主导航 */}
@@ -212,7 +235,8 @@ export function TabBar({
           const isActive = activeCategory === category.id;
           const styles = getColorStyles(category.color, isActive);
           return <div key={category.id} className="relative">
-                <button onClick={() => {
+                <button onClick={e => {
+              e.stopPropagation();
               if (category.items && category.items.length > 0) {
                 toggleCategory(category.id);
               } else {
@@ -229,21 +253,25 @@ export function TabBar({
                 {/* 展开的子菜单 */}
                 {isExpanded && <div className={`absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 
                     bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden 
-                    min-w-[280px] animate-in slide-in-from-bottom-2 duration-200 z-[100]
+                    min-w-[320px] animate-in slide-in-from-bottom-2 duration-200 z-[100]
                   `}>
-                    <div className="p-2">
+                    <div className="p-2.5">
                       <div className="flex items-center gap-2 mb-2 pb-2 border-b border-gray-100">
                         <Icon className="w-4 h-4" style={{
                     color: styles.hex
                   }} />
                         <span className="text-sm font-semibold text-gray-700">{category.label}</span>
+                        <span className="ml-auto text-xs text-gray-400">{category.items.length} 项</span>
                       </div>
-                      <div className="grid grid-cols-4 gap-1">
+                      <div className="grid grid-cols-3 gap-1.5">
                         {category.items && category.items.map(item => {
                     const ItemIcon = item.icon;
                     const isItemActive = currentPage === item.id;
                     const itemStyles = getColorStyles(category.color, isItemActive);
-                    return <button key={item.id} onClick={() => handlePageChange(item.id)} className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all duration-200 ${isItemActive ? itemStyles.active : 'text-gray-600 hover:bg-gray-50'}`}>
+                    return <button key={item.id} onClick={e => {
+                      e.stopPropagation();
+                      handlePageChange(item.id);
+                    }} className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all duration-200 ${isItemActive ? itemStyles.active : 'text-gray-600 hover:bg-gray-50'}`}>
                               <ItemIcon className="w-4 h-4" strokeWidth={2.5} />
                               <span className="text-[9px] font-medium">{item.label}</span>
                             </button>;
@@ -261,4 +289,3 @@ export function TabBar({
       </div>
     </nav>;
 }
-export default TabBar;
