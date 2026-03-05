@@ -5,7 +5,17 @@ import { toast } from '@/components/ui';
 
 import { ROLES, hasPermission, hasAnyPermission, canAccessPage, getAccessiblePages } from '@/lib/permissions';
 // 权限上下文
-const PermissionContext = createContext(null);
+// 创建默认上下文值，避免在没有 Provider 时 useContext 报错
+const defaultPermissionContext = {
+  userRole: ROLES.ADMIN,
+  userPermissions: [],
+  accessiblePages: [],
+  isLoading: false,
+  checkPageAccess: () => true,
+  checkPermission: () => true,
+  handlePermissionDenied: () => {}
+};
+const PermissionContext = createContext(defaultPermissionContext);
 
 /**
  * 权限提供者组件
