@@ -40,6 +40,13 @@ export default function SemesterPage(props) {
   } = props.$w.utils;
   const [semesters, setSemesters] = useState(MOCK_SEMESTERS);
   const [currentPage, setCurrentPage] = useState('semester');
+  const handlePageChange = pageId => {
+    setCurrentPage(pageId);
+    $w.utils.navigateTo({
+      pageId,
+      params: {}
+    });
+  };
 
   // 创建学期对话框
   const [showCreateDialog, setShowCreateDialog] = useState(false);
