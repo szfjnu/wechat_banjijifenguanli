@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 // @ts-ignore;
 import { useToast, Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui';
 // @ts-ignore;
-import { Activity, TrendingUp, BarChart3, Calendar, Filter, Download, Search, ArrowLeft, User, School, Award, AlertCircle } from 'lucide-react';
+import { Activity, TrendingUp, BarChart3, Calendar, Filter, Download, Search, ArrowLeft, User, School, Award, AlertCircle, CalendarDays } from 'lucide-react';
 
 import { GrowthChart } from '@/components/GrowthChart';
 import { GrowthTimeline } from '@/components/GrowthTimeline';
@@ -27,6 +27,26 @@ export default function StudentGrowth(props) {
   const [sortOrder, setSortOrder] = useState('desc');
   const [semesters, setSemesters] = useState([]);
   const [selectedSemester, setSelectedSemester] = useState('');
+
+  // 加载学期列表
+  const loadSemesters = async () => {
+    try {
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('score_records').field({
+        semester_id: true
+      }).groupBy('semester_id').groupField({
+        semester_id: db.command.aggregate.first('$semester_id')
+      }).get();
+      const semesterList = result.data || [];
+      setSemesters(semesterList);
+      if (semesterList.length > 0) {
+        setSelectedSemester(semesterList[0].semester_id);
+      }
+    } catch (error) {
+      console.error('加载学期列表失败:', error);
+    }
+  };
 
   // 加载学生列表
   const loadStudents = async () => {
@@ -88,6 +108,7 @@ export default function StudentGrowth(props) {
     }
   };
   useEffect(() => {
+    loadSemesters();
     loadStudents();
   }, []);
   useEffect(() => {
@@ -284,6 +305,17 @@ export default function StudentGrowth(props) {
             
             {/* 筛选工具栏 */}
             <div className="flex flex-wrap items-center gap-4 mb-6">
+              <Select value={selectedSemester} onValueChange={setSelectedSemester}>
+                <SelectTrigger className="w-40">
+                  <CalendarDays className="w-4 h-4 mr-2" />
+                  <SelectValue placeholder="选择学期" />
+                </SelectTrigger>
+                <SelectContent>
+                  {semesters.map(sem => <SelectItem key={sem.semester_id} value={sem.semester_id}>
+                      {sem.semester_id}
+                    </SelectItem>)}
+                </SelectContent>
+              </Select>
               <div className="flex-1 min-w-64">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />

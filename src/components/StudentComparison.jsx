@@ -9,7 +9,8 @@ import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, L
 const StudentComparison = ({
   students,
   semesterId,
-  onBack
+  onBack,
+  $w
 }) => {
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [recordsData, setRecordsData] = useState([]);

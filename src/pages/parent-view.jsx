@@ -48,6 +48,9 @@ const ParentView = ({
       const semesterRes = await db.collection('semesters').get();
       const semesterList = semesterRes.data || [];
       setSemesters(semesterList);
+      if (semesterList.length > 0) {
+        setSelectedSemester(semesterList[0]._id);
+      }
 
       // 默认选中第一个学期
       if (semesterList.length > 0) {
@@ -82,7 +85,6 @@ const ParentView = ({
       const _ = db.command;
       const res = await db.collection('score_records').where({
         student_id: studentId,
-        semester_id: semesterId,
         approval_status: '已通过'
       }).orderBy('date', 'desc').get();
       setGrowthRecords(res.data || []);

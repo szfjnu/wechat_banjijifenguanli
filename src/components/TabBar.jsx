@@ -192,13 +192,15 @@ export function TabBar({
     // 验证页面 ID 是否有效
     const validPageIds = ['home',
     // 学生管理
-    'students', 'grades', 'certificates', 'volunteer',
+    'students', 'students-manage', 'student-growth', 'grades', 'certificates', 'volunteer',
     // 积分管理
     'points', 'dorm-points', 'exchange', 'points-manage', 'exchange-admin', 'points-settings',
     // 班级事务
     'seating-chart', 'groups', 'duty-roster', 'subjects', 'semester',
     // 综合管理
-    'exam-monitor', 'ai-review', 'documents', 'discipline'];
+    'exam-monitor', 'ai-review', 'documents', 'discipline',
+    // 家长端
+    'parent-view'];
     if (!validPageIds.includes(pageId)) {
       console.error('[TabBar] 无效的页面 ID:', pageId, '有效页面列表:', validPageIds);
       return;
