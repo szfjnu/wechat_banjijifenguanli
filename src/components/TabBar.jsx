@@ -1,10 +1,10 @@
 // @ts-ignore;
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 // @ts-ignore;
 import { Home, Users, User, Activity, TrendingUp, Gift, ShieldAlert, Award, BookOpen, UsersRound, Grid3X3, Heart, FileText, Brain, CalendarDays, GraduationCap, CalendarCheck, Calculator, ChevronUp, ChevronDown, Bed, Star, Settings, LayoutGrid, Clock, Shield } from 'lucide-react';
 
-import { usePermission } from '@/components/PermissionProvider';
-import { getAccessiblePages } from '@/lib/permissions';
+import { PermissionContext } from '@/components/PermissionProvider';
+import { ROLES, getAccessiblePages } from '@/lib/permissions';
 
 // 分类定义 - 按功能归类
 const CATEGORIES = [{
@@ -197,12 +197,15 @@ export function TabBar({
 }) {
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [activeCategory, setActiveCategory] = useState(null);
-  const {
-    userRole,
-    checkPageAccess,
-    accessiblePages,
-    isLoading
-  } = usePermission();
+
+  // 获取权限上下文
+  const permissionContext = useContext(PermissionContext);
+
+  // 如果没有 PermissionProvider，使用默认值（管理员角色，显示所有页面）
+  const userRole = permissionContext?.userRole || ROLES.ADMIN;
+  const checkPageAccess = permissionContext?.checkPageAccess || (() => true);
+  const accessiblePages = permissionContext?.accessiblePages || getAccessiblePages(userRole, CATEGORIES);
+  const isLoading = permissionContext?.isLoading || false;
 
   // 使用权限过滤后的分类
   const filteredCategories = accessiblePages;
