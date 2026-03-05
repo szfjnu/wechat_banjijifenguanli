@@ -1,7 +1,7 @@
 // @ts-ignore;
 import React, { useState, useEffect } from 'react';
 // @ts-ignore;
-import { Bed, AlertTriangle, Search, Filter, TrendingDown, Shield, ShieldAlert, FileText, Upload, Users, Camera, RefreshCw, Settings, Calendar, Image as ImageIcon, X, Eye, Trash2 } from 'lucide-react';
+import { Bed, AlertTriangle, Search, Filter, TrendingDown, Shield, ShieldAlert, FileText, Upload, Users, Camera, RefreshCw, Settings, Calendar, Image as ImageIcon, X, Eye, Trash2, Plus, Edit2, Save } from 'lucide-react';
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
 
@@ -168,7 +168,88 @@ export default function DormPointsPage(props) {
   const [uploadedImages, setUploadedImages] = useState([]);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showItemManager, setShowItemManager] = useState(false);
   const [newConversionRate, setNewConversionRate] = useState(CONVERSION_RATE);
+  const [deductionItems, setDeductionItems] = useState([...DEDUCTION_ITEMS]);
+  const [editingItem, setEditingItem] = useState(null);
+  const [itemFormData, setItemFormData] = useState({
+    id: null,
+    name: '',
+    points: 0,
+    category: '卫生'
+  });
+
+  // 项目分类
+  const itemCategories = ['卫生', '纪律', '安全'];
+  useEffect(() => {
+    loadDormStudentsData();
+    loadDeductionHistory();
+  }, []);
+
+  // 项目管理函数
+  const handleAddItem = () => {
+    setEditingItem(null);
+    setItemFormData({
+      id: null,
+      name: '',
+      points: 0,
+      category: '卫生'
+    });
+  };
+  const handleEditItem = item => {
+    setEditingItem(item);
+    setItemFormData({
+      ...item
+    });
+  };
+  const handleSaveItem = () => {
+    if (!itemFormData.name || itemFormData.points === 0) {
+      toast({
+        title: '请填写完整信息',
+        description: '项目名称和分数不能为空',
+        variant: 'destructive'
+      });
+      return;
+    }
+    if (editingItem) {
+      // 编辑
+      setDeductionItems(items => items.map(item => item.id === editingItem.id ? {
+        ...itemFormData,
+        id: editingItem.id
+      } : item));
+      toast({
+        title: '保存成功',
+        description: '项目已更新'
+      });
+    } else {
+      // 新增
+      const newItem = {
+        ...itemFormData,
+        id: Math.max(...deductionItems.map(i => i.id), 0) + 1
+      };
+      setDeductionItems([...deductionItems, newItem]);
+      toast({
+        title: '添加成功',
+        description: '新项目已添加'
+      });
+    }
+    setEditingItem(null);
+    setItemFormData({
+      id: null,
+      name: '',
+      points: 0,
+      category: '卫生'
+    });
+  };
+  const handleDeleteItem = id => {
+    if (confirm('确定要删除这个项目吗？')) {
+      setDeductionItems(items => items.filter(item => item.id !== id));
+      toast({
+        title: '删除成功',
+        description: '项目已删除'
+      });
+    }
+  };
   useEffect(() => {
     loadDormStudentsData();
     loadDeductionHistory();
@@ -833,9 +914,118 @@ export default function DormPointsPage(props) {
                     {loading ? '重置中...' : '确认重置'}
                   </Button>
                 </div>
+
+                {/* 加减分项目管理 */}
+                <div className="border-t border-gray-200 pt-4 mt-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-semibold text-gray-800">加减分项目</h4>
+                    <Button onClick={() => {
+                setShowItemManager(true);
+              }} className="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                      管理项目
+                    </Button>
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    共 {deductionItems.length} 个项目：
+                    {deductionItems.slice(0, 3).map((item, index) => <span key={item.id} className="inline-block px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-[10px] mr-1">
+                        {item.name}（{item.points}）
+                      </span>)}
+                    {deductionItems.length > 3 && <span className="text-gray-400">...</span>}
+                  </div>
+                </div>
               </div>
             </div>
           </div>}
+
+          {/* 项目管理模态框 */}
+          {showItemManager && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[80vh] overflow-hidden">
+                <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-4 rounded-t-xl">
+                  <h3 className="text-xl font-bold">加减分项目管理</h3>
+                  <p className="text-purple-100 text-sm mt-1">管理宿舍积分的加减分项目</p>
+                </div>
+                <div className="p-6 overflow-y-auto max-h-[60vh]">
+                  <div className="flex gap-2 mb-4">
+                    <Button onClick={handleAddItem} className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors flex items-center justify-center gap-2">
+                      <Plus className="w-4 h-4" />
+                      添加项目
+                    </Button>
+                  </div>
+
+                  {editingItem !== null && <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-4">
+                      <h4 className="font-semibold text-gray-800 mb-3">{editingItem ? '编辑项目' : '添加新项目'}</h4>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">项目名称</label>
+                          <input type="text" value={itemFormData.name} onChange={e => setItemFormData({
+                  ...itemFormData,
+                  name: e.target.value
+                })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="例如：宿舍卫生不合格" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">分数</label>
+                          <input type="number" value={itemFormData.points} onChange={e => setItemFormData({
+                  ...itemFormData,
+                  points: parseInt(e.target.value) || 0
+                })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="负数表示扣分" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">分类</label>
+                          <select value={itemFormData.category} onChange={e => setItemFormData({
+                  ...itemFormData,
+                  category: e.target.value
+                })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            {itemCategories.map(cat => <option key={cat} value={cat}>
+                                {cat}
+                              </option>)}
+                          </select>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button onClick={() => setEditingItem(null)} className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors">
+                            取消
+                          </Button>
+                          <Button onClick={handleSaveItem} className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors">
+                            <Save className="w-4 h-4 mr-1" />
+                            保存
+                          </Button>
+                        </div>
+                      </div>
+                    </div>}
+
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-gray-800 text-sm">项目列表</h4>
+                    {deductionItems.map(item => <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div className="flex items-center gap-3">
+                          <div className={`px-2 py-0.5 rounded text-xs font-semibold ${item.category === '卫生' ? 'bg-green-100 text-green-700' : item.category === '纪律' ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'}`}>
+                            {item.category}
+                          </div>
+                          <div>
+                            <div className="text-sm font-medium text-gray-800">{item.name}</div>
+                            <div className={`text-xs font-semibold ${item.points < 0 ? 'text-red-600' : 'text-green-600'}`}>
+                              {item.points > 0 ? '+' : ''}{item.points} 分
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button onClick={() => handleEditItem(item)} variant="outline" size="icon" className="h-8 w-8">
+                            <Edit2 className="w-4 h-4" />
+                          </Button>
+                          <Button onClick={() => handleDeleteItem(item.id)} variant="outline" size="icon" className="h-8 w-8 text-red-600 hover:bg-red-50 hover:border-red-300">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>)}
+                  </div>
+                </div>
+                <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
+                  <Button onClick={() => {
+            setShowItemManager(false);
+          }} className="w-full px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors">
+                    关闭
+                  </Button>
+                </div>
+              </div>
+            </div>}
 
         <TabBar currentPage={currentPage} onPageChange={setCurrentPage} />
       </div>;
