@@ -225,10 +225,45 @@ export default function DisciplinePage(props) {
   const loadData = async () => {
     try {
       setLoading(true);
-      // 模拟数据加载
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setRecords(MOCK_RECORDS);
-      setStudents(MOCK_STUDENTS);
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+
+      // 加载处分记录
+      const recordsResult = await db.collection('score_records').where({
+        source_type: '处分'
+      }).orderBy('date', 'desc').limit(100).get();
+      if (recordsResult.data && recordsResult.data.length > 0) {
+        const transformedRecords = recordsResult.data.map(record => ({
+          id: record._id,
+          studentId: record.student_id,
+          studentName: record.student_name || '未知',
+          levelId: 1,
+          levelName: '处分',
+          reason: record.reason_detail || '未说明',
+          pointsDeducted: record.score_change,
+          date: record.date ? new Date(record.date).toLocaleString('zh-CN') : '',
+          status: record.approval_status === '已通过' ? 'active' : record.approval_status === '已撤销' ? 'revoked' : 'expired',
+          expiryDate: record.expiry_date || '',
+          operator: record.recorder_name || '管理员',
+          revokeRequests: []
+        }));
+        setRecords(transformedRecords);
+      } else {
+        setRecords([]);
+      }
+
+      // 加载学生数据
+      const studentsResult = await db.collection('students').get();
+      if (studentsResult.data && studentsResult.data.length > 0) {
+        const transformedStudents = studentsResult.data.map(student => ({
+          id: student._id,
+          studentId: student.student_id,
+          name: student.name,
+          group: student.group || '未分组',
+          totalPoints: student.current_score || 0
+        }));
+        setStudents(transformedStudents);
+      }
     } catch (error) {
       console.error('加载数据失败:', error);
       toast({
@@ -329,19 +364,38 @@ export default function DisciplinePage(props) {
     try {
       const student = students.find(s => s.id === parseInt(newRecord.studentId));
       const level = DISCIPLINE_LEVELS.find(l => l.id === parseInt(newRecord.levelId));
-      const newId = Math.max(...records.map(r => r.id)) + 1;
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+
+      // 添加处分记录到数据库
+      const result = await db.collection('score_records').add({
+        record_id: `DP${Date.now()}`,
+        student_id: student.studentId,
+        student_name: student.name,
+        item_id: level.name,
+        score_change: -level.points,
+        reason_detail: newRecord.reason,
+        date: new Date(newRecord.date).toISOString(),
+        expiry_date: new Date(Date.now() + level.duration * 24 * 60 * 60 * 1000).toISOString(),
+        source_type: '处分',
+        approval_status: '已通过',
+        approval_time: new Date().toISOString(),
+        approver_name: $w?.auth?.currentUser?.name || '班主任',
+        recorder_name: $w?.auth?.currentUser?.name || '班主任',
+        semester_id: 'current'
+      });
       const createdRecord = {
-        id: newId,
-        studentId: parseInt(newRecord.studentId),
+        id: result.id || result._id,
+        studentId: student.studentId,
         studentName: student.name,
         levelId: level.id,
         levelName: level.name,
         reason: newRecord.reason,
-        pointsDeducted: level.points,
+        pointsDeducted: -level.points,
         date: newRecord.date,
         status: 'active',
         expiryDate: new Date(Date.now() + level.duration * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        operator: '班主任',
+        operator: $w?.auth?.currentUser?.name || '班主任',
         revokeRequests: []
       };
       setRecords([...records, createdRecord]);
@@ -383,6 +437,15 @@ export default function DisciplinePage(props) {
       return;
     }
     try {
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+
+      // 更新数据库中的处分状态
+      await db.collection('score_records').doc(selectedRecord.id).update({
+        approval_status: '已撤销',
+        approval_time: new Date().toISOString(),
+        approver_name: $w?.auth?.currentUser?.name || '班主任'
+      });
       const updatedRecords = records.map(r => r.id === selectedRecord.id ? {
         ...r,
         status: 'revoked',

@@ -221,9 +221,30 @@ export default function CertificatesPage(props) {
   const loadCertificates = async () => {
     try {
       setLoading(true);
-      // 模拟数据加载（后续替换为真实数据源调用）
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setCertificates(MOCK_CERTIFICATES);
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+
+      // 加载证书记录
+      const certificatesResult = await db.collection('score_records').where({
+        source_type: '证书'
+      }).orderBy('date', 'desc').limit(100).get();
+      if (certificatesResult.data && certificatesResult.data.length > 0) {
+        const transformedCertificates = certificatesResult.data.map(record => ({
+          id: record._id,
+          studentId: record.student_id,
+          studentName: record.student_name || '未知',
+          certificateName: record.item_id || '未知证书',
+          levelId: 1,
+          levelName: '证书',
+          points: record.score_change,
+          date: record.date ? record.date.split('T')[0] : '',
+          status: record.approval_status === '已通过' ? 'verified' : record.approval_status === '待审核' ? 'pending' : 'rejected',
+          note: record.reason_detail || ''
+        }));
+        setCertificates(transformedCertificates);
+      } else {
+        setCertificates([]);
+      }
     } catch (error) {
       toast({
         title: '加载失败',
@@ -351,11 +372,36 @@ export default function CertificatesPage(props) {
     }
     try {
       setUploading(true);
-      const student = MOCK_STUDENTS.find(s => s.id === parseInt(formData.studentId));
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+
+      // 查询学生信息
+      const studentsResult = await db.collection('students').where({
+        student_id: formData.studentId
+      }).get();
+      const student = studentsResult.data?.[0];
+      if (!student) {
+        throw new Error('学生不存在');
+      }
       const level = CERTIFICATE_LEVELS.find(l => l.id === parseInt(formData.levelId));
+
+      // 添加证书记录到数据库
+      const result = await db.collection('score_records').add({
+        record_id: `CERT${Date.now()}`,
+        student_id: formData.studentId,
+        student_name: student.name,
+        item_id: formData.certificateName,
+        score_change: level.points,
+        reason_detail: formData.note || '证书获得',
+        date: new Date(formData.date).toISOString(),
+        source_type: '证书',
+        approval_status: '待审核',
+        recorder_name: $w?.auth?.currentUser?.name || '管理员',
+        semester_id: 'current'
+      });
       const newCertificate = {
-        id: Math.max(...certificates.map(c => c.id), 0) + 1,
-        studentId: parseInt(formData.studentId),
+        id: result.id || result._id,
+        studentId: formData.studentId,
         studentName: student.name,
         certificateName: formData.certificateName,
         levelId: level.id,
