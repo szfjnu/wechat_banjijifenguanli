@@ -271,24 +271,21 @@ export default function DormPointsPage(props) {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
 
-      // 加载所有学生数据
-      const result = await db.collection('students').get();
+      // 从数据库加载住宿生数据
+      const result = await db.collection('students').where({
+        is_boarding: true
+      }).get();
       if (result.data && result.data.length > 0) {
-        // 筛选出住宿生（is_boarding = true）
-        const boarders = result.data.filter(student => student.is_boarding);
-
-        // 转换数据格式
-        const transformedStudents = boarders.map(student => ({
+        const transformedStudents = result.data.map(student => ({
           id: student._id,
-          name: student.name,
           studentId: student.student_id,
+          name: student.name,
           group: student.group || '未分组',
           dormRoom: student.dorm_room || '未分配',
           isBoarding: student.is_boarding,
           dormPoints: student.dorm_score || 100,
-          convertedPoints: student.converted_points || 0,
-          totalPoints: student.current_score || 0,
-          dormInitialScore: student.dorm_initial_score || 100
+          convertedPoints: ((student.dorm_score || 100) - 100) * conversionRate,
+          totalPoints: student.current_score || 0
         }));
         setStudents(transformedStudents);
       } else {
@@ -310,91 +307,68 @@ export default function DormPointsPage(props) {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
 
-      // 注意：当前数据库中可能没有 dorm_score_records 表
-      // 如果有，则加载真实数据；如果没有，使用空数组
-      try {
-        const result = await db.collection('dorm_score_records').orderBy('deduction_date', 'desc').limit(50).get();
-        if (result.data && result.data.length > 0) {
-          const transformedHistory = result.data.map(record => ({
-            id: record._id,
-            studentId: record.student_id,
-            studentName: record.student_name || '未知',
-            itemName: record.item_name || '未知项目',
-            points: record.points_change,
-            originalDormPoints: record.original_dorm_score,
-            convertedPoints: record.converted_points,
-            date: record.deduction_date || record.created_at,
-            operator: record.operator_name || '未知',
-            remark: record.remark || '',
-            images: record.proof_images || null,
-            dormRoom: record.dorm_room || '未分配'
-          }));
-          setDeductionHistory(transformedHistory);
-        } else {
-          setDeductionHistory([]);
-        }
-      } catch (error) {
-        // 如果表不存在，使用空数组
-        console.log('dorm_score_records 表不存在，使用空数组');
+      // 从数据库加载宿舍扣分记录
+      const result = await db.collection('score_records').where({
+        source_type: '宿舍扣分'
+      }).orderBy('date', 'desc').limit(50).get();
+      if (result.data && result.data.length > 0) {
+        const transformedHistory = result.data.map(record => ({
+          id: record._id,
+          studentId: record.student_id,
+          studentName: record.student_name || '未知',
+          itemName: record.item_id || '宿舍扣分',
+          points: record.score_change,
+          originalDormPoints: record.original_score || 100,
+          convertedPoints: (record.score_change * conversionRate).toFixed(1),
+          date: record.date ? new Date(record.date).toLocaleString('zh-CN') : '',
+          operator: record.recorder_name || '宿管员',
+          remark: record.reason_detail || ''
+        }));
+        setDeductionHistory(transformedHistory);
+      } else {
         setDeductionHistory([]);
       }
     } catch (error) {
       console.error('加载历史记录失败:', error);
+      setDeductionHistory([]);
     }
   };
 
   // 扣分处理
   const handleDeduction = async (student, deductionItem, remark) => {
     try {
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
       const convertedPoints = deductionItem.points * conversionRate;
       const newDormPoints = student.dormPoints + deductionItem.points;
       const newTotalPoints = student.totalPoints + convertedPoints;
-      const operatorName = $w?.auth?.currentUser?.name || '当前用户';
-      const deductionDate = new Date().toLocaleString('zh-CN');
-      const tcb = await $w.cloud.getCloudInstance();
-      const db = tcb.database();
 
-      // 1. 更新学生宿舍积分
-      await db.collection('students').doc(student.id).update({
-        dorm_score: newDormPoints,
-        converted_points: student.convertedPoints + convertedPoints,
-        current_score: newTotalPoints,
-        updated_at: new Date().toISOString().split('T')[0],
-        updated_by: $w.auth.currentUser.userId,
-        operation_history: [...(students.find(s => s.id === student.id).operation_history || []), {
-          operation: '宿舍扣分',
-          operator: operatorName,
-          timestamp: new Date().toISOString(),
-          details: `${deductionItem.name}：${deductionItem.points}分`
-        }]
+      // 1. 添加扣分记录到数据库
+      const recordResult = await db.collection('score_records').add({
+        record_id: `DP${Date.now()}`,
+        student_id: student.studentId,
+        student_name: student.name,
+        item_id: deductionItem.name,
+        score_change: deductionItem.points,
+        original_score: student.dormPoints,
+        reason_detail: remark || deductionItem.name,
+        date: new Date().toISOString(),
+        source_type: '宿舍扣分',
+        source_record_id: '',
+        approval_status: '已通过',
+        approval_time: new Date().toISOString(),
+        approver_name: $w?.auth?.currentUser?.name || '宿管员',
+        recorder_name: $w?.auth?.currentUser?.name || '宿管员',
+        semester_id: 'current'
       });
 
-      // 2. 尝试添加扣分记录到 dorm_score_records 表
-      try {
-        await db.collection('dorm_score_records').add({
-          record_id: `DSR${Date.now()}`,
-          student_id: student.studentId,
-          student_name: student.name,
-          item_name: deductionItem.name,
-          item_category: deductionItem.category,
-          points_change: deductionItem.points,
-          original_dorm_score: student.dormPoints,
-          converted_points: convertedPoints,
-          conversion_rate: conversionRate,
-          deduction_date: new Date().toISOString(),
-          dorm_room: student.dormRoom,
-          operator_name: operatorName,
-          operator_id: $w.auth.currentUser.userId,
-          remark: remark || '',
-          proof_images: uploadedImages.length > 0 ? uploadedImages.map(img => img.url) : [],
-          semester_id: 'current',
-          created_at: new Date().toISOString()
-        });
-      } catch (error) {
-        console.warn('dorm_score_records 表不存在或添加失败:', error);
-      }
+      // 2. 更新学生的宿舍积分
+      await db.collection('students').doc(student.id).update({
+        dorm_score: newDormPoints,
+        current_score: newTotalPoints
+      });
 
-      // 更新前端状态
+      // 3. 更新前端状态
       const updatedStudents = students.map(s => s.id === student.id ? {
         ...s,
         dormPoints: newDormPoints,
@@ -402,16 +376,18 @@ export default function DormPointsPage(props) {
         totalPoints: newTotalPoints
       } : s);
       setStudents(updatedStudents);
+
+      // 4. 添加到前端历史记录
       const newHistory = {
-        id: Date.now(),
+        id: recordResult.id || recordResult._id,
         studentId: student.studentId,
         studentName: student.name,
         itemName: deductionItem.name,
         points: deductionItem.points,
         originalDormPoints: student.dormPoints,
-        convertedPoints: convertedPoints,
-        date: deductionDate,
-        operator: operatorName,
+        convertedPoints: convertedPoints.toFixed(1),
+        date: new Date().toLocaleString('zh-CN'),
+        operator: $w?.auth?.currentUser?.name || '宿管员',
         remark: remark || '',
         images: uploadedImages.length > 0 ? uploadedImages.map(img => ({
           name: img.name,
@@ -447,7 +423,7 @@ export default function DormPointsPage(props) {
       console.error('扣分失败:', error);
       toast({
         title: '操作失败',
-        description: error.message || '扣分操作失败，请重试',
+        description: '扣分操作失败，请重试',
         variant: 'destructive'
       });
     }
@@ -569,16 +545,23 @@ export default function DormPointsPage(props) {
   const handleResetSemester = async () => {
     try {
       setLoading(true);
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
 
-      // 模拟重置操作
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // 批量更新所有住宿生的宿舍积分为100分
+      const boardingStudents = students.filter(s => s.isBoarding);
+      for (const student of boardingStudents) {
+        await db.collection('students').doc(student.id).update({
+          dorm_score: 100
+        });
+      }
 
-      // 重置所有住宿生的宿舍积分为100分
-      const updatedStudents = students.map(s => ({
+      // 更新前端状态
+      const updatedStudents = students.map(s => s.isBoarding ? {
         ...s,
         dormPoints: 100,
         convertedPoints: 0
-      }));
+      } : s);
       setStudents(updatedStudents);
 
       // 清空历史记录
@@ -593,7 +576,7 @@ export default function DormPointsPage(props) {
       console.error('重置失败:', error);
       toast({
         title: '重置失败',
-        description: '重置操作失败，请重试',
+        description: error.message || '重置操作失败，请重试',
         variant: 'destructive'
       });
     } finally {
