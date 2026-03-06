@@ -257,13 +257,36 @@ export default function DocumentsPage({
     }
     setIsUploading(true);
     try {
-      // 模拟文件上传
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
 
       // 计算文件大小
       const fileSize = uploadForm.file.size < 1024 * 1024 ? `${(uploadForm.file.size / 1024).toFixed(0)}KB` : `${(uploadForm.file.size / (1024 * 1024)).toFixed(2)}MB`;
+
+      // 添加文件到数据库
+      const result = await db.collection('policy_document').add({
+        document_id: `PD${Date.now()}`,
+        title: uploadForm.title,
+        category: uploadForm.category,
+        description: uploadForm.description,
+        file_name: uploadForm.file.name,
+        file_size: fileSize,
+        file_type: uploadForm.file.name.split('.').pop().toUpperCase(),
+        file_url: 'https://example.com/files/' + uploadForm.file.name,
+        is_pinned: false,
+        permission: uploadForm.permission === 'public' ? '公开' : uploadForm.permission === 'student' ? '仅学生可见' : uploadForm.permission === 'parent' ? '仅家长可见' : '公开',
+        upload_date: new Date().toISOString(),
+        update_date: new Date().toISOString(),
+        expiry_date: uploadForm.expiryDate ? new Date(uploadForm.expiryDate).toISOString() : null,
+        uploader: $w.auth.currentUser?.name || '管理员',
+        status: '正常',
+        view_count: 0,
+        download_count: 0,
+        semester_id: 2,
+        semester_name: '2024-2025第二学期'
+      });
       const newFile = {
-        id: files.length + 1,
+        id: result.id || result._id,
         title: uploadForm.title,
         category: uploadForm.category,
         description: uploadForm.description,
@@ -296,6 +319,7 @@ export default function DocumentsPage({
         description: `文件"${uploadForm.title}"已成功上传`
       });
     } catch (error) {
+      console.error('上传文件失败:', error);
       toast({
         title: '上传失败',
         description: error.message || '文件上传失败，请重试',
@@ -307,61 +331,122 @@ export default function DocumentsPage({
   };
 
   // 置顶/取消置顶
-  const togglePin = fileId => {
-    setFiles(files.map(f => f.id === fileId ? {
-      ...f,
-      isPinned: !f.isPinned
-    } : f));
-    const file = files.find(f => f.id === fileId);
-    const status = file.isPinned ? '已取消置顶' : '已置顶';
-    toast({
-      title: '成功',
-      description: `文件"${file.title}"${status}`
-    });
+  const togglePin = async fileId => {
+    try {
+      const file = files.find(f => f.id === fileId);
+      const newPinnedStatus = !file.isPinned;
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+
+      // 更新数据库中的置顶状态
+      await db.collection('policy_document').doc(fileId).update({
+        is_pinned: newPinnedStatus,
+        update_date: new Date().toISOString()
+      });
+      setFiles(files.map(f => f.id === fileId ? {
+        ...f,
+        isPinned: newPinnedStatus
+      } : f));
+      const status = newPinnedStatus ? '已置顶' : '已取消置顶';
+      toast({
+        title: '成功',
+        description: `文件"${file.title}"${status}`
+      });
+    } catch (error) {
+      console.error('置顶操作失败:', error);
+      toast({
+        title: '操作失败',
+        description: error.message || '请重试',
+        variant: 'destructive'
+      });
+    }
   };
 
   // 删除文件
-  const deleteFile = fileId => {
+  const deleteFile = async fileId => {
     const file = files.find(f => f.id === fileId);
     if (!confirm(`确定要删除文件"${file.title}"吗？此操作不可恢复。`)) {
       return;
     }
-    setFiles(files.filter(f => f.id !== fileId));
-    toast({
-      title: '删除成功',
-      description: `文件"${file.title}"已删除`
-    });
+    try {
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+
+      // 从数据库删除文件
+      await db.collection('policy_document').doc(fileId).remove();
+      setFiles(files.filter(f => f.id !== fileId));
+      toast({
+        title: '删除成功',
+        description: `文件"${file.title}"已删除`
+      });
+    } catch (error) {
+      console.error('删除文件失败:', error);
+      toast({
+        title: '删除失败',
+        description: error.message || '请重试',
+        variant: 'destructive'
+      });
+    }
   };
 
   // 查看文件
-  const viewFile = file => {
+  const viewFile = async file => {
     setSelectedFile(file);
     setViewDialogOpen(true);
+    try {
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
 
-    // 增加查看次数
-    setFiles(files.map(f => f.id === file.id ? {
-      ...f,
-      viewCount: f.viewCount + 1
-    } : f));
+      // 更新数据库中的查看次数
+      await db.collection('policy_document').doc(file.id).update({
+        view_count: (file.viewCount || 0) + 1,
+        update_date: new Date().toISOString()
+      });
+
+      // 增加前端查看次数
+      setFiles(files.map(f => f.id === file.id ? {
+        ...f,
+        viewCount: (f.viewCount || 0) + 1
+      } : f));
+    } catch (error) {
+      console.error('更新查看次数失败:', error);
+    }
   };
 
   // 下载文件
-  const downloadFile = file => {
+  const downloadFile = async file => {
     // 模拟下载
     console.log('下载文件:', file.fileUrl);
+    try {
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
 
-    // 增加下载次数
-    setFiles(files.map(f => f.id === file.id ? {
-      ...f,
-      downloadCount: f.downloadCount + 1
-    } : f));
-    toast({
-      title: '开始下载',
-      description: `正在下载"${file.fileName}"...`
-    });
+      // 更新数据库中的下载次数
+      await db.collection('policy_document').doc(file.id).update({
+        download_count: (file.downloadCount || 0) + 1,
+        update_date: new Date().toISOString()
+      });
 
-    // 实际应用中这里会触发浏览器下载
-    // window.open(file.fileUrl, '_blank');
+      // 增加前端下载次数
+      setFiles(files.map(f => f.id === file.id ? {
+        ...f,
+        downloadCount: (f.downloadCount || 0) + 1
+      } : f));
+      toast({
+        title: '开始下载',
+        description: `正在下载"${file.fileName}"...`
+      });
+
+      // 实际应用中这里会触发浏览器下载
+      // window.open(file.fileUrl, '_blank');
+    } catch (error) {
+      console.error('更新下载次数失败:', error);
+      toast({
+        title: '下载失败',
+        description: error.message || '请重试',
+        variant: 'destructive'
+      });
+    }
   };
 
   // 查看历史记录

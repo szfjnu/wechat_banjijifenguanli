@@ -1,0 +1,104 @@
+{
+  "name": "policy_document",
+  "title": "制度文件管理",
+  "schemas": [
+    {
+      "name": "document_id",
+      "title": "文件ID",
+      "type": "String"
+    },
+    {
+      "name": "title",
+      "title": "文件标题",
+      "type": "String"
+    },
+    {
+      "name": "category",
+      "title": "文件分类",
+      "type": "String"
+    },
+    {
+      "name": "description",
+      "title": "文件描述",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "file_name",
+      "title": "文件名",
+      "type": "String"
+    },
+    {
+      "name": "file_size",
+      "title": "文件大小",
+      "type": "String"
+    },
+    {
+      "name": "file_type",
+      "title": "文件类型",
+      "type": "String"
+    },
+    {
+      "name": "file_url",
+      "title": "文件URL",
+      "type": "String"
+    },
+    {
+      "name": "is_pinned",
+      "title": "是否置顶",
+      "type": "Boolean"
+    },
+    {
+      "name": "permission",
+      "title": "访问权限",
+      "type": "String"
+    },
+    {
+      "name": "upload_date",
+      "title": "上传时间",
+      "type": "DateTime",
+      "format": "string"
+    },
+    {
+      "name": "update_date",
+      "title": "更新时间",
+      "type": "DateTime",
+      "format": "string"
+    },
+    {
+      "name": "expiry_date",
+      "title": "有效期",
+      "type": "Date",
+      "format": "string"
+    },
+    {
+      "name": "uploader",
+      "title": "上传人",
+      "type": "String"
+    },
+    {
+      "name": "status",
+      "title": "文件状态",
+      "type": "String"
+    },
+    {
+      "name": "view_count",
+      "title": "查看次数",
+      "type": "Number"
+    },
+    {
+      "name": "download_count",
+      "title": "下载次数",
+      "type": "Number"
+    },
+    {
+      "name": "semester_id",
+      "title": "关联学期ID",
+      "type": "Number"
+    },
+    {
+      "name": "semester_name",
+      "title": "学期名称",
+      "type": "String"
+    }
+  ]
+}

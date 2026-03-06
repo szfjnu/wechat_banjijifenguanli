@@ -1,0 +1,83 @@
+{
+  "name": "redemption_request",
+  "title": "积分兑换申请",
+  "schemas": [
+    {
+      "name": "request_id",
+      "title": "申请ID",
+      "type": "String"
+    },
+    {
+      "name": "student_id",
+      "title": "关联学生ID",
+      "type": "String"
+    },
+    {
+      "name": "student_name",
+      "title": "学生姓名",
+      "type": "String"
+    },
+    {
+      "name": "item_id",
+      "title": "申请物品ID",
+      "type": "Number"
+    },
+    {
+      "name": "item_name",
+      "title": "申请物品名称",
+      "type": "String"
+    },
+    {
+      "name": "points_required",
+      "title": "所需积分",
+      "type": "Number"
+    },
+    {
+      "name": "redemption_mode",
+      "title": "兑换模式",
+      "type": "String"
+    },
+    {
+      "name": "status",
+      "title": "申请状态",
+      "type": "String"
+    },
+    {
+      "name": "redemption_time",
+      "title": "申请时间",
+      "type": "DateTime",
+      "format": "string"
+    },
+    {
+      "name": "approver_name",
+      "title": "审核人",
+      "type": "String"
+    },
+    {
+      "name": "approval_time",
+      "title": "审核时间",
+      "type": "DateTime",
+      "format": "string"
+    },
+    {
+      "name": "approval_comment",
+      "title": "审核意见",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "semester_id",
+      "title": "关联学期ID",
+      "type": "Number"
+    },
+    {
+      "name": "semester_name",
+      "title": "学期名称",
+      "type": "String"
+    },
+    {
+      "name": "is_winner",
+      "title": "是否中标",
+      "type": "Boolean"
+    }
+  ]
+}
