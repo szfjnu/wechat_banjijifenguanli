@@ -38,8 +38,43 @@ export default function SemesterPage(props) {
   const {
     navigateTo
   } = props.$w.utils;
-  const [semesters, setSemesters] = useState(MOCK_SEMESTERS);
+  const [semesters, setSemesters] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState('semester');
+
+  // 加载学期数据
+  useEffect(() => {
+    loadSemesters();
+  }, []);
+  const loadSemesters = async () => {
+    try {
+      setLoading(true);
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const result = await tcb.database().collection('semesters').get();
+      if (result.data && result.data.length > 0) {
+        const transformedSemesters = result.data.map(sem => ({
+          id: sem._id,
+          name: sem.semester_name,
+          startDate: sem.start_date ? sem.start_date.split('T')[0] : '',
+          endDate: sem.end_date ? sem.end_date.split('T')[0] : '',
+          isCurrent: sem.is_current,
+          createdAt: sem.created_at
+        }));
+        setSemesters(transformedSemesters);
+      } else {
+        setSemesters([]);
+      }
+    } catch (error) {
+      console.error('加载学期数据失败:', error);
+      toast({
+        title: '加载失败',
+        description: error.message || '无法加载学期数据',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
   const handlePageChange = pageId => {
     setCurrentPage(pageId);
     $w.utils.navigateTo({

@@ -1,358 +1,374 @@
 // @ts-ignore;
 import React, { useState, useEffect } from 'react';
 // @ts-ignore;
-import { useToast } from '@/components/ui'; // @ts-ignore;
+import { useToast } from '@/components/ui';
+// @ts-ignore;
 import { Settings2, Target, Plus, Edit2, Trash2, Save, X, TrendingUp, Star, Shield, BookOpen, Heart, Award, Zap, ChevronUp, ChevronDown, CheckCircle, Database } from 'lucide-react';
+
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 export default function PointsSettings({
   $w,
   className,
-  style })
-{
+  style
+}) {
   const {
-    toast } =
-  useToast();
+    toast
+  } = useToast();
   const [currentPage, setCurrentPage] = useState('points-settings');
-  const handlePageChange = (pageId) => {
+  const handlePageChange = pageId => {
     setCurrentPage(pageId);
     $w.utils.navigateTo({
       pageId,
-      params: {} });
-
+      params: {}
+    });
   };
 
   // 数据状态
   // 数据状态
-  const [items, setItems] = useState([]);const [loading, setLoading] = useState(false);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   // 对话框状态
   // 对话框状态
-  const [showEditDialog, setShowEditDialog] = useState(false);const [editingItem, setEditingItem] = useState(null);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
 
   // 表单状态
   // 表单状态
-  const [formData, setFormData] = useState({ name: '',
+  const [formData, setFormData] = useState({
+    name: '',
     description: '',
     points: 0,
     category: 'positive',
     icon: 'Star',
-    enabled: true });
-
+    enabled: true
+  });
 
   // 分类选项
   // 分类选项
-  const categories = [{ id: 'positive',
+  const categories = [{
+    id: 'positive',
     name: '加分项',
     color: 'green',
-    icon: TrendingUp },
-  {
+    icon: TrendingUp
+  }, {
     id: 'negative',
     name: '扣分项',
     color: 'red',
-    icon: TrendingUp },
-  {
+    icon: TrendingUp
+  }, {
     id: 'academic',
     name: '学习表现',
     color: 'blue',
-    icon: BookOpen },
-  {
+    icon: BookOpen
+  }, {
     id: 'behavior',
     name: '行为表现',
     color: 'purple',
-    icon: Shield },
-  {
+    icon: Shield
+  }, {
     id: 'activity',
     name: '活动参与',
     color: 'orange',
-    icon: Heart },
-  {
+    icon: Heart
+  }, {
     id: 'other',
     name: '其他',
     color: 'gray',
-    icon: Star }];
-
+    icon: Star
+  }];
 
   // 图标选项
   // 图标选项
-  const iconOptions = [{ id: 'Star',
-    icon: Star },
-  {
+  const iconOptions = [{
+    id: 'Star',
+    icon: Star
+  }, {
     id: 'TrendingUp',
-    icon: TrendingUp },
-  {
+    icon: TrendingUp
+  }, {
     id: 'BookOpen',
-    icon: BookOpen },
-  {
+    icon: BookOpen
+  }, {
     id: 'Shield',
-    icon: Shield },
-  {
+    icon: Shield
+  }, {
     id: 'Heart',
-    icon: Heart },
-  {
+    icon: Heart
+  }, {
     id: 'Award',
-    icon: Award },
-  {
+    icon: Award
+  }, {
     id: 'Zap',
-    icon: Zap },
-  {
+    icon: Zap
+  }, {
     id: 'Target',
-    icon: Target }];
+    icon: Target
+  }];
 
-
-  // 初始化示例数据
-  // 初始化示例数据
-  useEffect(() => {loadInitialData();
+  // 加载积分项目数据
+  useEffect(() => {
+    loadScoreItems();
   }, []);
-  const loadInitialData = () => {
-    const initialItems = [{
-      id: 1,
-      name: '课堂表现优秀',
-      description: '积极发言、认真听讲、完成课堂任务',
-      points: 2,
-      category: 'positive',
-      icon: 'Star',
-      enabled: true,
-      createdAt: '2026-03-03',
-      usageCount: 45 },
-    {
-      id: 2,
-      name: '作业完成',
-      description: '按时、高质量完成作业',
-      points: 1,
-      category: 'academic',
-      icon: 'BookOpen',
-      enabled: true,
-      createdAt: '2026-03-03',
-      usageCount: 128 },
-    {
-      id: 3,
-      name: '迟到',
-      description: '上课迟到，每次扣分',
-      points: -1,
-      category: 'negative',
-      icon: 'TrendingUp',
-      enabled: true,
-      createdAt: '2026-03-03',
-      usageCount: 23 },
-    {
-      id: 4,
-      name: '志愿活动参与',
-      description: '参与班级或学校志愿活动',
-      points: 3,
-      category: 'activity',
-      icon: 'Heart',
-      enabled: true,
-      createdAt: '2026-03-03',
-      usageCount: 67 },
-    {
-      id: 5,
-      name: '违纪行为',
-      description: '违反课堂纪律或校规校纪',
-      points: -2,
-      category: 'negative',
-      icon: 'Shield',
-      enabled: true,
-      createdAt: '2026-03-03',
-      usageCount: 15 },
-    {
-      id: 6,
-      name: '优秀作业',
-      description: '作业被评为优秀',
-      points: 2,
-      category: 'academic',
-      icon: 'Award',
-      enabled: true,
-      createdAt: '2026-03-03',
-      usageCount: 89 },
-    {
-      id: 7,
-      name: '积极参与讨论',
-      description: '在讨论环节积极参与并贡献观点',
-      points: 1,
-      category: 'positive',
-      icon: 'Zap',
-      enabled: true,
-      createdAt: '2026-03-03',
-      usageCount: 156 },
-    {
-      id: 8,
-      name: '帮助同学',
-      description: '主动帮助同学解决问题',
-      points: 2,
-      category: 'positive',
-      icon: 'Heart',
-      enabled: true,
-      createdAt: '2026-03-03',
-      usageCount: 34 }];
-
-    setItems(initialItems);
+  const loadScoreItems = async () => {
+    try {
+      setLoading(true);
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const result = await tcb.database().collection('score_items').get();
+      if (result.data && result.data.length > 0) {
+        const transformedItems = result.data.map(item => ({
+          id: item._id,
+          name: item.item_name,
+          description: item.description || '',
+          points: item.score_value,
+          category: item.item_type === '加分' ? item.score_value > 0 ? 'positive' : 'negative' : 'negative',
+          icon: item.icon_name || 'Star',
+          enabled: item.is_enabled !== false,
+          createdAt: item.created_at ? item.created_at.split('T')[0] : '',
+          usageCount: 0 // 需要从 score_records 计算后续添加
+        }));
+        setItems(transformedItems);
+      } else {
+        setItems([]);
+      }
+    } catch (error) {
+      console.error('加载积分项目失败:', error);
+      toast({
+        title: '加载失败',
+        description: error.message || '无法加载积分项目',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   // 打开新增对话框
   // 打开新增对话框
-  const handleAdd = () => {setEditingItem(null);
+  const handleAdd = () => {
+    setEditingItem(null);
     setFormData({
       name: '',
       description: '',
       points: 0,
       category: 'positive',
       icon: 'Star',
-      enabled: true });
-
+      enabled: true
+    });
     setShowEditDialog(true);
   };
 
   // 打开编辑对话框
   // 打开编辑对话框
-  const handleEdit = (item) => {setEditingItem(item);
+  const handleEdit = item => {
+    setEditingItem(item);
     setFormData({
       name: item.name,
       description: item.description,
       points: item.points,
       category: item.category,
       icon: item.icon,
-      enabled: item.enabled });
-
+      enabled: item.enabled
+    });
     setShowEditDialog(true);
   };
 
   // 删除项目
   // 删除项目
-  const handleDelete = (item) => {if (window.confirm(`确定要删除「${item.name}」这个积分项目吗？`)) {
-      setItems(items.filter((i) => i.id !== item.id));
+  const handleDelete = item => {
+    if (window.confirm(`确定要删除「${item.name}」这个积分项目吗？`)) {
+      setItems(items.filter(i => i.id !== item.id));
       toast({
         title: '删除成功',
         description: '积分项目已删除',
-        variant: 'default' });
-
+        variant: 'default'
+      });
     }
   };
 
   // 保存项目
   // 保存项目
-  const handleSave = () => {// 验证
+  const handleSave = async () => {
+    // 验证
     if (!formData.name.trim()) {
       toast({
         title: '验证失败',
         description: '请输入项目名称',
-        variant: 'destructive' });
-
+        variant: 'destructive'
+      });
       return;
     }
     if (formData.points === 0) {
       toast({
         title: '验证失败',
         description: '请设置积分值',
-        variant: 'destructive' });
-
+        variant: 'destructive'
+      });
       return;
     }
-    if (editingItem) {
-      // 更新
-      setItems(items.map((item) => item.id === editingItem.id ? {
-        ...item,
-        ...formData,
-        updatedAt: new Date().toISOString() } :
-      item));
+    try {
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+      if (editingItem) {
+        // 更新数据库
+        await db.collection('score_items').doc(editingItem.id).update({
+          item_name: formData.name,
+          description: formData.description,
+          score_value: formData.points,
+          icon_name: formData.icon,
+          is_enabled: formData.enabled,
+          updated_at: new Date().toISOString()
+        });
+
+        // 更新前端
+        setItems(items.map(item => item.id === editingItem.id ? {
+          ...item,
+          ...formData,
+          updatedAt: new Date().toISOString()
+        } : item));
+        toast({
+          title: '更新成功',
+          description: '积分项目已更新',
+          variant: 'default'
+        });
+      } else {
+        // 新增到数据库
+        const result = await db.collection('score_items').add({
+          item_name: formData.name,
+          description: formData.description,
+          score_value: formData.points,
+          item_type: formData.points > 0 ? '加分' : '扣分',
+          icon_name: formData.icon,
+          is_enabled: formData.enabled,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+
+        // 更新前端
+        const newItem = {
+          id: result.id || result._id,
+          ...formData,
+          createdAt: new Date().toISOString().split('T')[0],
+          usageCount: 0
+        };
+        setItems([...items, newItem]);
+        toast({
+          title: '添加成功',
+          description: '积分项目已添加',
+          variant: 'default'
+        });
+      }
+      setShowEditDialog(false);
+    } catch (error) {
+      console.error('保存积分项目失败:', error);
       toast({
-        title: '更新成功',
-        description: '积分项目已更新',
-        variant: 'default' });
-
-    } else {
-      // 新增
-      const newItem = {
-        id: Date.now(),
-        ...formData,
-        createdAt: new Date().toISOString().split('T')[0],
-        usageCount: 0 };
-
-      setItems([...items, newItem]);
-      toast({
-        title: '添加成功',
-        description: '积分项目已添加',
-        variant: 'default' });
-
+        title: '保存失败',
+        description: error.message || '请重试',
+        variant: 'destructive'
+      });
     }
-    setShowEditDialog(false);
   };
 
   // 切换启用状态
   // 切换启用状态
-  const handleToggleEnabled = (item) => {setItems(items.map((i) => i.id === item.id ? {
-      ...i,
-      enabled: !i.enabled } :
-    i));
-    toast({
-      title: '状态已更新',
-      description: `项目「${item.name}」已${item.enabled ? '禁用' : '启用'}`,
-      variant: 'default' });
+  const handleToggleEnabled = async item => {
+    try {
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
 
+      // 更新数据库中的启用状态
+      await db.collection('score_items').doc(item.id).update({
+        is_enabled: !item.enabled,
+        updated_at: new Date().toISOString()
+      });
+
+      // 更新前端
+      setItems(items.map(i => i.id === item.id ? {
+        ...i,
+        enabled: !i.enabled
+      } : i));
+      toast({
+        title: '状态已更新',
+        description: `项目「${item.name}」已${item.enabled ? '禁用' : '启用'}`,
+        variant: 'default'
+      });
+    } catch (error) {
+      console.error('切换启用状态失败:', error);
+      toast({
+        title: '操作失败',
+        description: error.message || '请重试',
+        variant: 'destructive'
+      });
+    }
   };
 
   // 获取分类信息
   // 获取分类信息
-  const getCategory = (categoryId) => {return categories.find((c) => c.id === categoryId) || categories[0];
+  const getCategory = categoryId => {
+    return categories.find(c => c.id === categoryId) || categories[0];
   };
 
   // 获取图标组件
   // 获取图标组件
-  const getIcon = (iconId) => {const iconOption = iconOptions.find((o) => o.id === iconId);
+  const getIcon = iconId => {
+    const iconOption = iconOptions.find(o => o.id === iconId);
     return iconOption ? iconOption.icon : Star;
   };
 
   // 获取颜色样式
   // 获取颜色样式
-  const getColorClasses = (category) => {const colorMap = {
+  const getColorClasses = category => {
+    const colorMap = {
       green: {
         bg: 'from-green-400 to-emerald-500',
         text: 'text-green-600',
         bgLight: 'bg-green-50',
-        border: 'border-green-200' },
-
+        border: 'border-green-200'
+      },
       red: {
         bg: 'from-red-400 to-rose-500',
         text: 'text-red-600',
         bgLight: 'bg-red-50',
-        border: 'border-red-200' },
-
+        border: 'border-red-200'
+      },
       blue: {
         bg: 'from-blue-400 to-indigo-500',
         text: 'text-blue-600',
         bgLight: 'bg-blue-50',
-        border: 'border-blue-200' },
-
+        border: 'border-blue-200'
+      },
       purple: {
         bg: 'from-purple-400 to-violet-500',
         text: 'text-purple-600',
         bgLight: 'bg-purple-50',
-        border: 'border-purple-200' },
-
+        border: 'border-purple-200'
+      },
       orange: {
         bg: 'from-orange-400 to-amber-500',
         text: 'text-orange-600',
         bgLight: 'bg-orange-50',
-        border: 'border-orange-200' },
-
+        border: 'border-orange-200'
+      },
       gray: {
         bg: 'from-gray-400 to-slate-500',
         text: 'text-gray-600',
         bgLight: 'bg-gray-50',
-        border: 'border-gray-200' } };
-
-
+        border: 'border-gray-200'
+      }
+    };
     return colorMap[category] || colorMap.gray;
   };
 
   // 统计数据
   // 统计数据
-  const stats = { total: items.length,
-    enabled: items.filter((i) => i.enabled).length,
-    positive: items.filter((i) => i.points > 0).length,
-    negative: items.filter((i) => i.points < 0).length,
-    totalUsage: items.reduce((sum, i) => sum + (i.usageCount || 0), 0) };
-
+  const stats = {
+    total: items.length,
+    enabled: items.filter(i => i.enabled).length,
+    positive: items.filter(i => i.points > 0).length,
+    negative: items.filter(i => i.points < 0).length,
+    totalUsage: items.reduce((sum, i) => sum + (i.usageCount || 0), 0)
+  };
   return <div className="min-h-screen bg-gray-50 pb-16" style={style}>
       {/* Header */}
       <div className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white pt-6 pb-8 px-6 rounded-b-3xl shadow-lg">
@@ -390,7 +406,7 @@ export default function PointsSettings({
           <div className="flex items-center gap-4">
             <span className="text-sm font-semibold text-gray-600">筛选：</span>
             <div className="flex items-center gap-2">
-              {categories.map((cat) => {
+              {categories.map(cat => {
               const Icon = cat.icon;
               return <button key={cat.id} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all ${cat.id === 'all' ? 'bg-gray-100 text-gray-700' : ''}`}>
                   <Icon className={`w-4 h-4 ${cat.id === 'positive' ? 'text-green-600' : cat.id === 'negative' ? 'text-red-600' : 'text-gray-500'}`} />
@@ -403,7 +419,7 @@ export default function PointsSettings({
         
         {/* Items List */}
         <div className="space-y-4">
-          {items.map((item) => {
+          {items.map(item => {
           const category = getCategory(item.category);
           const Icon = getIcon(item.icon);
           const colors = getColorClasses(category.color);
@@ -481,10 +497,10 @@ export default function PointsSettings({
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   项目名称 <span className="text-red-500">*</span>
                 </label>
-                <input type="text" value={formData.name} onChange={(e) => setFormData({
+                <input type="text" value={formData.name} onChange={e => setFormData({
               ...formData,
-              name: e.target.value })}
-            placeholder="输入项目名称" className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+              name: e.target.value
+            })} placeholder="输入项目名称" className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
               </div>
               
               {/* 描述 */}
@@ -492,10 +508,10 @@ export default function PointsSettings({
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   描述说明
                 </label>
-                <textarea value={formData.description} onChange={(e) => setFormData({
+                <textarea value={formData.description} onChange={e => setFormData({
               ...formData,
-              description: e.target.value })}
-            placeholder="描述这个积分项目的具体内容" rows={3} className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+              description: e.target.value
+            })} placeholder="描述这个积分项目的具体内容" rows={3} className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
               </div>
               
               {/* 积分值 */}
@@ -506,18 +522,18 @@ export default function PointsSettings({
                 <div className="flex items-center gap-4">
                   <button type="button" onClick={() => setFormData({
                 ...formData,
-                points: formData.points - 1 })}
-              className="w-10 h-10 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center">
+                points: formData.points - 1
+              })} className="w-10 h-10 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center">
                     <ChevronDown className="w-5 h-5 text-gray-600" />
                   </button>
-                  <input type="number" value={formData.points} onChange={(e) => setFormData({
+                  <input type="number" value={formData.points} onChange={e => setFormData({
                 ...formData,
-                points: parseInt(e.target.value) || 0 })}
-              className="w-20 text-center text-2xl font-bold px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                points: parseInt(e.target.value) || 0
+              })} className="w-20 text-center text-2xl font-bold px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
                   <button type="button" onClick={() => setFormData({
                 ...formData,
-                points: formData.points + 1 })}
-              className="w-10 h-10 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center">
+                points: formData.points + 1
+              })} className="w-10 h-10 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center">
                     <ChevronUp className="w-5 h-5 text-gray-600" />
                   </button>
                   <span className="text-sm text-gray-500">正数为加分，负数为扣分</span>
@@ -530,12 +546,12 @@ export default function PointsSettings({
                   所属分类
                 </label>
                 <div className="grid grid-cols-3 gap-2">
-                  {categories.map((cat) => {
+                  {categories.map(cat => {
                 const Icon = cat.icon;
                 return <button key={cat.id} type="button" onClick={() => setFormData({
                   ...formData,
-                  category: cat.id })}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all ${formData.category === cat.id ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                  category: cat.id
+                })} className={`flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all ${formData.category === cat.id ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 hover:border-gray-300'}`}>
                       <Icon className={`w-4 h-4 ${cat.id === 'positive' ? 'text-green-600' : cat.id === 'negative' ? 'text-red-600' : 'text-gray-500'}`} />
                       <span className="text-sm">{cat.name}</span>
                     </button>;
@@ -549,12 +565,12 @@ export default function PointsSettings({
                   选择图标
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  {iconOptions.map((iconOpt) => {
+                  {iconOptions.map(iconOpt => {
                 const Icon = iconOpt.icon;
                 return <button key={iconOpt.id} type="button" onClick={() => setFormData({
                   ...formData,
-                  icon: iconOpt.id })}
-                className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center transition-all ${formData.icon === iconOpt.id ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                  icon: iconOpt.id
+                })} className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center transition-all ${formData.icon === iconOpt.id ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 hover:border-gray-300'}`}>
                       <Icon className={`w-5 h-5 ${formData.icon === iconOpt.id ? 'text-emerald-600' : 'text-gray-500'}`} />
                     </button>;
               })}
@@ -569,8 +585,8 @@ export default function PointsSettings({
                 </div>
                 <button type="button" onClick={() => setFormData({
               ...formData,
-              enabled: !formData.enabled })}
-            className={`w-12 h-6 rounded-full transition-colors relative ${formData.enabled ? 'bg-emerald-500' : 'bg-gray-300'}`}>
+              enabled: !formData.enabled
+            })} className={`w-12 h-6 rounded-full transition-colors relative ${formData.enabled ? 'bg-emerald-500' : 'bg-gray-300'}`}>
                   <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all ${formData.enabled ? 'left-6.5' : 'left-0.5'}`} />
                 </button>
               </div>
