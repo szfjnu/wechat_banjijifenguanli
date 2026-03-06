@@ -232,16 +232,45 @@ export default function PointsPage(props) {
   const loadPointsData = async () => {
     try {
       setLoading(true);
-      // TODO: 替换为真实数据源调用
-      // const tcb = await $w.cloud.getCloudInstance();
-      // const result = await tcb.database().collection('point_records').get();
-      await new Promise(resolve => setTimeout(resolve, 300));
-      setHistoryRecords(MOCK_HISTORY);
+      const tcb = await $w.cloud.getCloudInstance();
+
+      // 加载积分记录
+      const recordsResult = await tcb.database().collection('score_records').orderBy('date', 'desc').limit(50).get();
+      if (recordsResult.data && recordsResult.data.length > 0) {
+        const transformedRecords = recordsResult.data.map(record => ({
+          id: record._id,
+          studentId: record.student_id,
+          studentName: record.student_name || '未知',
+          itemName: record.item_id || '未知项目',
+          points: record.score_change,
+          category: record.source_type || '日常',
+          time: record.date || record.created_at,
+          note: record.reason_detail || '',
+          status: record.approval_status === '已通过' ? 'approved' : record.approval_status === '待审核' ? 'pending' : 'rejected'
+        }));
+        setHistoryRecords(transformedRecords);
+      } else {
+        setHistoryRecords([]);
+      }
+
+      // 加载学生数据
+      const studentsResult = await tcb.database().collection('students').get();
+      if (studentsResult.data && studentsResult.data.length > 0) {
+        const transformedStudents = studentsResult.data.map(student => ({
+          id: student._id,
+          studentId: student.student_id,
+          name: student.name,
+          group: student.group || '未分组',
+          totalPoints: student.current_score || 0
+        }));
+        setStudents(transformedStudents);
+      }
       setLoading(false);
     } catch (error) {
+      console.error('加载积分数据失败:', error);
       toast({
         title: '加载失败',
-        description: '积分记录加载失败，请重试',
+        description: error.message || '积分记录加载失败，请重试',
         variant: 'destructive'
       });
       setLoading(false);
@@ -257,24 +286,30 @@ export default function PointsPage(props) {
       return;
     }
     try {
-      const student = students.find(s => s.id === Number(formData.studentId));
+      const student = students.find(s => s.id === formData.studentId);
       const item = POINT_ITEMS.find(i => i.id === Number(formData.itemId));
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
 
-      // TODO: 替换为真实数据源调用
-      // const tcb = await $w.cloud.getCloudInstance();
-      // await tcb.database().collection('point_records').add({
-      //   studentId: formData.studentId,
-      //   itemName: item.name,
-      //   points: item.points,
-      //   category: item.category,
-      //   time: new Date(formData.time).getTime(),
-      //   note: formData.note,
-      //   status: 'pending',
-      // });
+      // 添加积分记录到数据库
+      const result = await db.collection('score_records').add({
+        record_id: `SR${Date.now()}`,
+        student_id: student.studentId,
+        student_name: student.name,
+        item_id: item.name,
+        score_change: item.points,
+        reason_detail: formData.note || item.name,
+        date: new Date(formData.time).toISOString(),
+        source_type: '日常记录',
+        approval_status: '待审核',
+        recorder_name: '教师',
+        semester_id: 'current'
+      });
 
+      // 更新前端状态
       const newRecord = {
-        id: Date.now(),
-        studentId: Number(formData.studentId),
+        id: result.id || result._id,
+        studentId: student.studentId,
         studentName: student.name,
         itemName: item.name,
         points: item.points,
@@ -297,6 +332,7 @@ export default function PointsPage(props) {
         description: `${student.name}的${item.name}积分已添加，待审核`
       });
     } catch (error) {
+      console.error('添加积分记录失败:', error);
       toast({
         title: '添加失败',
         description: error.message || '请重试',
@@ -306,12 +342,17 @@ export default function PointsPage(props) {
   };
   const handleApprove = async recordId => {
     try {
-      // TODO: 替换为真实数据源调用
-      // const tcb = await $w.cloud.getCloudInstance();
-      // await tcb.database().collection('point_records').doc(recordId).update({
-      //   status: 'approved',
-      // });
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
 
+      // 更新数据库记录
+      await db.collection('score_records').doc(recordId).update({
+        approval_status: '已通过',
+        approval_time: new Date().toISOString(),
+        approver_name: '班主任'
+      });
+
+      // 更新前端状态
       setHistoryRecords(records => records.map(r => r.id === recordId ? {
         ...r,
         status: 'approved'
@@ -321,6 +362,7 @@ export default function PointsPage(props) {
         description: '积分记录已生效'
       });
     } catch (error) {
+      console.error('审核失败:', error);
       toast({
         title: '操作失败',
         description: error.message,
@@ -330,12 +372,17 @@ export default function PointsPage(props) {
   };
   const handleReject = async recordId => {
     try {
-      // TODO: 替换为真实数据源调用
-      // const tcb = await $w.cloud.getCloudInstance();
-      // await tcb.database().collection('point_records').doc(recordId).update({
-      //   status: 'rejected',
-      // });
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
 
+      // 更新数据库记录
+      await db.collection('score_records').doc(recordId).update({
+        approval_status: '已拒绝',
+        approval_time: new Date().toISOString(),
+        approver_name: '班主任'
+      });
+
+      // 更新前端状态
       setHistoryRecords(records => records.map(r => r.id === recordId ? {
         ...r,
         status: 'rejected'
@@ -345,6 +392,7 @@ export default function PointsPage(props) {
         description: '积分记录已驳回'
       });
     } catch (error) {
+      console.error('操作失败:', error);
       toast({
         title: '操作失败',
         description: error.message,

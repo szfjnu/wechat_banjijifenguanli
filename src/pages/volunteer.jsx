@@ -230,7 +230,7 @@ export default function VolunteerPage({
   };
 
   // 提交新记录
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!newRecord.studentId || !newRecord.activityName || !newRecord.duration) {
       toast({
         title: '请填写完整信息',
@@ -238,37 +238,67 @@ export default function VolunteerPage({
       });
       return;
     }
-    const points = calculatePoints(newRecord.duration);
-    const student = MOCK_STUDENTS.find(s => s.studentId === newRecord.studentId);
-    const activity = ACTIVITY_TYPES.find(a => a.name === newRecord.activityName);
-    const newEntry = {
-      id: history.length + 1,
-      studentId: newRecord.studentId,
-      studentName: student?.name || '',
-      group: student?.group || '',
-      activityName: newRecord.activityName,
-      activityCategory: activity?.category || '其他',
-      duration: parseFloat(newRecord.duration),
-      points: points,
-      date: newRecord.date,
-      note: newRecord.note || '',
-      operator: $w?.auth?.currentUser?.name || '管理员'
-    };
-    setHistory([newEntry, ...history]);
-    setShowNewDialog(false);
-    setNewRecord({
-      studentId: '',
-      activityName: '',
-      duration: '',
-      date: new Date().toISOString().split('T')[0],
-      note: ''
-    });
-    toast({
-      title: '志愿服务记录已创建',
-      description: `${student?.name} - ${newRecord.activityName}，时长 ${newRecord.duration} 小时，获得 ${points} 积分`
-    });
-    console.log('志愿服务记录创建成功:', newEntry);
-    console.log('应自动更新学生总积分:', student?.studentId, '当前积分:', student?.totalPoints, '新增积分:', points, '预计新积分:', (student?.totalPoints || 0) + points);
+    try {
+      const points = calculatePoints(newRecord.duration);
+      const student = students.find(s => s.studentId === newRecord.studentId);
+      const activity = ACTIVITY_TYPES.find(a => a.name === newRecord.activityName);
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+
+      // 添加到数据库
+      const result = await db.collection('volunteer_records').add({
+        record_id: `VOL${Date.now()}`,
+        student_id: newRecord.studentId,
+        student_name: student?.name || '',
+        activity_name: newRecord.activityName,
+        service_type: activity?.category || '其他',
+        duration: parseFloat(newRecord.duration),
+        earned_score: points,
+        date: newRecord.date,
+        location: '校内',
+        organization: '学校',
+        description: newRecord.note || '',
+        is_verified: true,
+        verifier_name: '管理员',
+        recorder_name: $w?.auth?.currentUser?.name || '管理员',
+        created_at: new Date().toISOString()
+      });
+
+      // 更新前端状态
+      const newEntry = {
+        id: result.id || result._id,
+        studentId: newRecord.studentId,
+        studentName: student?.name || '',
+        group: student?.group || '',
+        activityName: newRecord.activityName,
+        activityCategory: activity?.category || '其他',
+        duration: parseFloat(newRecord.duration),
+        points: points,
+        date: newRecord.date,
+        note: newRecord.note || '',
+        operator: $w?.auth?.currentUser?.name || '管理员'
+      };
+      setHistory([newEntry, ...history]);
+      setShowNewDialog(false);
+      setNewRecord({
+        studentId: '',
+        activityName: '',
+        duration: '',
+        date: new Date().toISOString().split('T')[0],
+        note: ''
+      });
+      toast({
+        title: '志愿服务记录已创建',
+        description: `${student?.name} - ${newRecord.activityName}，时长 ${newRecord.duration} 小时，获得 ${points} 积分`
+      });
+    } catch (error) {
+      console.error('创建志愿服务记录失败:', error);
+      toast({
+        title: '创建失败',
+        description: error.message || '请重试',
+        variant: 'destructive'
+      });
+    }
   };
 
   // 导出CSV
@@ -313,7 +343,7 @@ export default function VolunteerPage({
               </div>
               <select value={filterStudent} onChange={e => setFilterStudent(e.target.value)} className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-rose-300">
                 <option value="all">全部学生</option>
-                {MOCK_STUDENTS.map(student => <option key={student.studentId} value={student.studentId}>{student.name}</option>)}
+                {students.map(student => <option key={student.studentId} value={student.studentId}>{student.name}</option>)}
               </select>
               <select value={filterActivity} onChange={e => setFilterActivity(e.target.value)} className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-rose-300">
                 <option value="all">全部类别</option>

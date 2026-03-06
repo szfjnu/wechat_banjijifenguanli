@@ -1,10 +1,7 @@
 // @ts-ignore;
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 // @ts-ignore;
-import { Home, Users, User, Activity, TrendingUp, Gift, ShieldAlert, Award, BookOpen, UsersRound, Grid3X3, Heart, FileText, Brain, CalendarDays, GraduationCap, CalendarCheck, Calculator, ChevronUp, ChevronDown, Bed, Star, Settings, LayoutGrid, Clock, Shield } from 'lucide-react';
-
-import { PermissionContext } from '@/components/PermissionProvider';
-import { ROLES, getAccessiblePages } from '@/lib/permissions';
+import { Home, Users, User, Activity, TrendingUp, Gift, ShieldAlert, Award, BookOpen, UsersRound, Grid3X3, Heart, FileText, Brain, CalendarDays, GraduationCap, CalendarCheck, Calculator, ChevronUp, ChevronDown, Bed, Star, Settings, LayoutGrid, Clock } from 'lucide-react';
 
 // 分类定义 - 按功能归类
 const CATEGORIES = [{
@@ -133,16 +130,6 @@ const CATEGORIES = [{
     label: '家长查看',
     icon: User
   }]
-}, {
-  id: 'system',
-  label: '系统管理',
-  icon: Shield,
-  color: 'red',
-  items: [{
-    id: 'permission-manage',
-    label: '权限管理',
-    icon: Shield
-  }]
 }];
 
 // 获取颜色样式
@@ -171,12 +158,6 @@ const getColorStyles = (color, isActive) => {
       inactive: 'text-gray-500 hover:text-orange-500',
       bg: 'hover:bg-orange-50',
       hex: '#f97316'
-    },
-    red: {
-      active: 'bg-red-500 text-white',
-      inactive: 'text-gray-500 hover:text-red-500',
-      bg: 'hover:bg-red-50',
-      hex: '#ef4444'
     }
   };
   return colorMap[color] || colorMap.blue;
@@ -198,22 +179,10 @@ export function TabBar({
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [activeCategory, setActiveCategory] = useState(null);
 
-  // 获取权限上下文
-  const permissionContext = useContext(PermissionContext);
-
-  // 如果没有 PermissionProvider，使用默认值（管理员角色，显示所有页面）
-  const userRole = permissionContext?.userRole || ROLES.ADMIN;
-  const checkPageAccess = permissionContext?.checkPageAccess || (() => true);
-  const accessiblePages = permissionContext?.accessiblePages || getAccessiblePages(userRole, CATEGORIES);
-  const isLoading = permissionContext?.isLoading || false;
-
-  // 使用权限过滤后的分类
-  const filteredCategories = accessiblePages;
-
   // 判断当前页面属于哪个分类
   useEffect(() => {
     let found = false;
-    for (const category of filteredCategories) {
+    for (const category of CATEGORIES) {
       if (category.items && category.items.some(item => item.id === currentPage)) {
         setActiveCategory(category.id);
         found = true;
@@ -223,18 +192,12 @@ export function TabBar({
     if (!found) {
       setActiveCategory(null);
     }
-  }, [currentPage, filteredCategories]);
+  }, [currentPage]);
 
   // 处理页面切换
   const handlePageChange = pageId => {
     console.log('[TabBar] 切换到页面:', pageId);
     setExpandedCategory(null);
-
-    // 权限检查
-    if (pageId !== 'home' && !checkPageAccess(pageId)) {
-      console.error('[TabBar] 没有权限访问页面:', pageId);
-      return;
-    }
 
     // 验证页面 ID 是否有效
     const validPageIds = ['home',
@@ -243,13 +206,11 @@ export function TabBar({
     // 积分管理
     'points', 'dorm-points', 'exchange', 'points-manage', 'exchange-admin', 'points-settings',
     // 班级事务
-    'seating-chart', 'groups', 'duty-roster', 'subjects', 'semester', 'schedule-manage',
+    'seating-chart', 'groups', 'duty-roster', 'subjects', 'semester',
     // 综合管理
     'exam-monitor', 'ai-review', 'documents', 'discipline',
     // 家长端
-    'parent-view',
-    // 权限管理
-    'permission-manage'];
+    'parent-view'];
     if (!validPageIds.includes(pageId)) {
       console.error('[TabBar] 无效的页面 ID:', pageId, '有效页面列表:', validPageIds);
       return;
@@ -296,7 +257,7 @@ export function TabBar({
           </button>
 
           {/* 分类按钮 */}
-          {filteredCategories.map(category => {
+          {CATEGORIES.map(category => {
           const Icon = category.icon;
           const isExpanded = expandedCategory === category.id;
           const isActive = activeCategory === category.id;

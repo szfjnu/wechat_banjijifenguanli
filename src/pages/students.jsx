@@ -32,157 +32,34 @@ export default function Students(props) {
   const loadStudentsData = async () => {
     try {
       setLoading(true);
-
-      // 模拟数据加载
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setStudents([{
-        id: 1,
-        studentId: '2024001',
-        name: '张三',
-        gender: '男',
-        group: '第一组',
-        isBoarder: true,
-        position: '学习委员',
-        totalPoints: 156,
-        dailyPoints: 85,
-        dormPoints: 71,
-        avatar: null,
-        birthday: '2006-05-15',
-        academicRecords: [{
-          subject: '数学',
-          score: 85,
-          semester: '2024-春'
-        }, {
-          subject: '语文',
-          score: 88,
-          semester: '2024-春'
-        }, {
-          subject: '英语',
-          score: 82,
-          semester: '2024-春'
-        }],
-        certificates: [{
-          name: '英语四级',
-          level: '通过',
-          date: '2024-01-15'
-        }, {
-          name: '数学竞赛',
-          level: '省级三等奖',
-          date: '2024-02-20'
-        }]
-      }, {
-        id: 2,
-        studentId: '2024002',
-        name: '李四',
-        gender: '女',
-        group: '第二组',
-        isBoarder: true,
-        position: '无',
-        totalPoints: 148,
-        dailyPoints: 78,
-        dormPoints: 70,
-        avatar: null,
-        birthday: '2006-03-02',
-        academicRecords: [{
-          subject: '数学',
-          score: 92,
-          semester: '2024-春'
-        }, {
-          subject: '语文',
-          score: 85,
-          semester: '2024-春'
-        }, {
-          subject: '英语',
-          score: 90,
-          semester: '2024-春'
-        }],
-        certificates: []
-      }, {
-        id: 3,
-        studentId: '2024003',
-        name: '王五',
-        gender: '男',
-        group: '第一组',
-        isBoarder: false,
-        position: '体育委员',
-        totalPoints: 142,
-        dailyPoints: 82,
-        dormPoints: 60,
-        avatar: null,
-        birthday: '2006-08-20',
-        academicRecords: [{
-          subject: '数学',
-          score: 78,
-          semester: '2024-春'
-        }, {
-          subject: '语文',
-          score: 80,
-          semester: '2024-春'
-        }, {
-          subject: '英语',
-          score: 75,
-          semester: '2024-春'
-        }],
-        certificates: [{
-          name: '体育特长生',
-          level: '省级',
-          date: '2023-12-10'
-        }]
-      }, {
-        id: 4,
-        studentId: '2024004',
-        name: '赵六',
-        gender: '女',
-        group: '第三组',
-        isBoarder: true,
-        position: '无',
-        totalPoints: 135,
-        dailyPoints: 65,
-        dormPoints: 70,
-        avatar: null,
-        birthday: '2006-11-25',
-        academicRecords: [{
-          subject: '数学',
-          score: 70,
-          semester: '2024-春'
-        }, {
-          subject: '语文',
-          score: 75,
-          semester: '2024-春'
-        }, {
-          subject: '英语',
-          score: 68,
-          semester: '2024-春'
-        }],
-        certificates: []
-      }, {
-        id: 5,
-        studentId: '2024005',
-        name: '孙七',
-        gender: '男',
-        group: '第二组',
-        isBoarder: false,
-        position: '无',
-        totalPoints: 130,
-        dailyPoints: 60,
-        dormPoints: 70,
-        avatar: null,
-        birthday: '2006-07-10',
-        academicRecords: [{
-          subject: '数学',
-          score: 65,
-          semester: '2024-春'
-        }, {
-          subject: '语文',
-          score: 72,
-          semester: '2024-春'
-        }, {
-          subject: '英语',
-          score: 63,
-          semester: '2024-春'
-        }],
-        certificates: []
-      }]);
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('students').get();
+      if (result.data && result.data.length > 0) {
+        // 转换数据格式，适配前端显示
+        const transformedStudents = result.data.map(student => ({
+          id: student._id,
+          studentId: student.student_id,
+          name: student.name,
+          gender: student.gender,
+          group: student.group || '未分组',
+          isBoarder: student.is_boarding,
+          position: student.position || '无',
+          totalPoints: student.current_score || 0,
+          dailyPoints: student.current_score || 0,
+          dormPoints: student.dorm_score || 100,
+          avatar: student.avatar_url,
+          birthday: student.birthday,
+          className: student.class_name,
+          phoneNumber: student.phone_number,
+          parentPhoneNumber: student.parent_phone_number,
+          academicRecords: student.academic_records || [],
+          certificates: student.certificates || []
+        }));
+        setStudents(transformedStudents);
+      } else {
+        setStudents([]);
+      }
     } catch (error) {
       console.error('加载学生数据失败:', error);
       toast({
@@ -195,13 +72,13 @@ export default function Students(props) {
     }
   };
   const filterStudents = () => {
-    let filtered = students;
+    let filtered = [...students];
     if (selectedGroup !== 'all') {
       filtered = filtered.filter(s => s.group === selectedGroup);
     }
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(s => s.name.toLowerCase().includes(query) || s.studentId.includes(query));
+      filtered = filtered.filter(s => s.name?.toLowerCase().includes(query) || s.studentId?.toLowerCase().includes(query));
     }
     setFilteredStudents(filtered);
   };
@@ -212,46 +89,38 @@ export default function Students(props) {
       params: {}
     });
   };
-  const handleViewDetails = student => {
+  const handleViewDetails = async student => {
     setSelectedStudent(student);
-
-    // 模拟积分历史
-    setPointsHistory([{
-      id: 1,
-      type: '加分',
-      reason: '课堂表现优秀',
-      points: 5,
-      date: '2024-03-01',
-      category: '日常'
-    }, {
-      id: 2,
-      type: '加分',
-      reason: '完成志愿服务2小时',
-      points: 4,
-      date: '2024-02-28',
-      category: '志愿'
-    }, {
-      id: 3,
-      type: '扣分',
-      reason: '宿舍卫生不达标',
-      points: -3,
-      date: '2024-02-25',
-      category: '宿舍'
-    }, {
-      id: 4,
-      type: '加分',
-      reason: '技能证书获得',
-      points: 10,
-      date: '2024-02-20',
-      category: '证书'
-    }, {
-      id: 5,
-      type: '加分',
-      reason: '作业完成质量好',
-      points: 3,
-      date: '2024-02-18',
-      category: '日常'
-    }]);
+    try {
+      // 从数据库加载真实的积分历史
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('score_records').where({
+        student_id: student.studentId
+      }).orderBy('date', 'desc').limit(20).get();
+      if (result.data && result.data.length > 0) {
+        const transformedHistory = result.data.map(record => ({
+          id: record._id,
+          type: record.score_change >= 0 ? '加分' : '扣分',
+          reason: record.reason_detail || record.item_id || '未说明',
+          points: record.score_change,
+          date: record.date ? record.date.substring(0, 10) : record.created_at?.substring(0, 10),
+          category: record.source_type || '日常',
+          status: record.approval_status || '已生效'
+        }));
+        setPointsHistory(transformedHistory);
+      } else {
+        setPointsHistory([]);
+      }
+    } catch (error) {
+      console.error('加载积分历史失败:', error);
+      toast({
+        title: '加载失败',
+        description: '无法加载积分历史记录',
+        variant: 'destructive'
+      });
+      setPointsHistory([]);
+    }
     setShowDetails(true);
   };
   const handleAddPoints = student => {
