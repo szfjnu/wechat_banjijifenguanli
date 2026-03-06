@@ -1,0 +1,73 @@
+{
+  "name": "certificate",
+  "title": "技能证书管理",
+  "schemas": [
+    {
+      "name": "student_id",
+      "title": "关联学生ID",
+      "type": "Number"
+    },
+    {
+      "name": "student_name",
+      "title": "学生姓名",
+      "type": "String"
+    },
+    {
+      "name": "certificate_name",
+      "title": "证书名称",
+      "type": "String"
+    },
+    {
+      "name": "category",
+      "title": "证书类别",
+      "type": "String"
+    },
+    {
+      "name": "level_id",
+      "title": "级别ID",
+      "type": "Number"
+    },
+    {
+      "name": "level_name",
+      "title": "级别名称",
+      "type": "String"
+    },
+    {
+      "name": "points",
+      "title": "积分",
+      "type": "Number"
+    },
+    {
+      "name": "issuing_organization",
+      "title": "颁发机构",
+      "type": "String"
+    },
+    {
+      "name": "issue_date",
+      "title": "颁发时间",
+      "type": "Date",
+      "format": "string"
+    },
+    {
+      "name": "expiry_date",
+      "title": "有效期",
+      "type": "Date",
+      "format": "string"
+    },
+    {
+      "name": "image_attachment",
+      "title": "图片附件",
+      "type": "Image"
+    },
+    {
+      "name": "status",
+      "title": "状态",
+      "type": "String"
+    },
+    {
+      "name": "note",
+      "title": "备注",
+      "type": "MultiLineString"
+    }
+  ]
+}

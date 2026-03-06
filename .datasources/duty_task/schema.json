@@ -1,0 +1,90 @@
+{
+  "name": "duty_task",
+  "title": "卫生值日表管理",
+  "schemas": [
+    {
+      "name": "student_id",
+      "title": "值日学生ID",
+      "type": "String"
+    },
+    {
+      "name": "student_name",
+      "title": "学生姓名",
+      "type": "String"
+    },
+    {
+      "name": "student_no",
+      "title": "学号",
+      "type": "String"
+    },
+    {
+      "name": "task_name",
+      "title": "任务名称",
+      "type": "String"
+    },
+    {
+      "name": "task_icon",
+      "title": "任务图标",
+      "type": "String"
+    },
+    {
+      "name": "points",
+      "title": "任务积分",
+      "type": "Number"
+    },
+    {
+      "name": "date",
+      "title": "任务日期",
+      "type": "Date",
+      "format": "string"
+    },
+    {
+      "name": "semester_id",
+      "title": "关联学期ID",
+      "type": "Number"
+    },
+    {
+      "name": "semester_name",
+      "title": "学期名称",
+      "type": "String"
+    },
+    {
+      "name": "week_number",
+      "title": "周数",
+      "type": "Number"
+    },
+    {
+      "name": "status",
+      "title": "完成状态",
+      "type": "String"
+    },
+    {
+      "name": "score",
+      "title": "任务评分",
+      "type": "Number"
+    },
+    {
+      "name": "comment",
+      "title": "评价备注",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "images",
+      "title": "证据图片",
+      "type": "Array",
+      "items": {
+        "type": "String"
+      }
+    },
+    {
+      "name": "is_custom",
+      "title": "是否自定义",
+      "type": "Boolean"
+    },
+    {
+      "name": "reminder_sent",
+      "title": "已发送提醒",
+      "type": "Boolean"
+    }
+  ]
+}

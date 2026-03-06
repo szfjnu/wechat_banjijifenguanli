@@ -1,0 +1,77 @@
+{
+  "name": "grade",
+  "title": "学生成绩管理",
+  "schemas": [
+    {
+      "name": "student_id",
+      "title": "关联学生ID",
+      "type": "Number"
+    },
+    {
+      "name": "student_name",
+      "title": "学生姓名",
+      "type": "String"
+    },
+    {
+      "name": "subject_id",
+      "title": "关联课程ID",
+      "type": "Number"
+    },
+    {
+      "name": "subject_name",
+      "title": "科目名称",
+      "type": "String"
+    },
+    {
+      "name": "semester_id",
+      "title": "关联学期ID",
+      "type": "Number"
+    },
+    {
+      "name": "semester_name",
+      "title": "学期名称",
+      "type": "String"
+    },
+    {
+      "name": "exam_type",
+      "title": "考试类型",
+      "type": "String"
+    },
+    {
+      "name": "score",
+      "title": "分数",
+      "type": "Number"
+    },
+    {
+      "name": "credits",
+      "title": "学分",
+      "type": "Number"
+    },
+    {
+      "name": "exam_date",
+      "title": "考试日期",
+      "type": "Date",
+      "format": "string"
+    },
+    {
+      "name": "rank",
+      "title": "排名",
+      "type": "Number"
+    },
+    {
+      "name": "gpa",
+      "title": "绩点",
+      "type": "Number"
+    },
+    {
+      "name": "is_passing",
+      "title": "是否及格",
+      "type": "Boolean"
+    },
+    {
+      "name": "remark",
+      "title": "备注",
+      "type": "MultiLineString"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "name": "group",
+  "title": "学生分组管理",
+  "schemas": [
+    {
+      "name": "name",
+      "title": "组名",
+      "type": "String"
+    },
+    {
+      "name": "semester_id",
+      "title": "关联学期ID",
+      "type": "Number"
+    },
+    {
+      "name": "semester_name",
+      "title": "学期名称",
+      "type": "String"
+    },
+    {
+      "name": "leader_id",
+      "title": "组长ID",
+      "type": "Number"
+    },
+    {
+      "name": "leader_name",
+      "title": "组长姓名",
+      "type": "String"
+    },
+    {
+      "name": "members",
+      "title": "成员列表",
+      "type": "Array",
+      "items": {
+        "type": "Number"
+      }
+    },
+    {
+      "name": "member_count",
+      "title": "成员数量",
+      "type": "Number"
+    },
+    {
+      "name": "change_history",
+      "title": "变更历史",
+      "type": "MultiLineString"
+    }
+  ]
+}

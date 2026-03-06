@@ -1,0 +1,61 @@
+{
+  "name": "seat",
+  "title": "教室座位管理",
+  "schemas": [
+    {
+      "name": "seat_id",
+      "title": "座位ID",
+      "type": "String"
+    },
+    {
+      "name": "classroom_id",
+      "title": "教室ID",
+      "type": "Number"
+    },
+    {
+      "name": "classroom_name",
+      "title": "教室名称",
+      "type": "String"
+    },
+    {
+      "name": "row",
+      "title": "行号",
+      "type": "String"
+    },
+    {
+      "name": "col",
+      "title": "列号",
+      "type": "Number"
+    },
+    {
+      "name": "student_id",
+      "title": "当前占用学生ID",
+      "type": "String"
+    },
+    {
+      "name": "student_name",
+      "title": "学生姓名",
+      "type": "String"
+    },
+    {
+      "name": "semester_id",
+      "title": "关联学期ID",
+      "type": "Number"
+    },
+    {
+      "name": "semester_name",
+      "title": "学期名称",
+      "type": "String"
+    },
+    {
+      "name": "is_available",
+      "title": "是否可用",
+      "type": "Boolean"
+    },
+    {
+      "name": "note",
+      "title": "备注",
+      "type": "MultiLineString"
+    }
+  ]
+}
