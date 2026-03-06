@@ -307,22 +307,21 @@ export default function DormPointsPage(props) {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
 
-      // 从数据库加载宿舍扣分记录
-      const result = await db.collection('score_records').where({
-        source_type: '宿舍扣分'
-      }).orderBy('date', 'desc').limit(50).get();
+      // 从宿舍扣分记录表加载历史记录
+      const result = await db.collection('dorm_deduction_record').orderBy('deduction_date', 'desc').limit(50).get();
       if (result.data && result.data.length > 0) {
         const transformedHistory = result.data.map(record => ({
           id: record._id,
-          studentId: record.student_id,
+          studentId: record.student_id_number,
           studentName: record.student_name || '未知',
-          itemName: record.item_id || '宿舍扣分',
+          itemName: record.item_name || '宿舍扣分',
           points: record.score_change,
           originalDormPoints: record.original_score || 100,
-          convertedPoints: (record.score_change * conversionRate).toFixed(1),
-          date: record.date ? new Date(record.date).toLocaleString('zh-CN') : '',
+          convertedPoints: record.converted_points,
+          date: record.deduction_date ? new Date(record.deduction_date).toLocaleString('zh-CN') : '',
           operator: record.recorder_name || '宿管员',
-          remark: record.reason_detail || ''
+          remark: record.reason || '',
+          images: record.evidence_images || []
         }));
         setDeductionHistory(transformedHistory);
       } else {
@@ -343,23 +342,26 @@ export default function DormPointsPage(props) {
       const newDormPoints = student.dormPoints + deductionItem.points;
       const newTotalPoints = student.totalPoints + convertedPoints;
 
-      // 1. 添加扣分记录到数据库
-      const recordResult = await db.collection('score_records').add({
+      // 1. 添加扣分记录到宿舍扣分记录表
+      const recordResult = await db.collection('dorm_deduction_record').add({
         record_id: `DP${Date.now()}`,
-        student_id: student.studentId,
+        student_id: student.id,
         student_name: student.name,
-        item_id: deductionItem.name,
+        student_id_number: student.studentId,
+        dorm_room: student.dormRoom || '未分配',
+        item_name: deductionItem.name,
+        item_category: deductionItem.category || '其他',
         score_change: deductionItem.points,
+        converted_points: convertedPoints.toFixed(1),
         original_score: student.dormPoints,
-        reason_detail: remark || deductionItem.name,
-        date: new Date().toISOString(),
-        source_type: '宿舍扣分',
-        source_record_id: '',
-        approval_status: '已通过',
-        approval_time: new Date().toISOString(),
-        approver_name: $w?.auth?.currentUser?.name || '宿管员',
+        reason: remark || deductionItem.name,
+        evidence_images: uploadedImages.map(img => img.url),
+        deduction_date: new Date().toISOString(),
         recorder_name: $w?.auth?.currentUser?.name || '宿管员',
-        semester_id: 'current'
+        semester_id: 2,
+        semester_name: '2024-2025第二学期',
+        approval_status: '已通过',
+        remark: remark || ''
       });
 
       // 2. 更新学生的宿舍积分
@@ -389,10 +391,10 @@ export default function DormPointsPage(props) {
         date: new Date().toLocaleString('zh-CN'),
         operator: $w?.auth?.currentUser?.name || '宿管员',
         remark: remark || '',
-        images: uploadedImages.length > 0 ? uploadedImages.map(img => ({
+        images: uploadedImages.map(img => ({
           name: img.name,
           url: img.url
-        })) : null
+        }))
       };
       setDeductionHistory([newHistory, ...deductionHistory]);
 
@@ -552,15 +554,23 @@ export default function DormPointsPage(props) {
       const boardingStudents = students.filter(s => s.isBoarding);
       for (const student of boardingStudents) {
         await db.collection('students').doc(student.id).update({
-          dorm_score: 100
+          dorm_score: 100,
+          current_score: student.totalPoints - student.convertedPoints // 恢复到不含宿舍积分的状态
         });
+      }
+
+      // 清空宿舍扣分记录表中的所有记录
+      const dormRecords = await db.collection('dorm_deduction_record').get();
+      for (const record of dormRecords.data || []) {
+        await db.collection('dorm_deduction_record').doc(record._id).remove();
       }
 
       // 更新前端状态
       const updatedStudents = students.map(s => s.isBoarding ? {
         ...s,
         dormPoints: 100,
-        convertedPoints: 0
+        convertedPoints: 0,
+        totalPoints: s.totalPoints - s.convertedPoints
       } : s);
       setStudents(updatedStudents);
 
@@ -568,7 +578,7 @@ export default function DormPointsPage(props) {
       setDeductionHistory([]);
       toast({
         title: '重置成功',
-        description: '所有住宿生宿舍积分已重置为100分',
+        description: '所有住宿生宿舍积分已重置为100分，历史记录已清空',
         variant: 'default'
       });
       setShowResetConfirm(false);

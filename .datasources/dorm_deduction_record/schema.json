@@ -1,0 +1,100 @@
+{
+  "name": "dorm_deduction_record",
+  "title": "宿舍扣分记录",
+  "schemas": [
+    {
+      "name": "record_id",
+      "title": "记录ID",
+      "type": "String"
+    },
+    {
+      "name": "student_id",
+      "title": "关联学生ID",
+      "type": "Number"
+    },
+    {
+      "name": "student_name",
+      "title": "学生姓名",
+      "type": "String"
+    },
+    {
+      "name": "student_id_number",
+      "title": "学号",
+      "type": "String"
+    },
+    {
+      "name": "dorm_room",
+      "title": "宿舍号",
+      "type": "String"
+    },
+    {
+      "name": "item_name",
+      "title": "扣分项目名称",
+      "type": "String"
+    },
+    {
+      "name": "item_category",
+      "title": "扣分项目分类",
+      "type": "String"
+    },
+    {
+      "name": "score_change",
+      "title": "扣分金额",
+      "type": "Number"
+    },
+    {
+      "name": "converted_points",
+      "title": "折算分数",
+      "type": "Number"
+    },
+    {
+      "name": "original_score",
+      "title": "扣分前宿舍积分",
+      "type": "Number"
+    },
+    {
+      "name": "reason",
+      "title": "扣分原因",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "evidence_images",
+      "title": "证据图片",
+      "type": "Array",
+      "items": {
+        "type": "String"
+      }
+    },
+    {
+      "name": "deduction_date",
+      "title": "扣分日期",
+      "type": "DateTime",
+      "format": "string"
+    },
+    {
+      "name": "recorder_name",
+      "title": "记录人",
+      "type": "String"
+    },
+    {
+      "name": "semester_id",
+      "title": "关联学期ID",
+      "type": "Number"
+    },
+    {
+      "name": "semester_name",
+      "title": "学期名称",
+      "type": "String"
+    },
+    {
+      "name": "approval_status",
+      "title": "审批状态",
+      "type": "String"
+    },
+    {
+      "name": "remark",
+      "title": "备注",
+      "type": "MultiLineString"
+    }
+  ]
+}
