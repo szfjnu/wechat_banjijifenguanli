@@ -119,6 +119,7 @@ export default function StudentsManage(props) {
         initial_score: formData.initial_score || 100,
         dorm_score: formData.is_boarding ? formData.dorm_score || 100 : 0,
         dorm_initial_score: formData.is_boarding ? formData.dorm_initial_score || 100 : 0,
+        converted_points: formData.is_boarding ? ((formData.dorm_score || 100) - (formData.dorm_initial_score || 100)) * 0.3 : 0,
         operation_history: [{
           operation: '创建学生档案',
           operator: $w.auth.currentUser.name || '系统',
@@ -146,11 +147,21 @@ export default function StudentsManage(props) {
     try {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
+
+      // 计算宿舍折算积分（双重账本逻辑）
+      const convertedPoints = formData.is_boarding ? ((formData.dorm_score || 100) - (formData.dorm_initial_score || 100)) * 0.3 : 0;
+
+      // 计算新的总积分 = 日常积分变动 + 宿舍折算积分
+      const dailyScoreChange = (formData.current_score || 100) - (selectedStudent.current_score || 100);
+      const oldConvertedPoints = selectedStudent.is_boarding ? ((selectedStudent.dorm_score || 100) - (selectedStudent.dorm_initial_score || 100)) * 0.3 : 0;
       const updateData = {
         ...formData,
         updated_at: new Date().toISOString().split('T')[0],
         updated_by: $w.auth.currentUser.userId,
-        dorm_score: formData.is_boarding ? formData.dorm_score || 100 : 0
+        dorm_score: formData.is_boarding ? formData.dorm_score || 100 : 0,
+        converted_points: convertedPoints,
+        // 如果是住宿生，需要更新总积分以反映宿舍积分变化
+        current_score: formData.is_boarding ? (formData.current_score || 100) - oldConvertedPoints + convertedPoints : formData.current_score || 100
       };
       await db.collection('students').doc(selectedStudent._id).update(updateData);
       toast({
