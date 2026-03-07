@@ -1,0 +1,43 @@
+{
+  "name": "semester",
+  "title": "学期管理",
+  "schemas": [
+    {
+      "name": "semester_name",
+      "title": "学期名称",
+      "type": "String"
+    },
+    {
+      "name": "start_date",
+      "title": "开始日期",
+      "type": "Date",
+      "format": "string"
+    },
+    {
+      "name": "end_date",
+      "title": "结束日期",
+      "type": "Date",
+      "format": "string"
+    },
+    {
+      "name": "is_current",
+      "title": "是否当前学期",
+      "type": "Boolean"
+    },
+    {
+      "name": "is_automated",
+      "title": "是否自动重置",
+      "type": "Boolean"
+    },
+    {
+      "name": "reset_config",
+      "title": "重置配置",
+      "type": "Object"
+    },
+    {
+      "name": "note",
+      "title": "备注",
+      "type": "MultiLineString"
+    }
+  ]
+}

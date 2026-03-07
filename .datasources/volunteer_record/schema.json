@@ -1,0 +1,110 @@
+{
+  "name": "volunteer_record",
+  "title": "志愿服务记录管理",
+  "schemas": [
+    {
+      "name": "record_id",
+      "title": "记录ID",
+      "type": "String"
+    },
+    {
+      "name": "student_id",
+      "title": "学号",
+      "type": "String"
+    },
+    {
+      "name": "student_name",
+      "title": "学生姓名",
+      "type": "String"
+    },
+    {
+      "name": "group_name",
+      "title": "分组名称",
+      "type": "String"
+    },
+    {
+      "name": "activity_name",
+      "title": "活动名称",
+      "type": "String"
+    },
+    {
+      "name": "service_type",
+      "title": "服务类型",
+      "type": "String"
+    },
+    {
+      "name": "duration",
+      "title": "服务时长(小时)",
+      "type": "Number"
+    },
+    {
+      "name": "earned_score",
+      "title": "获得积分",
+      "type": "Number"
+    },
+    {
+      "name": "date",
+      "title": "服务日期",
+      "type": "Date",
+      "format": "string"
+    },
+    {
+      "name": "location",
+      "title": "服务地点",
+      "type": "String"
+    },
+    {
+      "name": "organization",
+      "title": "组织单位",
+      "type": "String"
+    },
+    {
+      "name": "description",
+      "title": "活动描述",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "proof_materials",
+      "title": "证明材料",
+      "type": "Array",
+      "items": {
+        "type": "String"
+      }
+    },
+    {
+      "name": "is_verified",
+      "title": "是否已审核",
+      "type": "Boolean"
+    },
+    {
+      "name": "verifier_name",
+      "title": "审核人姓名",
+      "type": "String"
+    },
+    {
+      "name": "verification_time",
+      "title": "审核时间",
+      "type": "DateTime"
+    },
+    {
+      "name": "recorder_name",
+      "title": "记录人姓名",
+      "type": "String"
+    },
+    {
+      "name": "semester_id",
+      "title": "关联学期ID",
+      "type": "Number"
+    },
+    {
+      "name": "semester_name",
+      "title": "学期名称",
+      "type": "String"
+    },
+    {
+      "name": "note",
+      "title": "备注",
+      "type": "MultiLineString"
+    }
+  ]
+}

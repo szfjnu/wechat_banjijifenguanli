@@ -20,7 +20,7 @@
     {
       "name": "leader_id",
       "title": "组长ID",
-      "type": "Number"
+      "type": "String"
     },
     {
       "name": "leader_name",
@@ -32,7 +32,7 @@
       "title": "成员列表",
       "type": "Array",
       "items": {
-        "type": "Number"
+        "type": "String"
       }
     },
     {

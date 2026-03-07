@@ -1,0 +1,117 @@
+{
+  "name": "reminder_config",
+  "title": "提醒配置管理",
+  "schemas": [
+    {
+      "name": "reminder_id",
+      "title": "提醒ID",
+      "type": "String"
+    },
+    {
+      "name": "reminder_type",
+      "title": "提醒类型",
+      "type": "String"
+    },
+    {
+      "name": "reminder_name",
+      "title": "提醒名称",
+      "type": "String"
+    },
+    {
+      "name": "reminder_content",
+      "title": "提醒内容",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "reminder_method",
+      "title": "提醒方式",
+      "type": "String"
+    },
+    {
+      "name": "reminder_frequency",
+      "title": "提醒频率",
+      "type": "String"
+    },
+    {
+      "name": "reminder_time",
+      "title": "提醒时间",
+      "type": "String"
+    },
+    {
+      "name": "target_type",
+      "title": "提醒对象类型",
+      "type": "String"
+    },
+    {
+      "name": "target_ids",
+      "title": "提醒对象ID列表",
+      "type": "Array",
+      "items": {
+        "type": "String"
+      }
+    },
+    {
+      "name": "target_names",
+      "title": "提醒对象名称列表",
+      "type": "Array",
+      "items": {
+        "type": "String"
+      }
+    },
+    {
+      "name": "related_business_type",
+      "title": "关联业务类型",
+      "type": "String"
+    },
+    {
+      "name": "related_business_id",
+      "title": "关联业务ID",
+      "type": "String"
+    },
+    {
+      "name": "is_enabled",
+      "title": "是否启用",
+      "type": "Boolean"
+    },
+    {
+      "name": "is_auto",
+      "title": "是否自动提醒",
+      "type": "Boolean"
+    },
+    {
+      "name": "last_reminder_time",
+      "title": "最后提醒时间",
+      "type": "DateTime"
+    },
+    {
+      "name": "reminder_count",
+      "title": "提醒次数",
+      "type": "Number"
+    },
+    {
+      "name": "status",
+      "title": "提醒状态",
+      "type": "String"
+    },
+    {
+      "name": "operator_name",
+      "title": "操作人姓名",
+      "type": "String"
+    },
+    {
+      "name": "semester_id",
+      "title": "关联学期ID",
+      "type": "Number"
+    },
+    {
+      "name": "semester_name",
+      "title": "学期名称",
+      "type": "String"
+    },
+    {
+      "name": "note",
+      "title": "备注",
+      "type": "MultiLineString"
+    }
+  ]
+}

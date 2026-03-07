@@ -1,0 +1,53 @@
+[
+  {
+    "_id": "1",
+    "semester_name": "2024-2025第一学期",
+    "start_date": "2024-09-01",
+    "end_date": "2025-01-20",
+    "is_current": false,
+    "is_automated": true,
+    "reset_config": {
+      "reset_points": true,
+      "reset_dorm_points": true,
+      "reset_tasks": true,
+      "reset_date": "2025-01-21"
+    },
+    "note": "第一学期，已自动重置",
+    "createdAt": 1724112000000,
+    "updatedAt": 1741267200000
+  },
+  {
+    "_id": "2",
+    "semester_name": "2024-2025第二学期",
+    "start_date": "2025-02-15",
+    "end_date": "2025-07-10",
+    "is_current": true,
+    "is_automated": true,
+    "reset_config": {
+      "reset_points": true,
+      "reset_dorm_points": true,
+      "reset_tasks": true,
+      "reset_date": "2025-07-11"
+    },
+    "note": "当前学期，启用自动重置",
+    "createdAt": 1734220800000,
+    "updatedAt": 1741267200000
+  },
+  {
+    "_id": "3",
+    "semester_name": "2025-2026第一学期",
+    "start_date": "2025-09-01",
+    "end_date": "2026-01-20",
+    "is_current": false,
+    "is_automated": true,
+    "reset_config": {
+      "reset_points": true,
+      "reset_dorm_points": true,
+      "reset_tasks": true,
+      "reset_date": "2026-01-21"
+    },
+    "note": "未来学期，启用自动重置",
+    "createdAt": 1741267200000,
+    "updatedAt": 1741267200000
+  }
+]

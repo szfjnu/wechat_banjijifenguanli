@@ -1,0 +1,106 @@
+{
+  "name": "discipline_record",
+  "title": "处分记录管理",
+  "schemas": [
+    {
+      "name": "record_id",
+      "title": "记录ID",
+      "type": "String"
+    },
+    {
+      "name": "student_id",
+      "title": "学号",
+      "type": "String"
+    },
+    {
+      "name": "student_name",
+      "title": "学生姓名",
+      "type": "String"
+    },
+    {
+      "name": "student_no",
+      "title": "学号",
+      "type": "String"
+    },
+    {
+      "name": "group_name",
+      "title": "分组名称",
+      "type": "String"
+    },
+    {
+      "name": "level_id",
+      "title": "处分级别ID",
+      "type": "Number"
+    },
+    {
+      "name": "level_name",
+      "title": "处分级别名称",
+      "type": "String"
+    },
+    {
+      "name": "reason",
+      "title": "处分原因",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "points_deducted",
+      "title": "扣分",
+      "type": "Number"
+    },
+    {
+      "name": "date",
+      "title": "处分日期",
+      "type": "Date",
+      "format": "string"
+    },
+    {
+      "name": "status",
+      "title": "处分状态",
+      "type": "String"
+    },
+    {
+      "name": "expiry_date",
+      "title": "有效期日期",
+      "type": "Date",
+      "format": "string"
+    },
+    {
+      "name": "revoke_reason",
+      "title": "撤销原因",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "revoked_date",
+      "title": "撤销日期",
+      "type": "DateTime"
+    },
+    {
+      "name": "operator_name",
+      "title": "操作人姓名",
+      "type": "String"
+    },
+    {
+      "name": "revoke_requests",
+      "title": "撤销申请",
+      "type": "Array",
+      "items": {
+        "type": "Object"
+      }
+    },
+    {
+      "name": "semester_id",
+      "title": "关联学期ID",
+      "type": "Number"
+    },
+    {
+      "name": "semester_name",
+      "title": "学期名称",
+      "type": "String"
+    },
+    {
+      "name": "note",
+      "title": "备注",
+      "type": "MultiLineString"
+    }
+  ]
+}
