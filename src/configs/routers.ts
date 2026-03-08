@@ -22,6 +22,7 @@ import SCHEDULE_MANAGE from '../pages/schedule-manage.jsx';
 import STUDENTS_MANAGE from '../pages/students-manage.jsx';
 import STUDENT_GROWTH from '../pages/student-growth.jsx';
 import PARENT_VIEW from '../pages/parent-view.jsx';
+import NOTICE_PUBLISH from '../pages/notice-publish.jsx';
 export const routers = [{
   id: "home",
   component: HOME
@@ -94,4 +95,7 @@ export const routers = [{
 }, {
   id: "parent-view",
   component: PARENT_VIEW
+}, {
+  id: "notice-publish",
+  component: NOTICE_PUBLISH
 }]

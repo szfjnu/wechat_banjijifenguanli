@@ -164,12 +164,24 @@ export default function ExchangePage({
     setBiddingRecordsDialogOpen(true);
   };
 
+  // 关闭投标记录对话框
+  const handleCloseBiddingRecordsDialog = () => {
+    setSelectedItem(null);
+    setBiddingRecordsDialogOpen(false);
+  };
+
   // 打开投标对话框
   const handleOpenBidDialog = item => {
     if (item.status !== 'bidding') return;
     setSelectedItem(item);
     setBidPoints('');
     setBidDialogOpen(true);
+  };
+
+  // 关闭投标对话框
+  const handleCloseBidDialog = () => {
+    setSelectedItem(null);
+    setBidDialogOpen(false);
   };
 
   // 提交投标
@@ -272,6 +284,12 @@ export default function ExchangePage({
     setSelectedItem(item);
     setExchangeReason('');
     setExchangeDialogOpen(true);
+  };
+
+  // 关闭兑换对话框
+  const handleCloseExchangeDialog = () => {
+    setSelectedItem(null);
+    setExchangeDialogOpen(false);
   };
 
   // 提交兑换申请
@@ -658,7 +676,9 @@ export default function ExchangePage({
       </div>
       
       {/* 投标对话框 */}
-      <Dialog open={bidDialogOpen} onOpenChange={setBidDialogOpen}>
+      <Dialog open={bidDialogOpen} onOpenChange={open => {
+      if (!open) handleCloseBidDialog();else setBidDialogOpen(open);
+    }}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>参与投标</DialogTitle>
@@ -699,7 +719,9 @@ export default function ExchangePage({
       </Dialog>
       
       {/* 兑换对话框 */}
-      <Dialog open={exchangeDialogOpen} onOpenChange={setExchangeDialogOpen}>
+      <Dialog open={exchangeDialogOpen} onOpenChange={open => {
+      if (!open) handleCloseExchangeDialog();else setExchangeDialogOpen(open);
+    }}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>确认兑换</DialogTitle>
@@ -736,13 +758,15 @@ export default function ExchangePage({
       </Dialog>
       
       {/* 投标记录对话框 */}
-      <Dialog open={biddingRecordsDialogOpen} onOpenChange={setBiddingRecordsDialogOpen}>
+      <Dialog open={biddingRecordsDialogOpen} onOpenChange={open => {
+      if (!open) handleCloseBiddingRecordsDialog();else setBiddingRecordsDialogOpen(open);
+    }}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>投标记录</DialogTitle>
           </DialogHeader>
           <div>
-            {selectedItem && <div className="mb-4">
+            {selectedItem && selectedItem.name && <div className="mb-4">
                 <div className="font-semibold text-gray-900">{selectedItem.name}</div>
                 <div className="text-sm text-gray-500">当前投标人数：{itemBiddings.length}人</div>
               </div>}

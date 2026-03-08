@@ -24,6 +24,11 @@ export default function Home(props) {
   const [tasks, setTasks] = useState([]);
   const [todayBirthdays, setTodayBirthdays] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const [statsData, setStatsData] = useState({
+    totalStudents: 0,
+    avgScore: 0,
+    pendingTasks: 0
+  });
   useEffect(() => {
     loadDashboardData();
     loadWeatherData();
@@ -59,17 +64,32 @@ export default function Home(props) {
           dorm: student.dorm_score || 0
         }));
         setPointsData(transformedPointsData);
+
+        // 计算数据概览统计
+        const totalStudents = studentResult.data.length;
+        const avgScore = studentResult.data.reduce((sum, s) => sum + (s.current_score || 0), 0) / totalStudents;
+        const pendingTasks = 3; // 可以从实际任务表查询
+        setStatsData({
+          totalStudents,
+          avgScore: Math.round(avgScore),
+          pendingTasks
+        });
       } else {
         setPointsData([]);
+        setStatsData({
+          totalStudents: 0,
+          avgScore: 0,
+          pendingTasks: 0
+        });
       }
 
-      // 加载今日生日学生
+      // 加载今日生日学生（使用 date_of_birth 字段）
       const today = new Date();
       const todayMonth = String(today.getMonth() + 1).padStart(2, '0');
       const todayDay = String(today.getDate()).padStart(2, '0');
-      const todayDateStr = `${todayMonth}-${todayDay}`;
+      const todayDateStr = `-${todayMonth}-${todayDay}`;
       const birthdayResult = await db.collection('students').where({
-        birthday: db.RegExp({
+        date_of_birth: db.RegExp({
           regexp: todayDateStr,
           options: 'i'
         })
@@ -137,13 +157,8 @@ export default function Home(props) {
   };
   const loadWeatherData = async () => {
     try {
-      // 调用联网工具获取实时天气数据
-      const weatherResult = await mcp_searchWeb({
-        query: '今天北京天气实时数据'
-      });
-
-      // 解析天气数据（这里需要根据实际返回格式进行解析）
-      const weatherInfo = {
+      // 设置默认天气数据作为后备
+      const defaultWeather = {
         condition: 'sunny',
         temperature: 23,
         description: '晴朗',
@@ -151,9 +166,27 @@ export default function Home(props) {
         wind: '东北风 3级',
         advice: '天气晴朗，适合户外活动'
       };
+
+      // 调用联网工具获取实时天气数据
+      const weatherResult = await mcp_searchWeb({
+        query: '今天北京天气实时数据'
+      });
+
+      // 解析天气数据（这里需要根据实际返回格式进行解析）
+      // 暂时使用默认数据，后续可以根据实际 API 返回格式进行解析
+      const weatherInfo = defaultWeather;
       setWeather(weatherInfo);
     } catch (error) {
       console.error('加载天气失败:', error);
+      // 使用默认天气数据作为回退，确保天气模块始终显示
+      setWeather({
+        condition: 'sunny',
+        temperature: 23,
+        description: '晴朗',
+        humidity: 65,
+        wind: '东北风 3级',
+        advice: '天气晴朗，适合户外活动'
+      });
     }
   };
   const handlePageChange = pageId => {
@@ -290,13 +323,13 @@ export default function Home(props) {
 
         {/* Quick Stats - Compact Grid */}
         <div className="grid grid-cols-3 gap-2">
-          <StatCard title="学生总数" value="45" icon={Users} color="blue" trend={{
+          <StatCard title="学生总数" value={String(statsData.totalStudents)} icon={Users} color="blue" trend={{
           value: 5
         }} />
-          <StatCard title="平均积分" value="142" icon={TrendingUp} color="green" trend={{
+          <StatCard title="平均积分" value={String(statsData.avgScore)} icon={TrendingUp} color="green" trend={{
           value: 8.2
         }} />
-          <StatCard title="待处理" value="3" icon={AlertCircle} color="amber" />
+          <StatCard title="待处理" value={String(statsData.pendingTasks)} icon={AlertCircle} color="amber" />
         </div>
 
         {/* Points Chart - Compact Card */}
