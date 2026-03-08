@@ -1,5 +1,5 @@
 // @ts-ignore;
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 // @ts-ignore;
 import { GraduationCap, BookOpen, Award, TrendingUp, AlertCircle, CheckCircle, Clock, Search, Download, FileText, Plus, Flag, Info, Target } from 'lucide-react';
 // @ts-ignore;
@@ -7,6 +7,256 @@ import { Button, useToast } from '@/components/ui';
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
+
+// 模拟转段考科目配置（可标记为转段考科目）
+const EXAM_SUBJECTS = [{
+  id: 1,
+  name: '语文',
+  isExamSubject: true,
+  passingScore: 60,
+  credits: 3
+}, {
+  id: 2,
+  name: '数学',
+  isExamSubject: true,
+  passingScore: 60,
+  credits: 4
+}, {
+  id: 3,
+  name: '英语',
+  isExamSubject: true,
+  passingScore: 60,
+  credits: 3
+}, {
+  id: 4,
+  name: '物理',
+  isExamSubject: false,
+  passingScore: 60,
+  credits: 3
+}, {
+  id: 5,
+  name: '化学',
+  isExamSubject: false,
+  passingScore: 60,
+  credits: 2
+}, {
+  id: 6,
+  name: '生物',
+  isExamSubject: false,
+  passingScore: 60,
+  credits: 2
+}, {
+  id: 7,
+  name: '历史',
+  isExamSubject: false,
+  passingScore: 60,
+  credits: 2
+}, {
+  id: 8,
+  name: '地理',
+  isExamSubject: false,
+  passingScore: 60,
+  credits: 2
+}];
+
+// 模拟学生数据
+const MOCK_STUDENTS = [{
+  id: 1,
+  studentId: '2024001',
+  name: '张伟',
+  group: '第一组',
+  points: 85,
+  gpa: 3.5,
+  certificates: [{
+    name: '英语四级',
+    level: '省级',
+    date: '2024-12-15'
+  }, {
+    name: '计算机二级',
+    level: '省级',
+    date: '2025-01-10'
+  }]
+}, {
+  id: 2,
+  studentId: '2024002',
+  name: '李娜',
+  group: '第二组',
+  points: 72,
+  gpa: 3.8,
+  certificates: [{
+    name: '英语四级',
+    level: '省级',
+    date: '2024-11-20'
+  }]
+}, {
+  id: 3,
+  studentId: '2024003',
+  name: '王强',
+  group: '第一组',
+  points: 68,
+  gpa: 3.2,
+  certificates: []
+}, {
+  id: 4,
+  studentId: '2024004',
+  name: '赵敏',
+  group: '第三组',
+  points: 91,
+  gpa: 4.0,
+  certificates: [{
+    name: '英语六级',
+    level: '国家级',
+    date: '2024-10-05'
+  }, {
+    name: '计算机二级',
+    level: '省级',
+    date: '2024-12-20'
+  }, {
+    name: '普通话证书',
+    level: '省级',
+    date: '2025-01-05'
+  }]
+}, {
+  id: 5,
+  studentId: '2024005',
+  name: '刘洋',
+  group: '第二组',
+  points: 55,
+  gpa: 2.8,
+  certificates: [{
+    name: '英语四级',
+    level: '省级',
+    date: '2025-01-15'
+  }]
+}, {
+  id: 6,
+  studentId: '2024006',
+  name: '陈静',
+  group: '第三组',
+  points: 78,
+  gpa: 3.6,
+  certificates: []
+}];
+
+// 模拟转段考成绩记录
+const MOCK_EXAM_GRADES = [{
+  id: 1,
+  studentId: '2024001',
+  studentName: '张伟',
+  subjectId: 1,
+  subjectName: '语文',
+  score: 85,
+  examDate: '2025-06-15',
+  isPassing: true,
+  remarks: ''
+}, {
+  id: 2,
+  studentId: '2024001',
+  studentName: '张伟',
+  subjectId: 2,
+  subjectName: '数学',
+  score: 72,
+  examDate: '2025-06-15',
+  isPassing: true,
+  remarks: ''
+}, {
+  id: 3,
+  studentId: '2024001',
+  studentName: '张伟',
+  subjectId: 3,
+  subjectName: '英语',
+  score: 88,
+  examDate: '2025-06-15',
+  isPassing: true,
+  remarks: ''
+}, {
+  id: 4,
+  studentId: '2024002',
+  studentName: '李娜',
+  subjectId: 1,
+  subjectName: '语文',
+  score: 92,
+  examDate: '2025-06-15',
+  isPassing: true,
+  remarks: ''
+}, {
+  id: 5,
+  studentId: '2024002',
+  studentName: '李娜',
+  subjectId: 2,
+  subjectName: '数学',
+  score: 68,
+  examDate: '2025-06-15',
+  isPassing: true,
+  remarks: ''
+}, {
+  id: 6,
+  studentId: '2024002',
+  studentName: '李娜',
+  subjectId: 3,
+  subjectName: '英语',
+  score: 76,
+  examDate: '2025-06-15',
+  isPassing: true,
+  remarks: ''
+}, {
+  id: 7,
+  studentId: '2024003',
+  studentName: '王强',
+  subjectId: 1,
+  subjectName: '语文',
+  score: 58,
+  examDate: '2025-06-15',
+  isPassing: false,
+  remarks: '不及格'
+}, {
+  id: 8,
+  studentId: '2024003',
+  studentName: '王强',
+  subjectId: 2,
+  subjectName: '数学',
+  score: 55,
+  examDate: '2025-06-15',
+  isPassing: false,
+  remarks: '不及格'
+}, {
+  id: 9,
+  studentId: '2024003',
+  studentName: '王强',
+  subjectId: 3,
+  subjectName: '英语',
+  score: 62,
+  examDate: '2025-06-15',
+  isPassing: true,
+  remarks: ''
+}];
+
+// 技能证书要求配置
+const CERTIFICATE_REQUIREMENTS = [{
+  id: 1,
+  name: '英语四级',
+  required: true,
+  level: '省级',
+  priority: 'high'
+}, {
+  id: 2,
+  name: '计算机二级',
+  required: true,
+  level: '省级',
+  priority: 'medium'
+}, {
+  id: 3,
+  name: '普通话证书',
+  required: false,
+  level: '省级',
+  priority: 'low'
+}, {
+  id: 4,
+  name: '英语六级',
+  required: false,
+  level: '国家级',
+  priority: 'medium'
+}];
 export default function ExamMonitorPage(props) {
   const {
     toast
@@ -24,122 +274,9 @@ export default function ExamMonitorPage(props) {
   };
 
   // 数据状态
-  const [students, setStudents] = useState([]);
-  const [examGrades, setExamGrades] = useState([]);
-  const [examSubjects, setExamSubjects] = useState([]);
-  const [examRecords, setExamRecords] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  // 加载转段考监控数据
-  useEffect(() => {
-    loadExamData();
-  }, []);
-  const loadExamData = async () => {
-    try {
-      setLoading(true);
-      const tcb = await props.$w.cloud.getCloudInstance();
-      const db = tcb.database();
-
-      // 加载转段考监控记录
-      const result = await db.collection('exam_monitor').orderBy('exam_date', 'desc').limit(100).get();
-      if (result.data && result.data.length > 0) {
-        const transformedRecords = result.data.map(record => ({
-          id: record.monitor_id || record._id,
-          examName: record.exam_name || '',
-          examType: record.exam_type || '',
-          examDate: record.exam_date || '',
-          examTime: record.exam_time || '',
-          location: record.location || '',
-          description: record.description || '',
-          subjectIds: record.subject_ids || [],
-          subjectNames: record.subject_names || [],
-          studentId: record.student_id || '',
-          studentName: record.student_name || '',
-          studentIdNumber: record.student_id_number || '',
-          monitorStatus: record.monitor_status || '',
-          overallScore: record.overall_score || 0,
-          averageScore: record.average_score || 0,
-          passingCount: record.passing_count || 0,
-          totalSubjects: record.total_subjects || 0,
-          isAllPassed: record.is_all_passed || false,
-          violationRecords: record.violation_records || [],
-          reminderRecords: record.reminder_records || [],
-          semesterId: record.semester_id || 0,
-          semesterName: record.semester_name || '',
-          createdAt: record.createdAt
-        }));
-        setExamRecords(transformedRecords);
-
-        // 从监控记录中提取学生数据
-        const uniqueStudents = {};
-        transformedRecords.forEach(record => {
-          if (!uniqueStudents[record.studentId]) {
-            uniqueStudents[record.studentId] = {
-              id: record.studentId,
-              studentId: record.studentIdNumber || record.studentId,
-              name: record.studentName || '未知',
-              group: '未分组',
-              points: 0,
-              gpa: 0,
-              certificates: []
-            };
-          }
-        });
-        setStudents(Object.values(uniqueStudents));
-
-        // 从监控记录中提取科目数据
-        const uniqueSubjects = {};
-        transformedRecords.forEach(record => {
-          if (record.subjectNames && record.subjectNames.length > 0) {
-            record.subjectNames.forEach((subjectName, index) => {
-              const subjectId = record.subjectIds[index] || index + 1;
-              if (!uniqueSubjects[subjectId]) {
-                uniqueSubjects[subjectId] = {
-                  id: subjectId,
-                  name: subjectName,
-                  isExamSubject: true,
-                  passingScore: 60,
-                  credits: 3
-                };
-              }
-            });
-          }
-        });
-        setExamSubjects(Object.values(uniqueSubjects));
-
-        // 生成成绩记录
-        const grades = [];
-        transformedRecords.forEach(record => {
-          if (record.subjectIds && record.subjectNames.length > 0) {
-            record.subjectIds.forEach((subjectId, index) => {
-              grades.push({
-                id: grades.length + 1,
-                studentId: record.studentId,
-                studentName: record.studentName,
-                subjectId: subjectId,
-                subjectName: record.subjectNames[index] || '',
-                score: 0,
-                // 需要从成绩表获取
-                examDate: record.examDate,
-                isPassing: true,
-                remarks: ''
-              });
-            });
-          }
-        });
-        setExamGrades(grades);
-      }
-    } catch (error) {
-      console.error('加载转段考数据失败:', error);
-      toast({
-        title: '加载失败',
-        description: '无法加载转段考数据，请重试',
-        variant: 'destructive'
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [students] = useState(MOCK_STUDENTS);
+  const [examGrades, setExamGrades] = useState(MOCK_EXAM_GRADES);
+  const [examSubjects, setExamSubjects] = useState(EXAM_SUBJECTS);
 
   // 筛选状态
   const [searchTerm, setSearchTerm] = useState('');

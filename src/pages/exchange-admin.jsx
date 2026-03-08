@@ -47,7 +47,9 @@ export default function ExchangeAdmin({
   });
   const [loading, setLoading] = useState(false);
 
-  // 兑换物品数据从数据库加载
+  // 模拟数据
+  // 模拟数据
+  const mockItems = [{
     id: 1,
     name: '免值日券',
     description: '免一次卫生值日，有效期一周',
@@ -118,7 +120,7 @@ export default function ExchangeAdmin({
     createdAt: '2026-02-23',
     usageCount: 8
   }];
-  const [biddingRecords, setBiddingRecords] = useState([]);
+  const mockBiddingRecords = [{
     id: 1,
     itemId: 3,
     itemName: '周末作业减免',
@@ -159,7 +161,7 @@ export default function ExchangeAdmin({
     bidTime: '2026-03-03 09:15',
     isWinner: null
   }];
-  const [exchangeHistory, setExchangeHistory] = useState([]);
+  const mockExchangeHistory = [{
     id: 1,
     itemId: 1,
     itemName: '免值日券',
@@ -245,7 +247,7 @@ export default function ExchangeAdmin({
   const loadExchangeHistory = async () => {
     try {
       const tcb = await $w.cloud.getCloudInstance();
-      const result = await tcb.database().collection('redemption_request').orderBy('redemption_time', 'desc').limit(50).get();
+      const result = await tcb.database().collection('redemption_requests').orderBy('redemption_time', 'desc').limit(50).get();
       if (result.data && result.data.length > 0) {
         const transformedHistory = result.data.map(record => ({
           id: record._id,

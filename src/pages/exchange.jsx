@@ -6,6 +6,124 @@ import { Gift, Search, Filter, TrendingUp, Clock, AlertCircle, Trophy, CheckCirc
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, useToast, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, StatCard } from '@/components/ui';
 
 import { TabBar } from '@/components/TabBar';
+
+// 模拟学生数据
+const MOCK_STUDENTS = [{
+  id: 1,
+  studentId: '2024001',
+  name: '张三',
+  group: '第一组',
+  totalPoints: 156
+}, {
+  id: 2,
+  studentId: '2024002',
+  name: '李四',
+  group: '第一组',
+  totalPoints: 143
+}, {
+  id: 3,
+  studentId: '2024003',
+  name: '王五',
+  group: '第二组',
+  totalPoints: 138
+}, {
+  id: 4,
+  studentId: '2024004',
+  name: '赵六',
+  group: '第二组',
+  totalPoints: 165
+}, {
+  id: 5,
+  studentId: '2024005',
+  name: '钱七',
+  group: '第三组',
+  totalPoints: 132
+}];
+
+// 模拟可兑换物品数据
+const MOCK_ITEMS = [{
+  id: 1,
+  name: '学习用品礼包',
+  description: '包含笔记本、签字笔、铅笔套装等',
+  imageUrl: 'https://images.unsplash.com/photo-1506792006437-256b665541e2?w=400',
+  pointsRequired: 30,
+  mode: 'direct',
+  status: 'available',
+  category: '学习用品',
+  createdAt: '2025-01-15'
+}, {
+  id: 2,
+  name: '图书借阅卡',
+  description: '可借阅班级图书角任意图书一个月',
+  imageUrl: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400',
+  pointsRequired: 20,
+  mode: 'direct',
+  status: 'available',
+  category: '学习用品',
+  createdAt: '2025-01-18'
+}, {
+  id: 3,
+  name: '周末影院套票',
+  description: '周末下午在教室观看精选电影',
+  imageUrl: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400',
+  pointsRequired: 25,
+  mode: 'direct',
+  status: 'available',
+  category: '娱乐活动',
+  createdAt: '2025-01-20'
+}, {
+  id: 4,
+  name: '特殊座位券',
+  description: '获得优先选择座位的权利',
+  imageUrl: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400',
+  pointsRequired: 40,
+  mode: 'bidding',
+  status: 'bidding',
+  category: '特权',
+  biddingStartTime: '2025-03-01 08:00:00',
+  biddingEndTime: '2025-03-15 18:00:00',
+  currentHighestPoints: 35,
+  biddingCount: 3,
+  createdAt: '2025-02-25'
+}, {
+  id: 5,
+  name: '班长体验周',
+  description: '获得一周班长体验机会',
+  imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400',
+  pointsRequired: 50,
+  mode: 'bidding',
+  status: 'bidding',
+  category: '特权',
+  biddingStartTime: '2025-02-28 08:00:00',
+  biddingEndTime: '2025-03-10 18:00:00',
+  currentHighestPoints: 45,
+  biddingCount: 5,
+  createdAt: '2025-02-20'
+}, {
+  id: 6,
+  name: '免作业券',
+  description: '可免除一次作业',
+  imageUrl: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400',
+  pointsRequired: 35,
+  mode: 'direct',
+  status: 'available',
+  category: '特权',
+  createdAt: '2025-02-15'
+}, {
+  id: 7,
+  name: '自习室使用权',
+  description: '午休时间使用自习室一周',
+  imageUrl: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400',
+  pointsRequired: 45,
+  mode: 'bidding',
+  status: 'bidding',
+  category: '特权',
+  biddingStartTime: '2025-03-05 08:00:00',
+  biddingEndTime: '2025-03-20 18:00:00',
+  currentHighestPoints: 40,
+  biddingCount: 2,
+  createdAt: '2025-02-28'
+}];
 export default function ExchangePage({
   $w
 }) {
@@ -80,7 +198,7 @@ export default function ExchangePage({
       }
 
       // 加载兑换记录
-      const exchangesResult = await db.collection('redemption_request').orderBy('redemption_time', 'desc').limit(100).get();
+      const exchangesResult = await db.collection('redemption_requests').orderBy('redemption_time', 'desc').limit(100).get();
       if (exchangesResult.data && exchangesResult.data.length > 0) {
         const transformedExchanges = exchangesResult.data.map(record => ({
           id: record._id,
@@ -204,7 +322,7 @@ export default function ExchangePage({
       const db = tcb.database();
 
       // 创建投标兑换申请记录
-      const result = await db.collection('redemption_request').add({
+      const result = await db.collection('redemption_requests').add({
         request_id: `RR${Date.now()}`,
         student_id: currentStudent.studentId,
         student_name: currentStudent.name,
@@ -290,7 +408,7 @@ export default function ExchangePage({
       const newTotalPoints = currentStudent.totalPoints - selectedItem.pointsRequired;
 
       // 添加兑换记录到数据库
-      const result = await db.collection('redemption_request').add({
+      const result = await db.collection('redemption_requests').add({
         request_id: `RR${Date.now()}`,
         student_id: currentStudent.studentId,
         student_name: currentStudent.name,

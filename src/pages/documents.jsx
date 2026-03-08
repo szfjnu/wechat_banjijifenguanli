@@ -8,6 +8,105 @@ import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 
+// 模拟文件数据
+const MOCK_FILES = [{
+  id: 1,
+  title: '班级管理制度汇编',
+  category: '规章制度',
+  description: '包含班级日常管理规定、奖惩制度、考勤制度等',
+  fileName: '班级管理制度汇编.pdf',
+  fileSize: '2.5MB',
+  fileType: 'PDF',
+  fileUrl: 'https://example.com/files/班级管理制度汇编.pdf',
+  isPinned: true,
+  permission: 'public',
+  uploadDate: '2025-01-10',
+  expiryDate: null,
+  uploader: '班主任',
+  viewCount: 156,
+  downloadCount: 89
+}, {
+  id: 2,
+  title: '学生安全须知',
+  category: '安全教育',
+  description: '校园安全、交通安全、食品安全等相关注意事项',
+  fileName: '学生安全须知.pdf',
+  fileSize: '1.8MB',
+  fileType: 'PDF',
+  fileUrl: 'https://example.com/files/学生安全须知.pdf',
+  isPinned: true,
+  permission: 'public',
+  uploadDate: '2025-01-12',
+  expiryDate: null,
+  uploader: '班主任',
+  viewCount: 203,
+  downloadCount: 112
+}, {
+  id: 3,
+  title: '课程表2025年春季',
+  category: '课程安排',
+  description: '本学期课程安排表',
+  fileName: '课程表2025年春季.docx',
+  fileSize: '856KB',
+  fileType: 'Word',
+  fileUrl: 'https://example.com/files/课程表2025年春季.docx',
+  isPinned: false,
+  permission: 'public',
+  uploadDate: '2025-02-20',
+  expiryDate: '2025-07-01',
+  uploader: '班主任',
+  viewCount: 89,
+  downloadCount: 45
+}, {
+  id: 4,
+  title: '春季运动会通知',
+  category: '活动通知',
+  description: '关于举办春季运动会的通知',
+  fileName: '春季运动会通知.pdf',
+  fileSize: '420KB',
+  fileType: 'PDF',
+  fileUrl: 'https://example.com/files/春季运动会通知.pdf',
+  isPinned: false,
+  permission: 'student',
+  uploadDate: '2025-03-01',
+  expiryDate: '2025-04-30',
+  uploader: '体育委员',
+  viewCount: 67,
+  downloadCount: 23
+}, {
+  id: 5,
+  title: '家校沟通联系表',
+  category: '家长须知',
+  description: '家校联系方式和沟通时间安排',
+  fileName: '家校沟通联系表.docx',
+  fileSize: '312KB',
+  fileType: 'Word',
+  fileUrl: 'https://example.com/files/家校沟通联系表.docx',
+  isPinned: true,
+  permission: 'parent',
+  uploadDate: '2025-02-28',
+  expiryDate: null,
+  uploader: '班主任',
+  viewCount: 145,
+  downloadCount: 78
+}, {
+  id: 6,
+  title: '食堂就餐管理规定',
+  category: '规章制度',
+  description: '食堂就餐相关管理规定',
+  fileName: '食堂就餐管理规定.pdf',
+  fileSize: '680KB',
+  fileType: 'PDF',
+  fileUrl: 'https://example.com/files/食堂就餐管理规定.pdf',
+  isPinned: false,
+  permission: 'public',
+  uploadDate: '2025-02-25',
+  expiryDate: null,
+  uploader: '班主任',
+  viewCount: 98,
+  downloadCount: 56
+}];
+
 // 文件分类
 const CATEGORIES = [{
   value: 'all',
@@ -43,56 +142,6 @@ const PERMISSIONS = [{
   value: 'parent',
   label: '仅家长可见'
 }];
-export default function DocumentsPage({
-  className = '',
-  style = {},
-  $w = {
-    auth: {
-      currentUser: {
-  // 加载文件数据
-  useEffect(() => {
-    loadFiles();
-  }, []);
-
-  const loadFiles = async () => {
-    try {
-      const tcb = await $w.cloud.getCloudInstance();
-      const db = tcb.database();
-      const result = await db.collection('policy_document').orderBy('upload_date', 'desc').limit(50).get();
-      if (result.data && result.data.length > 0) {
-        const transformedFiles = result.data.map(file => ({
-          id: file._id,
-          title: file.title || '',
-          category: file.category || '其他',
-          description: file.description || '',
-          fileName: file.file_name || '',
-          fileSize: file.file_size || '0KB',
-          fileType: file.file_type || '未知',
-          fileUrl: file.file_url || '',
-          isPinned: file.is_pinned || false,
-          permission: file.permission === '公开' ? 'public' : file.permission === '仅学生可见' ? 'student' : file.permission === '仅家长可见' ? 'parent' : 'public',
-          uploadDate: file.upload_date ? file.upload_date.split('T')[0] : '',
-          updateDate: file.update_date ? file.update_date.split('T')[0] : '',
-          expiryDate: file.expiry_date ? file.expiry_date.split('T')[0] : null,
-          uploader: file.uploader || '未知',
-          status: file.status || '正常',
-          viewCount: file.view_count || 0,
-          downloadCount: file.download_count || 0,
-          semesterId: file.semester_id || 0,
-          semesterName: file.semester_name || ''
-        }));
-        setFiles(transformedFiles);
-      }
-    } catch (error) {
-      console.error('加载文件数据失败:', error);
-      toast({
-        title: '加载失败',
-        description: '无法加载文件数据，请重试',
-        variant: 'destructive'
-      });
-    }
-  };
-
 export default function DocumentsPage({
   className = '',
   style = {},
@@ -135,50 +184,6 @@ export default function DocumentsPage({
   const [files, setFiles] = useState([]);
   const [filteredFiles, setFilteredFiles] = useState([]);
 
-  // 加载文件数据
-  useEffect(() => {
-    loadFiles();
-  }, []);
-
-  const loadFiles = async () => {
-    try {
-      const tcb = await $w.cloud.getCloudInstance();
-      const db = tcb.database();
-      const result = await db.collection('policy_document').orderBy('upload_date', 'desc').limit(50).get();
-      if (result.data && result.data.length > 0) {
-        const transformedFiles = result.data.map(file => ({
-          id: file._id,
-          title: file.title || '',
-          category: file.category || '其他',
-          description: file.description || '',
-          fileName: file.file_name || '',
-          fileSize: file.file_size || '0KB',
-          fileType: file.file_type || '未知',
-          fileUrl: file.file_url || '',
-          isPinned: file.is_pinned || false,
-          permission: file.permission === '公开' ? 'public' : file.permission === '仅学生可见' ? 'student' : file.permission === '仅家长可见' ? 'parent' : 'public',
-          uploadDate: file.upload_date ? file.upload_date.split('T')[0] : '',
-          updateDate: file.update_date ? file.update_date.split('T')[0] : '',
-          expiryDate: file.expiry_date ? file.expiry_date.split('T')[0] : null,
-          uploader: file.uploader || '未知',
-          status: file.status || '正常',
-          viewCount: file.view_count || 0,
-          downloadCount: file.download_count || 0,
-          semesterId: file.semester_id || 0,
-          semesterName: file.semester_name || ''
-        }));
-        setFiles(transformedFiles);
-      }
-    } catch (error) {
-      console.error('加载文件数据失败:', error);
-      toast({
-        title: '加载失败',
-        description: '无法加载文件数据，请重试',
-        variant: 'destructive'
-      });
-    }
-  };
-
   // 筛选条件
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [permissionFilter, setPermissionFilter] = useState('all');
@@ -202,6 +207,55 @@ export default function DocumentsPage({
 
   // 文件操作
   const [isUploading, setIsUploading] = useState(false);
+
+  // 加载数据
+  useEffect(() => {
+    loadDocuments();
+  }, []);
+  const loadDocuments = async () => {
+    try {
+      setLoading(true);
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('policy_document').orderBy('upload_date', 'desc').limit(50).get();
+      if (result.data && result.data.length > 0) {
+        const transformedDocuments = result.data.map(doc => ({
+          id: doc._id,
+          documentId: doc.document_id,
+          title: doc.title,
+          category: doc.category,
+          description: doc.description,
+          fileName: doc.file_name,
+          fileSize: doc.file_size,
+          fileType: doc.file_type,
+          fileUrl: doc.file_url,
+          isPinned: doc.is_pinned,
+          permission: doc.permission,
+          uploadDate: doc.upload_date ? doc.upload_date.split('T')[0] : '',
+          updateDate: doc.update_date ? doc.update_date.split('T')[0] : '',
+          expiryDate: doc.expiry_date,
+          uploader: doc.uploader,
+          status: doc.status,
+          viewCount: doc.view_count,
+          downloadCount: doc.download_count,
+          semesterId: doc.semester_id,
+          semesterName: doc.semester_name
+        }));
+        setFiles(transformedDocuments);
+      } else {
+        setFiles([]);
+      }
+    } catch (error) {
+      console.error('加载文档数据失败:', error);
+      toast({
+        title: '加载失败',
+        description: '无法加载文档数据',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // 筛选文件
   useEffect(() => {
