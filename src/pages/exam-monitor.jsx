@@ -1,5 +1,5 @@
 // @ts-ignore;
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 // @ts-ignore;
 import { GraduationCap, BookOpen, Award, TrendingUp, AlertCircle, CheckCircle, Clock, Search, Download, FileText, Plus, Flag, Info, Target } from 'lucide-react';
 // @ts-ignore;
@@ -138,99 +138,6 @@ const MOCK_STUDENTS = [{
   certificates: []
 }];
 
-// 模拟转段考成绩记录
-const MOCK_EXAM_GRADES = [{
-  id: 1,
-  studentId: '2024001',
-  studentName: '张伟',
-  subjectId: 1,
-  subjectName: '语文',
-  score: 85,
-  examDate: '2025-06-15',
-  isPassing: true,
-  remarks: ''
-}, {
-  id: 2,
-  studentId: '2024001',
-  studentName: '张伟',
-  subjectId: 2,
-  subjectName: '数学',
-  score: 72,
-  examDate: '2025-06-15',
-  isPassing: true,
-  remarks: ''
-}, {
-  id: 3,
-  studentId: '2024001',
-  studentName: '张伟',
-  subjectId: 3,
-  subjectName: '英语',
-  score: 88,
-  examDate: '2025-06-15',
-  isPassing: true,
-  remarks: ''
-}, {
-  id: 4,
-  studentId: '2024002',
-  studentName: '李娜',
-  subjectId: 1,
-  subjectName: '语文',
-  score: 92,
-  examDate: '2025-06-15',
-  isPassing: true,
-  remarks: ''
-}, {
-  id: 5,
-  studentId: '2024002',
-  studentName: '李娜',
-  subjectId: 2,
-  subjectName: '数学',
-  score: 68,
-  examDate: '2025-06-15',
-  isPassing: true,
-  remarks: ''
-}, {
-  id: 6,
-  studentId: '2024002',
-  studentName: '李娜',
-  subjectId: 3,
-  subjectName: '英语',
-  score: 76,
-  examDate: '2025-06-15',
-  isPassing: true,
-  remarks: ''
-}, {
-  id: 7,
-  studentId: '2024003',
-  studentName: '王强',
-  subjectId: 1,
-  subjectName: '语文',
-  score: 58,
-  examDate: '2025-06-15',
-  isPassing: false,
-  remarks: '不及格'
-}, {
-  id: 8,
-  studentId: '2024003',
-  studentName: '王强',
-  subjectId: 2,
-  subjectName: '数学',
-  score: 55,
-  examDate: '2025-06-15',
-  isPassing: false,
-  remarks: '不及格'
-}, {
-  id: 9,
-  studentId: '2024003',
-  studentName: '王强',
-  subjectId: 3,
-  subjectName: '英语',
-  score: 62,
-  examDate: '2025-06-15',
-  isPassing: true,
-  remarks: ''
-}];
-
 // 技能证书要求配置
 const CERTIFICATE_REQUIREMENTS = [{
   id: 1,
@@ -274,9 +181,77 @@ export default function ExamMonitorPage(props) {
   };
 
   // 数据状态
-  const [students] = useState(MOCK_STUDENTS);
-  const [examGrades, setExamGrades] = useState(MOCK_EXAM_GRADES);
+  const [students, setStudents] = useState([]);
+  const [examGrades, setExamGrades] = useState([]);
   const [examSubjects, setExamSubjects] = useState(EXAM_SUBJECTS);
+  const [monitorData, setMonitorData] = useState([]);
+
+  // 加载转段考监控数据
+  useEffect(() => {
+    loadMonitorData();
+    loadStudents();
+  }, []);
+  const loadMonitorData = async () => {
+    try {
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('exam_monitor').orderBy('exam_date', 'desc').limit(100).get();
+      if (result.data && result.data.length > 0) {
+        const transformedData = result.data.map(monitor => ({
+          id: monitor._id,
+          monitorId: monitor.monitor_id,
+          examName: monitor.exam_name,
+          examType: monitor.exam_type,
+          examDate: monitor.exam_date,
+          examTime: monitor.exam_time,
+          location: monitor.location,
+          description: monitor.description,
+          subjectIds: monitor.subject_ids || [],
+          subjectNames: monitor.subject_names || [],
+          studentId: monitor.student_id,
+          studentName: monitor.student_name,
+          studentIdNumber: monitor.student_id_number,
+          monitorStatus: monitor.monitor_status,
+          overallScore: monitor.overall_score,
+          averageScore: monitor.average_score,
+          passingCount: monitor.passing_count,
+          totalSubjects: monitor.total_subjects,
+          isAllPassed: monitor.is_all_passed,
+          violationRecords: monitor.violation_records || [],
+          reminderRecords: monitor.reminder_records || []
+        }));
+        setMonitorData(transformedData);
+      }
+    } catch (error) {
+      console.error('加载转段考监控数据失败:', error);
+      toast({
+        title: '加载失败',
+        description: '无法加载转段考监控数据，请重试',
+        variant: 'destructive'
+      });
+    }
+  };
+  const loadStudents = async () => {
+    try {
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('students').get();
+      if (result.data && result.data.length > 0) {
+        const transformedStudents = result.data.map(student => ({
+          id: student._id,
+          studentId: student.student_id,
+          name: student.name,
+          group: student.group_id || student.group || '未分组',
+          points: student.current_score || 0,
+          gpa: student.gpa || 0,
+          certificates: []
+        }));
+        setStudents(transformedStudents);
+      }
+    } catch (error) {
+      console.error('加载学生数据失败:', error);
+    }
+  };
 
   // 筛选状态
   const [searchTerm, setSearchTerm] = useState('');
