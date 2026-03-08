@@ -55,131 +55,6 @@ const DISCIPLINE_LEVELS = [{
 }];
 
 // 模拟学生数据
-const MOCK_STUDENTS = [{
-  id: 1,
-  name: '张三',
-  studentId: '202401001',
-  group: '第一组',
-  totalPoints: 156
-}, {
-  id: 2,
-  name: '李四',
-  studentId: '202401002',
-  group: '第二组',
-  totalPoints: 148
-}, {
-  id: 3,
-  name: '王五',
-  studentId: '202401003',
-  group: '第一组',
-  totalPoints: 132
-}, {
-  id: 4,
-  name: '赵六',
-  studentId: '202401004',
-  group: '第三组',
-  totalPoints: 145
-}, {
-  id: 5,
-  name: '钱七',
-  studentId: '202401005',
-  group: '第二组',
-  totalPoints: 128
-}, {
-  id: 6,
-  name: '孙八',
-  studentId: '202401006',
-  group: '第三组',
-  totalPoints: 139
-}, {
-  id: 7,
-  name: '周九',
-  studentId: '202401007',
-  group: '第四组',
-  totalPoints: 142
-}, {
-  id: 8,
-  name: '吴十',
-  studentId: '202401008',
-  group: '第四组',
-  totalPoints: 135
-}];
-
-// 模拟处分记录数据
-const MOCK_RECORDS = [{
-  id: 1,
-  studentId: 2,
-  studentName: '李四',
-  levelId: 3,
-  levelName: '警告',
-  reason: '上课玩手机',
-  pointsDeducted: -10,
-  date: '2025-03-01 09:00',
-  status: 'active',
-  expiryDate: '2025-03-31',
-  operator: '班主任',
-  revokeRequests: []
-}, {
-  id: 2,
-  studentId: 5,
-  studentName: '钱七',
-  levelId: 4,
-  levelName: '严重警告',
-  reason: '打架斗殴',
-  pointsDeducted: -15,
-  date: '2025-02-28 15:30',
-  status: 'active',
-  expiryDate: '2025-04-29',
-  operator: '德育主任',
-  revokeRequests: [{
-    reason: '误判',
-    requestDate: '2025-03-01',
-    status: 'pending'
-  }]
-}, {
-  id: 3,
-  studentId: 3,
-  studentName: '王五',
-  levelId: 1,
-  levelName: '口头警告',
-  reason: '未按时完成作业',
-  pointsDeducted: -2,
-  date: '2025-02-20 10:00',
-  status: 'expired',
-  expiryDate: '2025-02-27',
-  operator: '班主任',
-  revokeRequests: []
-}, {
-  id: 4,
-  studentId: 6,
-  studentName: '孙八',
-  levelId: 5,
-  levelName: '记过',
-  reason: '逃课上网',
-  pointsDeducted: -20,
-  date: '2025-02-15 14:00',
-  status: 'revoked',
-  expiryDate: '2025-05-15',
-  operator: '德育主任',
-  revokeRequests: [{
-    reason: '家长申请',
-    requestDate: '2025-02-20',
-    status: 'approved'
-  }]
-}, {
-  id: 5,
-  studentId: 8,
-  studentName: '吴十',
-  levelId: 2,
-  levelName: '通报批评',
-  reason: '顶撞老师',
-  pointsDeducted: -5,
-  date: '2025-02-25 11:00',
-  status: 'active',
-  expiryDate: '2025-03-11',
-  operator: '班主任',
-  revokeRequests: []
-}];
 export default function DisciplinePage(props) {
   const {
     $w
@@ -225,10 +100,43 @@ export default function DisciplinePage(props) {
   const loadData = async () => {
     try {
       setLoading(true);
-      // 模拟数据加载
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setRecords(MOCK_RECORDS);
-      setStudents(MOCK_STUDENTS);
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+
+      // 加载学生数据
+      const studentResult = await db.collection('students').get();
+      if (studentResult.data && studentResult.data.length > 0) {
+        const transformedStudents = studentResult.data.map(student => ({
+          id: student._id,
+          name: student.name,
+          studentId: student.student_id,
+          group: student.group_id || student.group || '未分组',
+          totalPoints: student.current_score || 0
+        }));
+        setStudents(transformedStudents);
+      }
+
+      // 加载处分记录数据
+      const recordResult = await db.collection('discipline_record').orderBy('date', 'desc').limit(50).get();
+      if (recordResult.data && recordResult.data.length > 0) {
+        const transformedRecords = recordResult.data.map(record => ({
+          id: record._id,
+          studentId: record.student_id || record.student_no || '',
+          studentName: record.student_name || '未知',
+          levelId: record.level_id || 0,
+          levelName: record.level_name || '未知',
+          reason: record.reason || '',
+          pointsDeducted: record.points_deducted || 0,
+          date: record.date || '',
+          status: record.status || 'active',
+          expiryDate: record.expiry_date || '',
+          operator: record.operator_name || '管理员',
+          revokeRequests: record.revoke_requests || [],
+          semesterId: record.semester_id || '',
+          semesterName: record.semester_name || ''
+        }));
+        setRecords(transformedRecords);
+      }
     } catch (error) {
       console.error('加载数据失败:', error);
       toast({
@@ -327,11 +235,30 @@ export default function DisciplinePage(props) {
       return;
     }
     try {
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
       const student = students.find(s => s.id === parseInt(newRecord.studentId));
       const level = DISCIPLINE_LEVELS.find(l => l.id === parseInt(newRecord.levelId));
-      const newId = Math.max(...records.map(r => r.id)) + 1;
+
+      // 添加处分记录到数据库
+      const recordResult = await db.collection('discipline_record').add({
+        record_id: `DR${Date.now()}`,
+        student_id: parseInt(newRecord.studentId) || 0,
+        student_name: student.name,
+        student_no: student.studentId || '',
+        group_name: student.group || '',
+        level_id: level.id,
+        level_name: level.name,
+        reason: newRecord.reason,
+        points_deducted: level.points,
+        date: newRecord.date,
+        status: 'active',
+        expiry_date: new Date(Date.now() + level.duration * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        operator_name: '班主任',
+        revoke_requests: []
+      });
       const createdRecord = {
-        id: newId,
+        id: recordResult.id || recordResult.ids?.[0] || `DR${Date.now()}`,
         studentId: parseInt(newRecord.studentId),
         studentName: student.name,
         levelId: level.id,
@@ -383,6 +310,17 @@ export default function DisciplinePage(props) {
       return;
     }
     try {
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+
+      // 更新数据库中的处分记录
+      await db.collection('discipline_record').doc(selectedRecord.id).update({
+        status: 'revoked',
+        revoke_reason: revokeReason,
+        revoked_date: new Date().toISOString()
+      });
+
+      // 更新本地状态
       const updatedRecords = records.map(r => r.id === selectedRecord.id ? {
         ...r,
         status: 'revoked',
@@ -418,13 +356,26 @@ export default function DisciplinePage(props) {
       return;
     }
     try {
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+
+      // 获取现有撤销申请
+      const existingRequests = selectedRecord.revokeRequests || [];
+      const newRequest = {
+        reason: revokeRequestReason,
+        requestDate: new Date().toISOString(),
+        status: 'pending'
+      };
+
+      // 更新数据库中的撤销申请
+      await db.collection('discipline_record').doc(selectedRecord.id).update({
+        revoke_requests: [...existingRequests, newRequest]
+      });
+
+      // 更新本地状态
       const updatedRecords = records.map(r => r.id === selectedRecord.id ? {
         ...r,
-        revokeRequests: [{
-          reason: revokeRequestReason,
-          requestDate: new Date().toISOString(),
-          status: 'pending'
-        }]
+        revokeRequests: [...existingRequests, newRequest]
       } : r);
       setRecords(updatedRecords);
       setShowRevokeRequestDialog(false);
@@ -474,7 +425,7 @@ export default function DisciplinePage(props) {
         });
       }
       // 模拟导出
-      const csvContent = `学生姓名,学号,处分级别,扣分,原因,日期,状态,有效期\n${exportRecords.map(r => `${r.studentName},${students.find(s => s.id === r.studentId).studentId},${r.levelName},${r.pointsDeducted},${r.reason},${r.date},${r.status},${r.expiryDate}`).join('\n')}`;
+      const csvContent = `学生姓名,学号,处分级别,扣分,原因,日期,状态,有效期\n${exportRecords.map(r => `${r.studentName},${r.studentId},${r.levelName},${r.pointsDeducted},${r.reason},${r.date},${r.status},${r.expiryDate}`).join('\n')}`;
       const blob = new Blob([csvContent], {
         type: 'text/csv;charset=utf-8;'
       });
@@ -702,7 +653,7 @@ export default function DisciplinePage(props) {
                   </div>
                   <div>
                     <p className="font-medium text-gray-800">{selectedRecord.studentName}</p>
-                    <p className="text-sm text-gray-500">{students.find(s => s.id === selectedRecord.studentId)?.studentId}</p>
+                    <p className="text-sm text-gray-500">{selectedRecord.studentId || ''}</p>
                   </div>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-3 space-y-2">
