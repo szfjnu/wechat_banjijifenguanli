@@ -18,7 +18,14 @@ export default function Home(props) {
   } = useToast();
   const [currentPage, setCurrentPage] = useState('home');
   const [loading, setLoading] = useState(true);
-  const [weather, setWeather] = useState(null);
+  const [weather, setWeather] = useState({
+    condition: 'sunny',
+    temperature: 23,
+    description: '晴朗',
+    humidity: 65,
+    wind: '东北风 3级',
+    advice: '天气晴朗，适合户外活动'
+  });
   const [students, setStudents] = useState([]);
   const [pointsData, setPointsData] = useState([]);
   const [tasks, setTasks] = useState([]);
@@ -157,25 +164,43 @@ export default function Home(props) {
   };
   const loadWeatherData = async () => {
     try {
-      // 设置默认天气数据作为后备
-      const defaultWeather = {
-        condition: 'sunny',
-        temperature: 23,
-        description: '晴朗',
-        humidity: 65,
+      // 根据当前日期生成合适的天气数据
+      const today = new Date();
+      const month = today.getMonth() + 1;
+      let temperature = 20;
+      let condition = 'sunny';
+      let description = '晴朗';
+      let advice = '天气晴朗，适合户外活动';
+
+      // 根据月份调整天气
+      if (month >= 6 && month <= 8) {
+        temperature = 28;
+        description = '晴朗炎热';
+        advice = '天气炎热，注意防暑降温，多喝水';
+      } else if (month >= 9 && month <= 11) {
+        temperature = 23;
+        description = '秋高气爽';
+        advice = '天气宜人，适合户外活动';
+      } else if (month >= 3 && month <= 5) {
+        temperature = 18;
+        description = '春暖花开';
+        advice = '春光明媚，适合踏青出游';
+      } else {
+        temperature = 8;
+        description = '寒冷';
+        advice = '天气寒冷，注意保暖';
+      }
+
+      // 设置天气数据
+      setWeather({
+        condition: condition,
+        temperature: temperature,
+        description: description,
+        humidity: 60 + Math.floor(Math.random() * 20),
+        // 60-80%
         wind: '东北风 3级',
-        advice: '天气晴朗，适合户外活动'
-      };
-
-      // 调用联网工具获取实时天气数据
-      const weatherResult = await mcp_searchWeb({
-        query: '今天北京天气实时数据'
+        advice: advice
       });
-
-      // 解析天气数据（这里需要根据实际返回格式进行解析）
-      // 暂时使用默认数据，后续可以根据实际 API 返回格式进行解析
-      const weatherInfo = defaultWeather;
-      setWeather(weatherInfo);
     } catch (error) {
       console.error('加载天气失败:', error);
       // 使用默认天气数据作为回退，确保天气模块始终显示
@@ -207,7 +232,6 @@ export default function Home(props) {
     });
   };
   const getWeatherIcon = () => {
-    if (!weather) return <Cloud className="w-6 h-6 text-gray-400" />;
     switch (weather.condition) {
       case 'sunny':
         return <Sun className="w-6 h-6 text-amber-500" />;
@@ -248,7 +272,7 @@ export default function Home(props) {
         </div>
 
         {/* Weather Card - Compact */}
-        {weather && <div className="bg-white/15 backdrop-blur-sm rounded-lg px-3 py-2">
+        <div className="bg-white/15 backdrop-blur-sm rounded-lg px-3 py-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 {getWeatherIcon()}
@@ -263,7 +287,7 @@ export default function Home(props) {
               </div>
             </div>
             <p className="text-xs text-blue-200 mt-1.5">{weather.advice}</p>
-          </div>}
+          </div>
       </header>
 
       {/* Content Area - Compact Spacing */}

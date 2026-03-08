@@ -133,46 +133,53 @@ export function TeacherScheduleReminder(props) {
   const loadTodaySchedule = async () => {
     try {
       setLoading(true);
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
 
-      // 模拟数据 - 应该从数据库中根据教师ID和当前日期查询
-      // 实际实现需要调用数据模型：teacher_schedules
-      const mockSchedule = [{
-        id: 1,
-        section: 1,
-        sectionName: '第一节',
-        courseName: '智能仓储大数据分析',
-        className: '2024级物流服务与管理2班',
-        room: '2-2703电子商务实训4室',
-        campus: '大坦沙校区',
-        startTime: '08:50',
-        endTime: '10:10',
-        status: 'completed'
-      }, {
-        id: 2,
-        section: 3,
-        sectionName: '第三节',
-        courseName: '人工智能基础',
-        className: '2023级物流服务与管理1班',
-        room: '2-2504数字语音实训2室',
-        campus: '大坦沙校区',
-        startTime: '10:20',
-        endTime: '11:00',
-        status: 'upcoming'
-      }, {
-        id: 3,
-        section: 5,
-        sectionName: '第五节',
-        courseName: '智能仓储大数据分析',
-        className: '2024级物流服务与管理1班',
-        room: '2-2703电子商务实训4室',
-        campus: '大坦沙校区',
-        startTime: '14:00',
-        endTime: '14:40',
-        status: 'upcoming'
-      }];
-      setTodaySchedule(mockSchedule);
+      // 获取今天是星期几（0=周日，1=周一，...，6=周六）
+      const today = new Date();
+      const weekDay = today.getDay(); // 0-6
+
+      // 查询今天星期对应的课程
+      const result = await db.collection('class_schedule').where({
+        week_day: weekDay
+      }).orderBy('section', 'asc').get();
+      if (result.data && result.data.length > 0) {
+        // 转换数据格式
+        const schedule = result.data.map((item, index) => {
+          // 根据当前时间确定课程状态
+          const now = new Date();
+          const currentTime = now.getHours() * 60 + now.getMinutes();
+          const [startH, startM] = (item.start_time || '08:00').split(':').map(Number);
+          const [endH, endM] = (item.end_time || '09:00').split(':').map(Number);
+          const startTimeValue = startH * 60 + startM;
+          const endTimeValue = endH * 60 + endM;
+          let status = 'upcoming';
+          if (currentTime >= endTimeValue) {
+            status = 'completed';
+          } else if (currentTime >= startTimeValue && currentTime <= endTimeValue) {
+            status = 'ongoing';
+          }
+          return {
+            id: item._id,
+            section: item.section || index + 1,
+            sectionName: `第${item.section || index + 1}节`,
+            courseName: item.course_name || '未知课程',
+            className: item.class_name || '',
+            room: item.room || '',
+            campus: item.campus || '',
+            startTime: item.start_time || '',
+            endTime: item.end_time || '',
+            status: status
+          };
+        });
+        setTodaySchedule(schedule);
+      } else {
+        setTodaySchedule([]);
+      }
     } catch (error) {
       console.error('加载课程表失败:', error);
+      setTodaySchedule([]);
     } finally {
       setLoading(false);
     }

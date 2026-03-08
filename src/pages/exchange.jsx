@@ -186,7 +186,7 @@ export default function ExchangePage({
 
   // 提交投标
   const handleSubmitBid = async () => {
-    if (!bidPoints || !selectedItem) {
+    if (!bidPoints || !selectedItem || !selectedItem.name) {
       toast({
         title: '提示',
         description: '请填写投标积分',
@@ -203,7 +203,7 @@ export default function ExchangePage({
       });
       return;
     }
-    if (points <= selectedItem.currentHighestPoints) {
+    if (points <= (selectedItem.currentHighestPoints || 0)) {
       toast({
         title: '投标失败',
         description: '投标积分必须高于当前最高分',
@@ -257,7 +257,7 @@ export default function ExchangePage({
       } : item));
       toast({
         title: '投标成功',
-        description: `您已成功参与"${selectedItem.name}"的投标，投标积分：${points}分`
+        description: `您已成功参与"${selectedItem?.name || '该物品'}"的投标，投标积分：${points}分`
       });
       setBidDialogOpen(false);
     } catch (error) {
@@ -294,7 +294,7 @@ export default function ExchangePage({
 
   // 提交兑换申请
   const handleSubmitExchange = async () => {
-    if (!selectedItem || !currentStudent) {
+    if (!selectedItem || !selectedItem.name || !currentStudent) {
       toast({
         title: '提示',
         description: '请选择要兑换的物品',
@@ -305,7 +305,7 @@ export default function ExchangePage({
     try {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
-      const newTotalPoints = currentStudent.totalPoints - selectedItem.pointsRequired;
+      const newTotalPoints = currentStudent.totalPoints - (selectedItem.pointsRequired || 0);
 
       // 添加兑换记录到数据库
       const result = await db.collection('redemption_requests').add({
@@ -366,7 +366,7 @@ export default function ExchangePage({
       }
       toast({
         title: '兑换成功',
-        description: `您已成功兑换"${selectedItem.name}"，消耗${selectedItem.pointsRequired}积分`
+        description: `您已成功兑换"${selectedItem?.name || '该物品'}"，消耗${selectedItem?.pointsRequired || 0}积分`
       });
       setExchangeDialogOpen(false);
     } catch (error) {
@@ -684,20 +684,20 @@ export default function ExchangePage({
             <DialogTitle>参与投标</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            {selectedItem && <div>
+            {selectedItem && selectedItem.name && <div>
                 <div className="text-sm text-gray-600 mb-1">物品名称</div>
                 <div className="font-semibold text-gray-900 mb-2">{selectedItem.name}</div>
                 
                 <div className="text-sm text-gray-600 mb-1">当前最高分</div>
-                <div className="text-lg font-bold text-orange-600 mb-2">{selectedItem.currentHighestPoints} 分</div>
+                <div className="text-lg font-bold text-orange-600 mb-2">{selectedItem.currentHighestPoints || 0} 分</div>
                 
                 <div className="text-sm text-gray-600 mb-1">投标截止时间</div>
-                <div className="text-sm text-gray-900 mb-4">{selectedItem.biddingEndTime}</div>
+                <div className="text-sm text-gray-900 mb-4">{selectedItem.biddingEndTime || '-'}</div>
                 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-900">投标积分 *</label>
                   <input type="number" value={bidPoints} onChange={e => setBidPoints(e.target.value)} placeholder="请输入投标积分" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
-                  <p className="text-xs text-gray-500">投标积分必须高于当前最高分 {selectedItem.currentHighestPoints}分</p>
+                  <p className="text-xs text-gray-500">投标积分必须高于当前最高分 {selectedItem.currentHighestPoints || 0}分</p>
                 </div>
                 
                 <div className="bg-gray-50 rounded-lg p-3 mt-4">
@@ -727,12 +727,12 @@ export default function ExchangePage({
             <DialogTitle>确认兑换</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            {selectedItem && <div>
+            {selectedItem && selectedItem.name && <div>
                 <div className="text-sm text-gray-600 mb-1">物品名称</div>
                 <div className="font-semibold text-gray-900 mb-2">{selectedItem.name}</div>
                 
                 <div className="text-sm text-gray-600 mb-1">所需积分</div>
-                <div className="text-lg font-bold text-orange-600 mb-4">-{selectedItem.pointsRequired} 积分</div>
+                <div className="text-lg font-bold text-orange-600 mb-4">-{selectedItem.pointsRequired || 0} 积分</div>
                 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-900">兑换备注</label>
@@ -741,7 +741,7 @@ export default function ExchangePage({
                 
                 <div className="bg-gray-50 rounded-lg p-3 mt-4">
                   <div className="text-sm text-gray-600 mb-1">兑换后剩余积分</div>
-                  <div className="text-lg font-bold text-gray-900">{currentStudent.totalPoints - selectedItem.pointsRequired} 分</div>
+                  <div className="text-lg font-bold text-gray-900">{currentStudent.totalPoints - (selectedItem.pointsRequired || 0)} 分</div>
                 </div>
               </div>}
             
