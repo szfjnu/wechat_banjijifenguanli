@@ -1,216 +1,58 @@
 // @ts-ignore;
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 // @ts-ignore;
-import { Home, Users, User, Activity, TrendingUp, Gift, ShieldAlert, Award, BookOpen, UsersRound, Grid3X3, Heart, FileText, Brain, CalendarDays, GraduationCap, CalendarCheck, Calculator, ChevronUp, ChevronDown, Bed, Star, Settings, LayoutGrid, Clock } from 'lucide-react';
+import { Home, Users, TrendingUp, UsersRound, LayoutGrid, ChevronUp, ChevronDown } from 'lucide-react';
 
-// 分类定义 - 按功能归类
-const CATEGORIES = [{
+// 底部主导航项定义
+const NAV_ITEMS = [{
+  id: 'home',
+  label: '首页',
+  icon: Home,
+  pageId: 'home'
+}, {
   id: 'student',
   label: '学生管理',
   icon: Users,
-  color: 'blue',
-  items: [{
-    id: 'students',
-    label: '学生档案',
-    icon: Users
-  }, {
-    id: 'students-manage',
-    label: '基础信息',
-    icon: User
-  }, {
-    id: 'student-growth',
-    label: '成长轨迹',
-    icon: Activity
-  }, {
-    id: 'parent-view',
-    label: '家长查看',
-    icon: Users
-  }, {
-    id: 'grades',
-    label: '成绩管理',
-    icon: BookOpen
-  }, {
-    id: 'certificates',
-    label: '证书管理',
-    icon: Award
-  }, {
-    id: 'volunteer',
-    label: '志愿时长',
-    icon: Heart
-  }]
+  pageId: 'students'
 }, {
   id: 'points',
   label: '积分管理',
   icon: TrendingUp,
-  color: 'green',
-  items: [{
-    id: 'points',
-    label: '积分规则',
-    icon: TrendingUp
-  }, {
-    id: 'dorm-points',
-    label: '宿舍积分',
-    icon: Bed
-  }, {
-    id: 'exchange',
-    label: '积分兑换',
-    icon: Gift
-  }, {
-    id: 'points-manage',
-    label: '积分管理',
-    icon: Settings
-  }, {
-    id: 'exchange-admin',
-    label: '兑换管理',
-    icon: Star
-  }, {
-    id: 'points-settings',
-    label: '积分设置',
-    icon: Calculator
-  }]
+  pageId: 'points'
 }, {
   id: 'class',
   label: '班级事务',
   icon: UsersRound,
-  color: 'purple',
-  items: [{
-    id: 'seating-chart',
-    label: '座位安排',
-    icon: Grid3X3
-  }, {
-    id: 'groups',
-    label: '分组管理',
-    icon: UsersRound
-  }, {
-    id: 'duty-roster',
-    label: '值日安排',
-    icon: CalendarCheck
-  }, {
-    id: 'subjects',
-    label: '科目设置',
-    icon: Calculator
-  }, {
-    id: 'semester',
-    label: '学期计划',
-    icon: CalendarDays
-  }, {
-    id: 'schedule-manage',
-    label: '课程表',
-    icon: Clock
-  }]
+  pageId: 'seating-chart'
 }, {
   id: 'comprehensive',
   label: '综合管理',
   icon: LayoutGrid,
-  color: 'orange',
-  items: [{
-    id: 'exam-monitor',
-    label: '转段考',
-    icon: GraduationCap
-  }, {
-    id: 'ai-review',
-    label: 'AI点评',
-    icon: Brain
-  }, {
-    id: 'documents',
-    label: '文件资料',
-    icon: FileText
-  }, {
-    id: 'discipline',
-    label: '违纪记录',
-    icon: ShieldAlert
-  }]
-}, {
-  id: 'parent',
-  label: '家长端',
-  icon: Heart,
-  color: 'green',
-  items: [{
-    id: 'parent-view',
-    label: '家长查看',
-    icon: User
-  }]
+  pageId: 'exam-monitor'
 }];
-
-// 获取颜色样式
-const getColorStyles = (color, isActive) => {
-  const colorMap = {
-    blue: {
-      active: 'bg-blue-500 text-white',
-      inactive: 'text-gray-500 hover:text-blue-500',
-      bg: 'hover:bg-blue-50',
-      hex: '#3b82f6'
-    },
-    green: {
-      active: 'bg-green-500 text-white',
-      inactive: 'text-gray-500 hover:text-green-500',
-      bg: 'hover:bg-green-50',
-      hex: '#22c55e'
-    },
-    purple: {
-      active: 'bg-purple-500 text-white',
-      inactive: 'text-gray-500 hover:text-purple-500',
-      bg: 'hover:bg-purple-50',
-      hex: '#a855f7'
-    },
-    orange: {
-      active: 'bg-orange-500 text-white',
-      inactive: 'text-gray-500 hover:text-orange-500',
-      bg: 'hover:bg-orange-50',
-      hex: '#f97316'
-    }
-  };
-  return colorMap[color] || colorMap.blue;
-};
 
 /**
  * TabBar 组件 - 底部导航栏
  * 
  * 功能：
- * - 首页快速入口
- * - 分类导航（学生管理、积分管理、班级事务、综合管理）
- * - 下拉式子菜单
- * - 页面切换
+ * - 固定在页面底部
+ * - 3-5个主导航项，横向等宽分布
+ * - 图标在上（24×24px），文字在下（12px）
+ * - 未选中状态：颜色 #333
+ * - 选中状态：颜色 #1aad19，图标和文字高亮，底部小圆点
+ * - 点击切换页面
+ * - 适配不同屏幕尺寸，底部安全区
  */
 export function TabBar({
   currentPage,
   onPageChange
 }) {
-  const [expandedCategory, setExpandedCategory] = useState(null);
-  const [activeCategory, setActiveCategory] = useState(null);
-
-  // 判断当前页面属于哪个分类
-  useEffect(() => {
-    let found = false;
-    for (const category of CATEGORIES) {
-      if (category.items && category.items.some(item => item.id === currentPage)) {
-        setActiveCategory(category.id);
-        found = true;
-        break;
-      }
-    }
-    if (!found) {
-      setActiveCategory(null);
-    }
-  }, [currentPage]);
-
   // 处理页面切换
   const handlePageChange = pageId => {
     console.log('[TabBar] 切换到页面:', pageId);
-    setExpandedCategory(null);
 
     // 验证页面 ID 是否有效
-    const validPageIds = ['home',
-    // 学生管理
-    'students', 'students-manage', 'student-growth', 'grades', 'certificates', 'volunteer',
-    // 积分管理
-    'points', 'dorm-points', 'exchange', 'points-manage', 'exchange-admin', 'points-settings',
-    // 班级事务
-    'seating-chart', 'groups', 'duty-roster', 'subjects', 'semester',
-    // 综合管理
-    'exam-monitor', 'ai-review', 'documents', 'discipline',
-    // 家长端
-    'parent-view'];
+    const validPageIds = ['home', 'students', 'points', 'seating-chart', 'exam-monitor'];
     if (!validPageIds.includes(pageId)) {
       console.error('[TabBar] 无效的页面 ID:', pageId, '有效页面列表:', validPageIds);
       return;
@@ -226,94 +68,35 @@ export function TabBar({
       console.error('[TabBar] onPageChange 函数未定义或不是函数');
     }
   };
+  return <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
+      {/* 底部安全区 - 适配 iPhone X 等设备 */}
+      <div className="pb-safe">
+        <div className="flex justify-around items-center h-[60px] max-w-7xl mx-auto px-2">
+          {NAV_ITEMS.map(item => {
+          const Icon = item.icon;
+          const isActive = currentPage === item.pageId || currentPage !== 'home' && item.id === 'student' && ['students', 'students-manage', 'student-growth', 'parent-view', 'grades', 'certificates', 'volunteer'].includes(currentPage) || item.id === 'points' && ['points', 'dorm-points', 'exchange', 'points-manage', 'exchange-admin', 'points-settings'].includes(currentPage) || item.id === 'class' && ['seating-chart', 'groups', 'duty-roster', 'subjects', 'semester', 'schedule-manage'].includes(currentPage) || item.id === 'comprehensive' && ['exam-monitor', 'ai-review', 'documents', 'discipline', 'notice-publish'].includes(currentPage);
+          return <button key={item.id} onClick={() => handlePageChange(item.pageId)} className={`flex flex-col items-center justify-center gap-1.5 px-2 py-1 rounded-lg transition-all duration-200 relative group ${isActive ? 'scale-105' : 'hover:scale-105'}`}>
+                  {/* 图标 */}
+                  <Icon className={`w-6 h-6 transition-all duration-200 ${isActive ? 'text-[#1aad19]' : 'text-[#333333]'}`} strokeWidth={2} />
 
-  // 切换分类展开状态
-  const toggleCategory = categoryId => {
-    if (expandedCategory === categoryId) {
-      setExpandedCategory(null);
-    } else {
-      setExpandedCategory(categoryId);
-    }
-  };
+                  {/* 文字 */}
+                  <span className={`text-[12px] font-medium transition-all duration-200 ${isActive ? 'text-[#1aad19] font-semibold' : 'text-[#333333]'}`}>
+                    {item.label}
+                  </span>
 
-  // 点击外部关闭展开的分类
-  useEffect(() => {
-    const handleClickOutside = () => {
-      setExpandedCategory(null);
-    };
-    if (expandedCategory) {
-      document.addEventListener('click', handleClickOutside);
-      return () => document.removeEventListener('click', handleClickOutside);
-    }
-  }, [expandedCategory]);
-  return <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-1 py-1 z-50 shadow-lg">
-      <div className="max-w-7xl mx-auto">
-        {/* 底部主导航 */}
-        <div className="flex justify-around items-center py-0.5">
-          {/* 首页按钮 */}
-          <button onClick={() => handlePageChange('home')} className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg transition-all duration-200 ${currentPage === 'home' ? 'bg-blue-500 text-white' : 'text-gray-500 hover:text-blue-500 hover:bg-blue-50'}`}>
-            <Home className="w-4.5 h-4.5" strokeWidth={2.5} />
-            <span className="text-[9px] font-medium leading-tight">首页</span>
-          </button>
-
-          {/* 分类按钮 */}
-          {CATEGORIES.map(category => {
-          const Icon = category.icon;
-          const isExpanded = expandedCategory === category.id;
-          const isActive = activeCategory === category.id;
-          const styles = getColorStyles(category.color, isActive);
-          return <div key={category.id} className="relative">
-                <button onClick={e => {
-              e.stopPropagation();
-              if (category.items && category.items.length > 0) {
-                toggleCategory(category.id);
-              } else {
-                handlePageChange(category.id);
-              }
-            }} className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg transition-all duration-200 ${isActive && !isExpanded ? styles.active : styles.inactive} ${styles.bg}`}>
-                  <div className="relative">
-                    <Icon className="w-4.5 h-4.5" strokeWidth={2.5} />
-                    {isActive && !isExpanded && <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>}
-                  </div>
-                  <span className="text-[9px] font-medium leading-tight">{category.label}</span>
-                </button>
-
-                {/* 展开的子菜单 */}
-                {isExpanded && <div className={`absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 
-                    bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden 
-                    min-w-[320px] animate-in slide-in-from-bottom-2 duration-200 z-[100]
-                  `}>
-                    <div className="p-2.5">
-                      <div className="flex items-center gap-2 mb-2 pb-2 border-b border-gray-100">
-                        <Icon className="w-4 h-4" style={{
-                    color: styles.hex
-                  }} />
-                        <span className="text-sm font-semibold text-gray-700">{category.label}</span>
-                        <span className="ml-auto text-xs text-gray-400">{category.items.length} 项</span>
-                      </div>
-                      <div className="grid grid-cols-3 gap-1.5">
-                        {category.items && category.items.map(item => {
-                    const ItemIcon = item.icon;
-                    const isItemActive = currentPage === item.id;
-                    const itemStyles = getColorStyles(category.color, isItemActive);
-                    return <button key={item.id} onClick={e => {
-                      e.stopPropagation();
-                      handlePageChange(item.id);
-                    }} className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all duration-200 ${isItemActive ? itemStyles.active : 'text-gray-600 hover:bg-gray-50'}`}>
-                              <ItemIcon className="w-4 h-4" strokeWidth={2.5} />
-                              <span className="text-[9px] font-medium">{item.label}</span>
-                            </button>;
-                  })}
-                      </div>
-                    </div>
-                    {/* 三角形箭头 */}
-                    <div className="absolute bottom-[-6px] left-1/2 transform -translate-x-1/2 
-                      w-3 h-3 bg-white border-r border-b border-gray-200 rotate-45 z-[-1]">
-                    </div>
-                  </div>}
-              </div>;
+                  {/* 选中状态 - 底部小圆点 */}
+                  {isActive && <div className="absolute bottom-1 w-1 h-1 bg-[#1aad19] rounded-full animate-pulse" />}
+                </button>;
         })}
         </div>
+
+        {/* 底部安全区域样式 */}
+        <style>{`
+          .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+          }
+        `}</style>
       </div>
     </nav>;
 }
+export default TabBar;

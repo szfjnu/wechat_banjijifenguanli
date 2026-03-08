@@ -5,6 +5,7 @@ import { useToast, Button, Input, Select, SelectContent, SelectItem, SelectTrigg
 // @ts-ignore;
 import { Activity, TrendingUp, BarChart3, Calendar, Filter, Download, Search, ArrowLeft, User, School, Award, AlertCircle, CalendarDays } from 'lucide-react';
 
+import { TabBar } from '@/components/TabBar';
 import { GrowthChart } from '@/components/GrowthChart';
 import { GrowthTimeline } from '@/components/GrowthTimeline';
 export default function StudentGrowth(props) {
@@ -14,6 +15,7 @@ export default function StudentGrowth(props) {
   const {
     toast
   } = useToast();
+  const [currentPage, setCurrentPage] = useState('students');
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [scoreRecords, setScoreRecords] = useState([]);
@@ -27,6 +29,9 @@ export default function StudentGrowth(props) {
   const [sortOrder, setSortOrder] = useState('desc');
   const [semesters, setSemesters] = useState([]);
   const [selectedSemester, setSelectedSemester] = useState('');
+  const handlePageChange = pageId => {
+    setCurrentPage(pageId);
+  };
 
   // 加载学期列表
   const loadSemesters = async () => {
@@ -383,5 +388,6 @@ export default function StudentGrowth(props) {
             </div>
           </div>}
       </div>
+      <TabBar currentPage={currentPage} onPageChange={handlePageChange} />
     </div>;
 }

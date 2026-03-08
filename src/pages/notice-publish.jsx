@@ -5,12 +5,14 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input, 
 // @ts-ignore;
 import { Bell, Send, Clock, Users, UserCheck, X, ChevronRight } from 'lucide-react';
 
+import { TabBar } from '@/components/TabBar';
 import { useForm } from 'react-hook-form';
 export default function NoticePublish(props) {
   const {
     toast
   } = useToast();
   const $w = props.$w;
+  const [currentPage, setCurrentPage] = useState('exam-monitor');
   const [loading, setLoading] = useState(false);
   const [students, setStudents] = useState([]);
   const [groups, setGroups] = useState([]);
@@ -20,6 +22,9 @@ export default function NoticePublish(props) {
   const [activeTab, setActiveTab] = useState('publish');
   const [targetType, setTargetType] = useState('all');
   const [noticeHistory, setNoticeHistory] = useState([]);
+  const handlePageChange = pageId => {
+    setCurrentPage(pageId);
+  };
 
   // 表单管理
   const form = useForm({
@@ -409,5 +414,6 @@ export default function NoticePublish(props) {
           </TabsContent>
         </Tabs>
       </div>
+      <TabBar currentPage={currentPage} onPageChange={handlePageChange} />
     </div>;
 }
