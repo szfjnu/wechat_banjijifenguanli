@@ -12,7 +12,7 @@ export default function NoticePublish(props) {
     toast
   } = useToast();
   const $w = props.$w;
-  const [currentPage, setCurrentPage] = useState('exam-monitor');
+  const [currentPage, setCurrentPage] = useState('notice-publish');
   const [loading, setLoading] = useState(false);
   const [students, setStudents] = useState([]);
   const [groups, setGroups] = useState([]);

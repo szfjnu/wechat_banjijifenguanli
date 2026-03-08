@@ -15,7 +15,7 @@ export default function StudentGrowth(props) {
   const {
     toast
   } = useToast();
-  const [currentPage, setCurrentPage] = useState('students');
+  const [currentPage, setCurrentPage] = useState('student-growth');
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [scoreRecords, setScoreRecords] = useState([]);
