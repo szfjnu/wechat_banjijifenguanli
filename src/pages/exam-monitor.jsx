@@ -1,5 +1,5 @@
 // @ts-ignore;
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 // @ts-ignore;
 import { GraduationCap, BookOpen, Award, TrendingUp, AlertCircle, CheckCircle, Clock, Search, Download, FileText, Plus, Flag, Info, Target } from 'lucide-react';
 // @ts-ignore;
