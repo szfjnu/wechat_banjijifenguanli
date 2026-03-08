@@ -87,126 +87,6 @@ const SEMESTERS = [{
   isCurrent: false
 }];
 
-// 模拟学生数据
-const MOCK_STUDENTS = [{
-  id: 1,
-  name: '张三',
-  studentId: '202401001',
-  group: '第一组',
-  totalPoints: 156
-}, {
-  id: 2,
-  name: '李四',
-  studentId: '202401002',
-  group: '第二组',
-  totalPoints: 148
-}, {
-  id: 3,
-  name: '王五',
-  studentId: '202401003',
-  group: '第一组',
-  totalPoints: 132
-}, {
-  id: 4,
-  name: '赵六',
-  studentId: '202401004',
-  group: '第三组',
-  totalPoints: 145
-}, {
-  id: 5,
-  name: '钱七',
-  studentId: '202401005',
-  group: '第二组',
-  totalPoints: 138
-}, {
-  id: 6,
-  name: '孙八',
-  studentId: '202401006',
-  group: '第三组',
-  totalPoints: 142
-}];
-
-// 模拟成绩数据
-const MOCK_GRADES = [{
-  id: 1,
-  studentId: 1,
-  studentName: '张三',
-  subjectId: 1,
-  subjectName: '语文',
-  score: 92,
-  credits: 3,
-  examDate: '2025-02-20',
-  semesterId: 2,
-  semesterName: '2024-2025第二学期',
-  isPassing: true,
-  remark: '优秀'
-}, {
-  id: 2,
-  studentId: 1,
-  studentName: '张三',
-  subjectId: 2,
-  subjectName: '数学',
-  score: 85,
-  credits: 4,
-  examDate: '2025-02-22',
-  semesterId: 2,
-  semesterName: '2024-2025第二学期',
-  isPassing: true,
-  remark: ''
-}, {
-  id: 3,
-  studentId: 2,
-  studentName: '李四',
-  subjectId: 2,
-  subjectName: '数学',
-  score: 58,
-  credits: 4,
-  examDate: '2025-02-22',
-  semesterId: 2,
-  semesterName: '2024-2025第二学期',
-  isPassing: false,
-  remark: '需补考'
-}, {
-  id: 4,
-  studentId: 3,
-  studentName: '王五',
-  subjectId: 3,
-  subjectName: '英语',
-  score: 78,
-  credits: 3,
-  examDate: '2025-02-25',
-  semesterId: 2,
-  semesterName: '2024-2025第二学期',
-  isPassing: true,
-  remark: ''
-}, {
-  id: 5,
-  studentId: 4,
-  studentName: '赵六',
-  subjectId: 4,
-  subjectName: '物理',
-  score: 95,
-  credits: 3,
-  examDate: '2025-02-28',
-  semesterId: 2,
-  semesterName: '2024-2025第二学期',
-  isPassing: true,
-  remark: '优秀'
-}, {
-  id: 6,
-  studentId: 5,
-  studentName: '钱七',
-  subjectId: 5,
-  subjectName: '化学',
-  score: 45,
-  credits: 2,
-  examDate: '2025-03-01',
-  semesterId: 2,
-  semesterName: '2024-2025第二学期',
-  isPassing: false,
-  remark: '需补考'
-}];
-
 // 计算GPA
 const calculateGPA = score => {
   if (score >= 90) return 4.0;
@@ -263,17 +143,55 @@ export default function GradesPage(props) {
   // 加载数据
   useEffect(() => {
     loadData();
+    loadStudents();
   }, []);
+  const loadStudents = async () => {
+    try {
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('students').get();
+      if (result.data && result.data.length > 0) {
+        const transformedStudents = result.data.map(student => ({
+          id: student._id,
+          name: student.name,
+          studentId: student.student_id || '',
+          group: student.group_id || student.group || '未分组',
+          totalPoints: student.current_score || 0
+        }));
+        setStudents(transformedStudents);
+      }
+    } catch (error) {
+      console.error('加载学生数据失败:', error);
+    }
+  };
   const loadData = async () => {
     try {
       setLoading(true);
-      // 模拟数据加载
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setGrades(MOCK_GRADES.map(g => ({
-        ...g,
-        gpa: calculateGPA(g.score)
-      })));
-      setStudents(MOCK_STUDENTS);
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('grade').orderBy('exam_date', 'desc').limit(100).get();
+      if (result.data && result.data.length > 0) {
+        const transformedGrades = result.data.map(g => ({
+          id: g._id,
+          studentId: g.student_id || 0,
+          studentName: g.student_name || '',
+          subjectId: g.subject_id || 0,
+          subjectName: g.subject_name || '',
+          semesterId: g.semester_id || 0,
+          semesterName: g.semester_name || '',
+          examType: g.exam_type || '',
+          score: g.score || 0,
+          credits: g.credits || 0,
+          examDate: g.exam_date ? g.exam_date.split('T')[0] : '',
+          rank: g.rank || null,
+          gpa: g.gpa || calculateGPA(g.score || 0),
+          isPassing: g.is_passing || false,
+          remark: g.remark || ''
+        }));
+        setGrades(transformedGrades);
+      } else {
+        setGrades([]);
+      }
     } catch (error) {
       console.error('加载数据失败:', error);
       toast({
@@ -333,11 +251,31 @@ export default function GradesPage(props) {
       return;
     }
     try {
-      const student = MOCK_STUDENTS.find(s => s.id === parseInt(formData.studentId));
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const student = students.find(s => s.id === parseInt(formData.studentId));
       const subject = SUBJECTS.find(sub => sub.id === parseInt(formData.subjectId));
       const semester = SEMESTERS.find(sem => sem.id === parseInt(formData.semesterId));
+
+      // 添加成绩到数据库
+      const result = await db.collection('grade').add({
+        student_id: parseInt(formData.studentId) || 0,
+        student_name: student.name,
+        subject_id: subject.id,
+        subject_name: subject.name,
+        semester_id: semester.id,
+        semester_name: semester.name,
+        exam_type: '期末',
+        score: score,
+        credits: subject.credits,
+        exam_date: formData.examDate,
+        rank: null,
+        gpa: calculateGPA(score),
+        is_passing: score >= 60,
+        remark: formData.remark
+      });
       const newGrade = {
-        id: Math.max(...grades.map(g => g.id), 0) + 1,
+        id: result.id || result.ids?.[0] || `GRADE${Date.now()}`,
         studentId: parseInt(formData.studentId),
         studentName: student.name,
         subjectId: subject.id,
@@ -399,7 +337,10 @@ export default function GradesPage(props) {
           return gradeDate.getMonth() === lastMonth.getMonth() && gradeDate.getFullYear() === lastMonth.getFullYear();
         });
       }
-      const csvContent = `学号,姓名,小组,学期,科目,分数,GPA,学分,考试日期,是否通过,备注\n${exportData.map(g => `${g.studentId},${g.studentName},${MOCK_STUDENTS.find(s => s.id === g.studentId)?.group || ''},${g.semesterName},${g.subjectName},${g.score},${g.gpa},${g.credits},${g.examDate},${g.isPassing ? '是' : '否'},${g.remark}`).join('\n')}`;
+      const csvContent = `学号,姓名,小组,学期,科目,分数,GPA,学分,考试日期,是否通过,备注\n${exportData.map(g => {
+        const student = students.find(s => s.id === g.studentId);
+        return `${g.studentId},${g.studentName},${student ? student.group : ''},${g.semesterName},${g.subjectName},${g.score},${g.gpa},${g.credits},${g.examDate},${g.isPassing ? '是' : '否'},${g.remark}`;
+      }).join('\n')}`;
       const blob = new Blob([csvContent], {
         type: 'text/csv;charset=utf-8;'
       });
@@ -470,7 +411,7 @@ export default function GradesPage(props) {
               </div>
               <select className="px-2 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-xs" value={filterStudent} onChange={e => setFilterStudent(e.target.value)}>
                 <option value="all">全部学生</option>
-                {MOCK_STUDENTS.map(student => <option key={student.id} value={student.id}>{student.name}</option>)}
+                {students.map(student => <option key={student.id} value={student.id}>{student.name}</option>)}
               </select>
               <select className="px-2 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-xs" value={filterSubject} onChange={e => setFilterSubject(e.target.value)}>
                 <option value="all">全部科目</option>
@@ -546,7 +487,7 @@ export default function GradesPage(props) {
                 studentId: e.target.value
               })}>
                     <option value="">请选择学生</option>
-                    {MOCK_STUDENTS.map(student => <option key={student.id} value={student.id}>{student.name} ({student.studentId})</option>)}
+                    {students.map(student => <option key={student.id} value={student.id}>{student.name} ({student.studentId})</option>)}
                   </select>
                 </div>
                 <div>
@@ -621,7 +562,7 @@ export default function GradesPage(props) {
                   </div>
                   <div>
                     <p className="font-medium text-gray-800">{selectedGrade.studentName}</p>
-                    <p className="text-sm text-gray-500">{MOCK_STUDENTS.find(s => s.id === selectedGrade.studentId)?.studentId}</p>
+                    <p className="text-sm text-gray-500">{students.find(s => s.id === selectedGrade.studentId)?.studentId}</p>
                   </div>
                 </div>
                 <div className={`p-4 rounded-lg border-2 ${getScoreLevelStyle(selectedGrade.score)}
