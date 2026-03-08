@@ -692,28 +692,28 @@ export default function ExchangePage({
           <div className="space-y-4">
             {selectedItem && selectedItem.name && <div>
                 <div className="text-sm text-gray-600 mb-1">物品名称</div>
-                <div className="font-semibold text-gray-900 mb-2">{selectedItem.name}</div>
+                <div className="font-semibold text-gray-900 mb-2">{selectedItem?.name || '-'}</div>
                 
                 <div className="text-sm text-gray-600 mb-1">当前最高分</div>
-                <div className="text-lg font-bold text-orange-600 mb-2">{selectedItem.currentHighestPoints || 0} 分</div>
+                <div className="text-lg font-bold text-orange-600 mb-2">{selectedItem?.currentHighestPoints || 0} 分</div>
                 
                 <div className="text-sm text-gray-600 mb-1">投标截止时间</div>
-                <div className="text-sm text-gray-900 mb-4">{selectedItem.biddingEndTime || '-'}</div>
+                <div className="text-sm text-gray-900 mb-4">{selectedItem?.biddingEndTime || '-'}</div>
                 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-900">投标积分 *</label>
                   <input type="number" value={bidPoints} onChange={e => setBidPoints(e.target.value)} placeholder="请输入投标积分" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
-                  <p className="text-xs text-gray-500">投标积分必须高于当前最高分 {selectedItem.currentHighestPoints || 0}分</p>
+                  <p className="text-xs text-gray-500">投标积分必须高于当前最高分 {selectedItem?.currentHighestPoints || 0}分</p>
                 </div>
                 
                 <div className="bg-gray-50 rounded-lg p-3 mt-4">
                   <div className="text-sm text-gray-600 mb-1">您的当前积分</div>
-                  <div className="text-lg font-bold text-gray-900">{currentStudent.totalPoints} 分</div>
+                  <div className="text-lg font-bold text-gray-900">{currentStudent?.totalPoints || 0} 分</div>
                 </div>
               </div>}
             
             <div className="flex gap-2 pt-2">
-              <Button onClick={handleSubmitBid} className="flex-1 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white">
+              <Button onClick={handleSubmitBid} disabled={!selectedItem || !selectedItem.name} className="flex-1 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed text-white">
                 提交投标
               </Button>
               <Button onClick={() => setBidDialogOpen(false)} variant="outline">
@@ -735,10 +735,10 @@ export default function ExchangePage({
           <div className="space-y-4">
             {selectedItem && selectedItem.name && <div>
                 <div className="text-sm text-gray-600 mb-1">物品名称</div>
-                <div className="font-semibold text-gray-900 mb-2">{selectedItem.name}</div>
+                <div className="font-semibold text-gray-900 mb-2">{selectedItem?.name || '-'}</div>
                 
                 <div className="text-sm text-gray-600 mb-1">所需积分</div>
-                <div className="text-lg font-bold text-orange-600 mb-4">-{selectedItem.pointsRequired || 0} 积分</div>
+                <div className="text-lg font-bold text-orange-600 mb-4">-{selectedItem?.pointsRequired || 0} 积分</div>
                 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-900">兑换备注</label>
@@ -747,12 +747,12 @@ export default function ExchangePage({
                 
                 <div className="bg-gray-50 rounded-lg p-3 mt-4">
                   <div className="text-sm text-gray-600 mb-1">兑换后剩余积分</div>
-                  <div className="text-lg font-bold text-gray-900">{currentStudent && selectedItem ? currentStudent.totalPoints - (selectedItem.pointsRequired || 0) : 0} 分</div>
+                  <div className="text-lg font-bold text-gray-900">{currentStudent && selectedItem ? currentStudent.totalPoints - (selectedItem?.pointsRequired || 0) : 0} 分</div>
                 </div>
               </div>}
             
             <div className="flex gap-2 pt-2">
-              <Button onClick={handleSubmitExchange} className="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white">
+              <Button onClick={handleSubmitExchange} disabled={!selectedItem || !selectedItem.name} className="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed text-white">
                 确认兑换
               </Button>
               <Button onClick={() => setExchangeDialogOpen(false)} variant="outline">
