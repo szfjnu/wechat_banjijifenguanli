@@ -114,7 +114,7 @@ export default function PointsSettings({
   const loadScoreItems = async () => {
     try {
       setLoading(true);
-      const tcb = await props.$w.cloud.getCloudInstance();
+      const tcb = await $w.cloud.getCloudInstance();
       const result = await tcb.database().collection('score_items').get();
       if (result.data && result.data.length > 0) {
         const transformedItems = result.data.map(item => ({
@@ -208,7 +208,7 @@ export default function PointsSettings({
       return;
     }
     try {
-      const tcb = await props.$w.cloud.getCloudInstance();
+      const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
       if (editingItem) {
         // 更新数据库
@@ -274,7 +274,7 @@ export default function PointsSettings({
   // 切换启用状态
   const handleToggleEnabled = async item => {
     try {
-      const tcb = await props.$w.cloud.getCloudInstance();
+      const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
 
       // 更新数据库中的启用状态
