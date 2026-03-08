@@ -8,25 +8,7 @@ import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 
-// 模拟文件数据
-const MOCK_FILES = [{
-  id: 1,
-  title: '班级管理制度汇编',
-  category: '规章制度',
-  description: '包含班级日常管理规定、奖惩制度、考勤制度等',
-  fileName: '班级管理制度汇编.pdf',
-  fileSize: '2.5MB',
-  fileType: 'PDF',
-  fileUrl: 'https://example.com/files/班级管理制度汇编.pdf',
-  isPinned: true,
-  permission: 'public',
-  uploadDate: '2025-01-10',
-  expiryDate: null,
-  uploader: '班主任',
-  viewCount: 156,
-  downloadCount: 89
-}, {
-  id: 2,
+export default function DocumentsPage({
   title: '学生安全须知',
   category: '安全教育',
   description: '校园安全、交通安全、食品安全等相关注意事项',

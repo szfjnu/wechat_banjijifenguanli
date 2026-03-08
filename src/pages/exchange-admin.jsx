@@ -24,6 +24,8 @@ export default function ExchangeAdmin({
     });
   };
   const [items, setItems] = useState([]);
+  const [biddingRecords, setBiddingRecords] = useState([]);
+  const [exchangeHistory, setExchangeHistory] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -209,8 +211,36 @@ export default function ExchangeAdmin({
   }];
   useEffect(() => {
     loadItemsData();
+    loadBiddingRecords();
     loadExchangeHistory();
   }, []);
+  const loadBiddingRecords = async () => {
+    try {
+      const tcb = await $w.cloud.getCloudInstance();
+      const result = await tcb.database().collection('redemption_requests').where({
+        status: 'pending'
+      }).orderBy('request_time', 'desc').limit(50).get();
+      if (result.data && result.data.length > 0) {
+        const transformedBiddingRecords = result.data.map(record => ({
+          id: record._id,
+          itemId: record.item_id,
+          itemName: record.item_name,
+          studentId: record.student_id,
+          studentName: record.student_name,
+          points: record.points_spent,
+          status: record.status === 'pending' ? 'active' : 'completed',
+          bidTime: record.request_time ? record.request_time.split('T')[0] : '',
+          isWinner: record.is_winner || false
+        }));
+        setBiddingRecords(transformedBiddingRecords);
+      } else {
+        setBiddingRecords([]);
+      }
+    } catch (error) {
+      console.error('加载投标记录失败:', error);
+      setBiddingRecords([]);
+    }
+  };
   const loadItemsData = async () => {
     try {
       const tcb = await $w.cloud.getCloudInstance();
@@ -522,8 +552,8 @@ export default function ExchangeAdmin({
     totalItems: items.length,
     availableItems: items.filter(i => i.status === 'available').length,
     biddingItems: items.filter(i => i.status === 'bidding').length,
-    totalExchanges: mockExchangeHistory.length,
-    totalPointsSpent: mockExchangeHistory.reduce((sum, h) => sum + h.points, 0)
+    totalExchanges: exchangeHistory.length,
+    totalPointsSpent: exchangeHistory.reduce((sum, h) => sum + h.points, 0)
   };
   return <div className="min-h-screen bg-gray-50 pb-16" style={style}>
       {/* Header */}
@@ -657,10 +687,10 @@ export default function ExchangeAdmin({
         {activeTab === 'bidding' && <div className="bg-white rounded-xl shadow-md p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-gray-800">投标记录</h2>
-              <span className="text-sm text-gray-500">共 {mockBiddingRecords.length} 条记录</span>
+              <span className="text-sm text-gray-500">共 {biddingRecords.length} 条记录</span>
             </div>
             <div className="space-y-4">
-              {mockBiddingRecords.map(record => <div key={record.id} className="border border-gray-200 rounded-lg p-4 hover:border-indigo-300 transition-colors">
+              {biddingRecords.map(record => <div key={record.id} className="border border-gray-200 rounded-lg p-4 hover:border-indigo-300 transition-colors">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
@@ -691,10 +721,10 @@ export default function ExchangeAdmin({
         {activeTab === 'history' && <div className="bg-white rounded-xl shadow-md p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-gray-800">兑换记录</h2>
-              <span className="text-sm text-gray-500">共 {mockExchangeHistory.length} 条记录</span>
+              <span className="text-sm text-gray-500">共 {exchangeHistory.length} 条记录</span>
             </div>
             <div className="space-y-3">
-              {mockExchangeHistory.map(record => <div key={record.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              {exchangeHistory.map(record => <div key={record.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
                       <CheckCircle2 className="w-5 h-5 text-indigo-600" />
