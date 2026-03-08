@@ -59,114 +59,6 @@ const CERTIFICATE_LEVELS = [{
   description: '国际级竞赛获奖',
   icon: Medal
 }];
-
-// 模拟学生数据
-const MOCK_STUDENTS = [{
-  id: 1,
-  name: '张三',
-  studentId: '202401001',
-  group: '第一组',
-  totalPoints: 156
-}, {
-  id: 2,
-  name: '李四',
-  studentId: '202401002',
-  group: '第二组',
-  totalPoints: 148
-}, {
-  id: 3,
-  name: '王五',
-  studentId: '202401003',
-  group: '第一组',
-  totalPoints: 132
-}, {
-  id: 4,
-  name: '赵六',
-  studentId: '202401004',
-  group: '第三组',
-  totalPoints: 145
-}, {
-  id: 5,
-  name: '钱七',
-  studentId: '202401005',
-  group: '第二组',
-  totalPoints: 138
-}, {
-  id: 6,
-  name: '孙八',
-  studentId: '202401006',
-  group: '第三组',
-  totalPoints: 140
-}];
-
-// 模拟证书数据
-const MOCK_CERTIFICATES = [{
-  id: 1,
-  studentId: 1,
-  studentName: '张三',
-  certificateName: '英语四级',
-  levelId: 3,
-  levelName: '高级证书',
-  points: 20,
-  date: '2025-02-15',
-  status: 'verified',
-  note: '全国大学生英语四级考试'
-}, {
-  id: 2,
-  studentId: 2,
-  studentName: '李四',
-  certificateName: '数学竞赛省级一等奖',
-  levelId: 5,
-  levelName: '省级获奖',
-  points: 25,
-  date: '2025-02-10',
-  status: 'verified',
-  note: '全国大学生数学竞赛'
-}, {
-  id: 3,
-  studentId: 1,
-  studentName: '张三',
-  certificateName: '计算机二级',
-  levelId: 2,
-  levelName: '中级证书',
-  points: 10,
-  date: '2025-01-20',
-  status: 'verified',
-  note: '全国计算机等级考试'
-}, {
-  id: 4,
-  studentId: 3,
-  studentName: '王五',
-  certificateName: '物理竞赛国家级二等奖',
-  levelId: 6,
-  levelName: '国家级获奖',
-  points: 40,
-  date: '2025-01-15',
-  status: 'verified',
-  note: '全国大学生物理竞赛'
-}, {
-  id: 5,
-  studentId: 4,
-  studentName: '赵六',
-  certificateName: '英语六级',
-  levelId: 3,
-  levelName: '高级证书',
-  points: 20,
-  date: '2025-02-01',
-  status: 'verified',
-  note: '全国大学生英语六级考试'
-}, {
-  id: 6,
-  studentId: 5,
-  studentName: '钱七',
-  certificateName: '编程竞赛省级三等奖',
-  levelId: 5,
-  levelName: '省级获奖',
-  points: 25,
-  date: '2025-02-20',
-  status: 'pending',
-  note: 'ACM程序设计竞赛'
-}];
 export default function CertificatesPage(props) {
   const {
     $w
@@ -192,6 +84,7 @@ export default function CertificatesPage(props) {
   const [filterLevel, setFilterLevel] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [uploading, setUploading] = useState(false);
+  const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [exportRange, setExportRange] = useState('all');
@@ -213,7 +106,27 @@ export default function CertificatesPage(props) {
   });
   useEffect(() => {
     loadCertificates();
+    loadStudents();
   }, []);
+  const loadStudents = async () => {
+    try {
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('students').get();
+      if (result.data && result.data.length > 0) {
+        const transformedStudents = result.data.map(student => ({
+          id: student._id,
+          name: student.name,
+          studentId: student.student_id,
+          group: student.group_id || student.group || '未分组',
+          totalPoints: student.current_score || 0
+        }));
+        setStudents(transformedStudents);
+      }
+    } catch (error) {
+      console.error('加载学生数据失败:', error);
+    }
+  };
   useEffect(() => {
     filterCertificates();
     calculateStats();
@@ -221,10 +134,30 @@ export default function CertificatesPage(props) {
   const loadCertificates = async () => {
     try {
       setLoading(true);
-      // 模拟数据加载（后续替换为真实数据源调用）
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setCertificates(MOCK_CERTIFICATES);
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('certificate').orderBy('issue_date', 'desc').limit(50).get();
+      if (result.data && result.data.length > 0) {
+        const transformedCertificates = result.data.map(cert => ({
+          id: cert._id,
+          studentId: cert.student_id || 0,
+          studentName: cert.student_name || '未知',
+          certificateName: cert.certificate_name || '',
+          levelId: cert.level_id || 0,
+          levelName: cert.level_name || '未知',
+          points: cert.points || 0,
+          date: cert.issue_date || '',
+          expiryDate: cert.expiry_date || '',
+          category: cert.category || '',
+          issuingOrganization: cert.issuing_organization || '',
+          imageAttachment: cert.image_attachment || '',
+          status: cert.status || 'pending',
+          note: cert.note || ''
+        }));
+        setCertificates(transformedCertificates);
+      }
     } catch (error) {
+      console.error('加载证书数据失败:', error);
       toast({
         title: '加载失败',
         description: '无法加载证书数据',
@@ -351,10 +284,29 @@ export default function CertificatesPage(props) {
     }
     try {
       setUploading(true);
-      const student = MOCK_STUDENTS.find(s => s.id === parseInt(formData.studentId));
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const student = students.find(s => s.id === parseInt(formData.studentId));
       const level = CERTIFICATE_LEVELS.find(l => l.id === parseInt(formData.levelId));
+
+      // 添加证书到数据库
+      const result = await db.collection('certificate').add({
+        student_id: parseInt(formData.studentId) || 0,
+        student_name: student.name,
+        certificate_name: formData.certificateName,
+        category: '其他',
+        level_id: level.id,
+        level_name: level.name,
+        points: level.points,
+        issuing_organization: '教务处',
+        issue_date: formData.date,
+        expiry_date: null,
+        image_attachment: '',
+        status: 'pending',
+        note: formData.note
+      });
       const newCertificate = {
-        id: Math.max(...certificates.map(c => c.id), 0) + 1,
+        id: result.id || result.ids?.[0] || `CERT${Date.now()}`,
         studentId: parseInt(formData.studentId),
         studentName: student.name,
         certificateName: formData.certificateName,
@@ -414,7 +366,10 @@ export default function CertificatesPage(props) {
         });
       }
       // 模拟导出
-      const csvContent = `学生姓名,学号,证书名称,级别,积分,日期,状态,备注\n${exportData.map(c => `${c.studentName},${MOCK_STUDENTS.find(s => s.id === c.studentId).studentId},${c.certificateName},${c.levelName},${c.points},${c.date},${c.status},${c.note}`).join('\n')}`;
+      const csvContent = `学生姓名,学号,证书名称,级别,积分,日期,状态,备注\n${exportData.map(c => {
+        const student = students.find(s => s.id === c.studentId);
+        return `${c.studentName},${student ? student.studentId : ''},${c.certificateName},${c.levelName},${c.points},${c.date},${c.status},${c.note}`;
+      }).join('\n')}`;
       const blob = new Blob([csvContent], {
         type: 'text/csv;charset=utf-8;'
       });
@@ -496,7 +451,7 @@ export default function CertificatesPage(props) {
               </div>
               <select className="px-2 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-xs" value={filterStudent} onChange={e => setFilterStudent(e.target.value)}>
                 <option value="all">全部学生</option>
-                {MOCK_STUDENTS.map(student => <option key={student.id} value={student.id}>{student.name}</option>)}
+                {students.map(student => <option key={student.id} value={student.id}>{student.name}</option>)}
               </select>
             </div>
           </div>
@@ -570,7 +525,7 @@ export default function CertificatesPage(props) {
               studentId: e.target.value
             })}>
                     <option value="">请选择学生</option>
-                    {MOCK_STUDENTS.map(student => <option key={student.id} value={student.id}>{student.name} ({student.studentId})</option>)}
+                    {students.map(student => <option key={student.id} value={student.id}>{student.name} ({student.studentId})</option>)}
                   </select>
                 </div>
                 <div>

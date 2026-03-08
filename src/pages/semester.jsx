@@ -7,30 +7,6 @@ import { Button, useToast } from '@/components/ui';
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
-
-// 模拟学期数据
-const MOCK_SEMESTERS = [{
-  id: 1,
-  name: '2024-2025第一学期',
-  startDate: '2024-09-01',
-  endDate: '2025-01-20',
-  isCurrent: true,
-  createdAt: '2024-08-20T10:00:00'
-}, {
-  id: 2,
-  name: '2024-2025第二学期',
-  startDate: '2025-02-15',
-  endDate: '2025-07-10',
-  isCurrent: false,
-  createdAt: '2024-12-15T14:30:00'
-}, {
-  id: 3,
-  name: '2025-2026第一学期',
-  startDate: '2025-09-01',
-  endDate: '2026-01-20',
-  isCurrent: false,
-  createdAt: '2025-08-20T10:00:00'
-}];
 export default function SemesterPage(props) {
   const {
     toast
@@ -50,15 +26,19 @@ export default function SemesterPage(props) {
     try {
       setLoading(true);
       const tcb = await props.$w.cloud.getCloudInstance();
-      const result = await tcb.database().collection('semesters').get();
+      const db = tcb.database();
+      const result = await db.collection('semester').orderBy('start_date', 'desc').limit(50).get();
       if (result.data && result.data.length > 0) {
         const transformedSemesters = result.data.map(sem => ({
           id: sem._id,
           name: sem.semester_name,
           startDate: sem.start_date ? sem.start_date.split('T')[0] : '',
           endDate: sem.end_date ? sem.end_date.split('T')[0] : '',
-          isCurrent: sem.is_current,
-          createdAt: sem.created_at
+          isCurrent: sem.is_current || false,
+          isAutomated: sem.is_automated || false,
+          resetConfig: sem.reset_config || {},
+          note: sem.note || '',
+          createdAt: sem.createdAt
         }));
         setSemesters(transformedSemesters);
       } else {
@@ -142,7 +122,7 @@ export default function SemesterPage(props) {
   };
 
   // 创建学期
-  const handleCreateSemester = () => {
+  const handleCreateSemester = async () => {
     if (!newSemester.name || !newSemester.startDate || !newSemester.endDate) {
       toast({
         title: '提示',
@@ -176,45 +156,102 @@ export default function SemesterPage(props) {
       });
       return;
     }
-    const createdSemester = {
-      id: semesters.length + 1,
-      name: newSemester.name,
-      startDate: newSemester.startDate,
-      endDate: newSemester.endDate,
-      isCurrent: false,
-      createdAt: new Date().toISOString()
-    };
-    setSemesters([...semesters, createdSemester]);
-    setNewSemester({
-      name: '',
-      startDate: '',
-      endDate: ''
-    });
-    setShowCreateDialog(false);
-    toast({
-      title: '创建成功',
-      description: `学期“${newSemester.name}”已创建`
-    });
-    console.log('[模拟] 创建学期:', createdSemester);
+    try {
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+
+      // 添加学期到数据库
+      const result = await db.collection('semester').add({
+        semester_name: newSemester.name,
+        start_date: newSemester.startDate,
+        end_date: newSemester.endDate,
+        is_current: false,
+        is_automated: true,
+        reset_config: {
+          reset_points: true,
+          reset_dorm_points: true,
+          reset_tasks: true,
+          reset_date: newSemester.endDate
+        },
+        note: ''
+      });
+      const createdSemester = {
+        id: result.id || result.ids?.[0] || `SEM${Date.now()}`,
+        name: newSemester.name,
+        startDate: newSemester.startDate,
+        endDate: newSemester.endDate,
+        isCurrent: false,
+        isAutomated: true,
+        resetConfig: {
+          reset_points: true,
+          reset_dorm_points: true,
+          reset_tasks: true,
+          reset_date: newSemester.endDate
+        },
+        note: '',
+        createdAt: new Date().toISOString()
+      };
+      setSemesters([...semesters, createdSemester]);
+      setNewSemester({
+        name: '',
+        startDate: '',
+        endDate: ''
+      });
+      setShowCreateDialog(false);
+      toast({
+        title: '创建成功',
+        description: `学期“${newSemester.name}”已创建`
+      });
+    } catch (error) {
+      console.error('创建失败:', error);
+      toast({
+        title: '创建失败',
+        description: error.message,
+        variant: 'destructive'
+      });
+    }
   };
 
   // 设置当前学期
-  const handleSetCurrent = semesterId => {
-    const updatedSemesters = semesters.map(sem => ({
-      ...sem,
-      isCurrent: sem.id === semesterId
-    }));
-    setSemesters(updatedSemesters);
-    const semester = semesters.find(s => s.id === semesterId);
-    toast({
-      title: '设置成功',
-      description: `已设置“${semester.name}”为当前学期`
-    });
-    console.log('[模拟] 设置当前学期:', semester);
+  const handleSetCurrent = async semesterId => {
+    try {
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const updatedSemesters = semesters.map(sem => ({
+        ...sem,
+        isCurrent: sem.id === semesterId
+      }));
+
+      // 更新数据库中的学期状态
+      const semester = semesters.find(s => s.id === semesterId);
+      if (semester) {
+        await db.collection('semester').doc(semester.id).update({
+          is_current: true
+        });
+
+        // 更新其他学期的状态
+        await Promise.all(semesters.filter(s => s.id !== semesterId).map(s => db.collection('semester').doc(s.id).update({
+          is_current: false
+        })));
+      }
+      setSemesters(updatedSemesters);
+      const currentSemester = semesters.find(s => s.id === semesterId);
+      toast({
+        title: '设置成功',
+        description: `已设置“${currentSemester.name}”为当前学期`
+      });
+    } catch (error) {
+      console.error('设置失败:', error);
+      toast({
+        title: '设置失败',
+        description: error.message,
+        variant: 'destructive'
+      });
+    }
   };
 
   // 编辑学期
-  const handleEditSemester = () => {
+  const handleEditSemester = async () => {
     if (!editingSemester.name || !editingSemester.startDate || !editingSemester.endDate) {
       toast({
         title: '提示',
@@ -231,19 +268,36 @@ export default function SemesterPage(props) {
       });
       return;
     }
-    const updatedSemesters = semesters.map(sem => sem.id === editingSemester.id ? editingSemester : sem);
-    setSemesters(updatedSemesters);
-    setEditingSemester(null);
-    setShowEditDialog(false);
-    toast({
-      title: '修改成功',
-      description: `学期“${editingSemester.name}”已更新`
-    });
-    console.log('[模拟] 编辑学期:', editingSemester);
+    try {
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+
+      // 更新数据库中的学期信息
+      await db.collection('semester').doc(editingSemester.id).update({
+        semester_name: editingSemester.name,
+        start_date: editingSemester.startDate,
+        end_date: editingSemester.endDate
+      });
+      const updatedSemesters = semesters.map(sem => sem.id === editingSemester.id ? editingSemester : sem);
+      setSemesters(updatedSemesters);
+      setEditingSemester(null);
+      setShowEditDialog(false);
+      toast({
+        title: '修改成功',
+        description: `学期“${editingSemester.name}”已更新`
+      });
+    } catch (error) {
+      console.error('修改失败:', error);
+      toast({
+        title: '修改失败',
+        description: error.message,
+        variant: 'destructive'
+      });
+    }
   };
 
   // 删除学期
-  const handleDeleteSemester = semesterId => {
+  const handleDeleteSemester = async semesterId => {
     const semester = semesters.find(s => s.id === semesterId);
     if (semester.isCurrent) {
       toast({
@@ -253,13 +307,26 @@ export default function SemesterPage(props) {
       });
       return;
     }
-    const updatedSemesters = semesters.filter(s => s.id !== semesterId);
-    setSemesters(updatedSemesters);
-    toast({
-      title: '删除成功',
-      description: `学期“${semester.name}”已删除`
-    });
-    console.log('[模拟] 删除学期:', semester);
+    try {
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+
+      // 从数据库中删除学期
+      await db.collection('semester').doc(semesterId).remove();
+      const updatedSemesters = semesters.filter(s => s.id !== semesterId);
+      setSemesters(updatedSemesters);
+      toast({
+        title: '删除成功',
+        description: `学期“${semester.name}”已删除`
+      });
+    } catch (error) {
+      console.error('删除失败:', error);
+      toast({
+        title: '删除失败',
+        description: error.message,
+        variant: 'destructive'
+      });
+    }
   };
 
   // 打开编辑对话框
