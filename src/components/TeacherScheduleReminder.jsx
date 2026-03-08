@@ -10,12 +10,15 @@ export function TeacherScheduleReminder(props) {
     $w
   } = props;
   const [todaySchedule, setTodaySchedule] = useState([]);
+  const [reminders, setReminders] = useState([]);
+  const [showReminders, setShowReminders] = useState(false);
   const [currentSection, setCurrentSection] = useState(null);
   const [nextClass, setNextClass] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
   useEffect(() => {
     loadTodaySchedule();
+    loadReminders();
     updateTime();
     const timer = setInterval(updateTime, 60000);
     return () => clearInterval(timer);
@@ -92,6 +95,40 @@ export function TeacherScheduleReminder(props) {
     }
     setCurrentSection(current);
     setNextClass(next);
+  };
+  const loadReminders = async () => {
+    try {
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('reminder_config').where({
+        is_enabled: true,
+        status: 'active'
+      }).orderBy('reminder_time', 'asc').get();
+      if (result.data && result.data.length > 0) {
+        const transformedReminders = result.data.map(reminder => ({
+          id: reminder._id,
+          reminderId: reminder.reminder_id,
+          reminderType: reminder.reminder_type,
+          reminderName: reminder.reminder_name,
+          reminderContent: reminder.reminder_content,
+          reminderMethod: reminder.reminder_method,
+          reminderFrequency: reminder.reminder_frequency,
+          reminderTime: reminder.reminder_time,
+          targetType: reminder.target_type,
+          targetIds: reminder.target_ids || [],
+          targetNames: reminder.target_names || [],
+          isAuto: reminder.is_auto,
+          lastReminderTime: reminder.last_reminder_time,
+          reminderCount: reminder.reminder_count,
+          status: reminder.status
+        }));
+        setReminders(transformedReminders);
+      } else {
+        setReminders([]);
+      }
+    } catch (error) {
+      console.error('加载提醒数据失败:', error);
+    }
   };
   const loadTodaySchedule = async () => {
     try {
@@ -182,11 +219,17 @@ export function TeacherScheduleReminder(props) {
             </span>
           </h3>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-3">
           <Clock className="w-4 h-4 text-white" />
           <span className="text-white text-sm font-mono">
             {formatTime(currentTime)}
           </span>
+          <button className="relative p-1 hover:bg-amber-400 rounded-full transition-colors" onClick={() => setShowReminders(!showReminders)}>
+            <Bell className="w-4 h-4 text-white" />
+            {reminders.filter(r => r.isAuto && r.reminderCount > 0).length > 0 && <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                  {reminders.filter(r => r.isAuto && r.reminderCount > 0).length}
+                </span>}
+          </button>
         </div>
       </div>
 
