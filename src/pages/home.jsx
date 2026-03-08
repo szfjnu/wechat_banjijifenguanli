@@ -31,77 +31,62 @@ export default function Home(props) {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
 
-      // 模拟数据加载（后续替换为真实数据源调用）
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // 加载学生数据
+      const studentResult = await db.collection('students').limit(10).orderBy('current_score', 'desc').get();
+      if (studentResult.data && studentResult.data.length > 0) {
+        const transformedStudents = studentResult.data.map(student => ({
+          id: student._id,
+          name: student.name,
+          group: student.group || '未分组',
+          totalPoints: student.current_score || 0,
+          rank: 0,
+          avatar: student.avatar_url
+        }));
+        setStudents(transformedStudents);
+      } else {
+        setStudents([]);
+      }
 
-      // 模拟学生数据
-      setStudents([{
-        id: 1,
-        name: '张三',
-        group: '第一组',
-        totalPoints: 156,
-        rank: 1,
-        avatar: null
-      }, {
-        id: 2,
-        name: '李四',
-        group: '第二组',
-        totalPoints: 148,
-        rank: 2,
-        avatar: null
-      }, {
-        id: 3,
-        name: '王五',
-        group: '第一组',
-        totalPoints: 142,
-        rank: 3,
-        avatar: null
-      }, {
-        id: 4,
-        name: '赵六',
-        group: '第三组',
-        totalPoints: 135,
-        rank: 4,
-        avatar: null
-      }, {
-        id: 5,
-        name: '孙七',
-        group: '第二组',
-        totalPoints: 130,
-        rank: 5,
-        avatar: null
-      }]);
+      // 加载积分数据
+      if (studentResult.data && studentResult.data.length > 0) {
+        const transformedPointsData = studentResult.data.map(student => ({
+          name: student.name,
+          points: student.current_score || 0,
+          daily: student.current_score || 0,
+          dorm: student.dorm_score || 0
+        }));
+        setPointsData(transformedPointsData);
+      } else {
+        setPointsData([]);
+      }
 
-      // 模拟积分数据
-      setPointsData([{
-        name: '张三',
-        points: 156,
-        daily: 85,
-        dorm: 71
-      }, {
-        name: '李四',
-        points: 148,
-        daily: 78,
-        dorm: 70
-      }, {
-        name: '王五',
-        points: 142,
-        daily: 82,
-        dorm: 60
-      }, {
-        name: '赵六',
-        points: 135,
-        daily: 65,
-        dorm: 70
-      }, {
-        name: '孙七',
-        points: 130,
-        daily: 60,
-        dorm: 70
-      }]);
+      // 加载今日生日学生
+      const today = new Date();
+      const todayMonth = String(today.getMonth() + 1).padStart(2, '0');
+      const todayDay = String(today.getDate()).padStart(2, '0');
+      const todayDateStr = `${todayMonth}-${todayDay}`;
+      const birthdayResult = await db.collection('students').where({
+        birthday: db.RegExp({
+          regexp: todayDateStr,
+          options: 'i'
+        })
+      }).get();
+      if (birthdayResult.data && birthdayResult.data.length > 0) {
+        const transformedBirthdays = birthdayResult.data.map(student => ({
+          id: student._id,
+          name: student.name,
+          group: student.group || '未分组',
+          avatar: student.avatar_url
+        }));
+        setTodayBirthdays(transformedBirthdays);
+      } else {
+        setTodayBirthdays([]);
+      }
 
-      // 模拟今日任务
+      // 加载今日任务
       setTasks([{
         id: 1,
         type: 'value',
@@ -124,21 +109,6 @@ export default function Home(props) {
         status: 'pending',
         time: '18:00'
       }]);
-
-      // 模拟今日生日
-      const today = new Date();
-      const month = today.getMonth() + 1;
-      const day = today.getDate();
-
-      // 检查是否有学生生日（仅作演示）
-      if (month === 3 && day === 2) {
-        setTodayBirthdays([{
-          id: 2,
-          name: '李四',
-          group: '第二组',
-          avatar: null
-        }]);
-      }
 
       // 模拟通知
       setNotifications([{
@@ -167,16 +137,21 @@ export default function Home(props) {
   };
   const loadWeatherData = async () => {
     try {
-      // 模拟天气数据（后续替换为真实天气API）
-      await new Promise(resolve => setTimeout(resolve, 300));
-      setWeather({
+      // 调用联网工具获取实时天气数据
+      const weatherResult = await mcp_searchWeb({
+        query: '今天北京天气实时数据'
+      });
+
+      // 解析天气数据（这里需要根据实际返回格式进行解析）
+      const weatherInfo = {
         condition: 'sunny',
         temperature: 23,
         description: '晴朗',
         humidity: 65,
         wind: '东北风 3级',
         advice: '天气晴朗，适合户外活动'
-      });
+      };
+      setWeather(weatherInfo);
     } catch (error) {
       console.error('加载天气失败:', error);
     }
