@@ -50,132 +50,6 @@ const ACTIVITY_TYPES = [{
   pointsPerHour: 2,
   category: '其他'
 }];
-
-// 模拟学生数据
-const MOCK_STUDENTS = [{
-  id: 1,
-  studentId: '2024001',
-  name: '张三',
-  group: '第一组',
-  totalPoints: 156
-}, {
-  id: 2,
-  studentId: '2024002',
-  name: '李四',
-  group: '第一组',
-  totalPoints: 143
-}, {
-  id: 3,
-  studentId: '2024003',
-  name: '王五',
-  group: '第二组',
-  totalPoints: 138
-}, {
-  id: 4,
-  studentId: '2024004',
-  name: '赵六',
-  group: '第二组',
-  totalPoints: 165
-}, {
-  id: 5,
-  studentId: '2024005',
-  name: '钱七',
-  group: '第三组',
-  totalPoints: 152
-}, {
-  id: 6,
-  studentId: '2024006',
-  name: '孙八',
-  group: '第三组',
-  totalPoints: 149
-}, {
-  id: 7,
-  studentId: '2024007',
-  name: '周九',
-  group: '第一组',
-  totalPoints: 140
-}, {
-  id: 8,
-  studentId: '2024008',
-  name: '吴十',
-  group: '第一组',
-  totalPoints: 158
-}, {
-  id: 9,
-  studentId: '2024009',
-  name: '郑十一',
-  group: '第二组',
-  totalPoints: 147
-}, {
-  id: 10,
-  studentId: '2024010',
-  name: '王十二',
-  group: '第二组',
-  totalPoints: 160
-}];
-
-// 模拟历史记录数据
-const MOCK_HISTORY = [{
-  id: 1,
-  studentId: '2024001',
-  studentName: '张三',
-  group: '第一组',
-  activityName: '社区清洁',
-  activityCategory: '环保',
-  duration: 2,
-  points: 4,
-  date: '2025-03-01',
-  note: '社区公园清扫活动',
-  operator: '管理员'
-}, {
-  id: 2,
-  studentId: '2024002',
-  studentName: '李四',
-  group: '第一组',
-  activityName: '图书馆整理',
-  activityCategory: '校园',
-  duration: 1.5,
-  points: 3,
-  date: '2025-03-02',
-  note: '协助图书管理员整理书籍',
-  operator: '管理员'
-}, {
-  id: 3,
-  studentId: '2024004',
-  studentName: '赵六',
-  group: '第二组',
-  activityName: '敬老院慰问',
-  activityCategory: '社会',
-  duration: 3,
-  points: 6,
-  date: '2025-03-03',
-  note: '为老人表演节目，陪老人聊天',
-  operator: '管理员'
-}, {
-  id: 4,
-  studentId: '2024005',
-  studentName: '钱七',
-  group: '第三组',
-  activityName: '交通文明劝导',
-  activityCategory: '社会',
-  duration: 2,
-  points: 4,
-  date: '2025-03-04',
-  note: '十字路口交通疏导',
-  operator: '管理员'
-}, {
-  id: 5,
-  studentId: '2024003',
-  studentName: '王五',
-  group: '第二组',
-  activityName: '环保宣传活动',
-  activityCategory: '环保',
-  duration: 1,
-  points: 2,
-  date: '2025-03-05',
-  note: '校园垃圾分类宣传',
-  operator: '管理员'
-}];
 export default function VolunteerPage({
   className = '',
   style = {},
@@ -192,7 +66,67 @@ export default function VolunteerPage({
       params: {}
     });
   };
-  const [history, setHistory] = useState(MOCK_HISTORY);
+
+  // 加载数据
+  useEffect(() => {
+    loadStudentsData();
+    loadHistoryData();
+  }, []);
+  const loadStudentsData = async () => {
+    try {
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('students').get();
+      if (result.data && result.data.length > 0) {
+        const transformedStudents = result.data.map(student => ({
+          id: student._id,
+          studentId: student.student_id,
+          name: student.name,
+          group: student.group_id || student.group || '未分组',
+          totalPoints: student.current_score || 0
+        }));
+        setStudents(transformedStudents);
+      }
+    } catch (error) {
+      console.error('加载学生数据失败:', error);
+    }
+  };
+  const loadHistoryData = async () => {
+    try {
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('volunteer_records').orderBy('date', 'desc').limit(50).get();
+      if (result.data && result.data.length > 0) {
+        const transformedHistory = result.data.map(record => ({
+          id: record._id,
+          studentId: record.student_id || '',
+          studentName: record.student_name || '未知',
+          group: record.group_name || '',
+          activityName: record.activity_name || '',
+          activityCategory: record.service_type || '其他',
+          duration: record.duration || 0,
+          points: record.earned_score || 0,
+          date: record.date || '',
+          location: record.location || '',
+          organization: record.organization || '',
+          description: record.description || '',
+          note: record.note || '',
+          isVerified: record.is_verified || false,
+          verifierName: record.verifier_name || '',
+          verificationTime: record.verification_time || '',
+          recorderName: record.recorder_name || '管理员',
+          semesterId: record.semester_id || '',
+          semesterName: record.semester_name || '',
+          proofMaterials: record.proof_materials || record.proof_images || []
+        }));
+        setHistory(transformedHistory);
+      }
+    } catch (error) {
+      console.error('加载志愿服务记录失败:', error);
+    }
+  };
+  const [students, setStudents] = useState([]);
+  const [history, setHistory] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStudent, setFilterStudent] = useState('all');
   const [filterActivity, setFilterActivity] = useState('all');
@@ -370,7 +304,7 @@ export default function VolunteerPage({
                       studentId: e.target.value
                     })} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-300">
                         <option value="">请选择学生</option>
-                        {MOCK_STUDENTS.map(student => <option key={student.studentId} value={student.studentId}>{student.studentId} - {student.name} ({student.group}) - 当前积分: {student.totalPoints}</option>)}
+                        {students.map(student => <option key={student.studentId} value={student.studentId}>{student.studentId} - {student.name} ({student.group}) - 当前积分: {student.totalPoints}</option>)}
                       </select>
                     </div>
                     <div>

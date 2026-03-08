@@ -1,0 +1,129 @@
+{
+  "name": "exam_monitor",
+  "title": "转段考监控与提醒",
+  "schemas": [
+    {
+      "name": "monitor_id",
+      "title": "监控记录ID",
+      "type": "String"
+    },
+    {
+      "name": "exam_name",
+      "title": "考试名称",
+      "type": "String"
+    },
+    {
+      "name": "exam_type",
+      "title": "考试类型",
+      "type": "String"
+    },
+    {
+      "name": "exam_date",
+      "title": "考试日期",
+      "type": "Date",
+      "format": "string"
+    },
+    {
+      "name": "exam_time",
+      "title": "考试时间",
+      "type": "String"
+    },
+    {
+      "name": "location",
+      "title": "考试地点",
+      "type": "String"
+    },
+    {
+      "name": "description",
+      "title": "考试说明",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "subject_ids",
+      "title": "科目ID数组",
+      "type": "Array",
+      "items": {
+        "type": "Number"
+      }
+    },
+    {
+      "name": "subject_names",
+      "title": "科目名称数组",
+      "type": "Array",
+      "items": {
+        "type": "String"
+      }
+    },
+    {
+      "name": "student_id",
+      "title": "关联学生ID",
+      "type": "String"
+    },
+    {
+      "name": "student_name",
+      "title": "学生姓名",
+      "type": "String"
+    },
+    {
+      "name": "student_id_number",
+      "title": "学号",
+      "type": "String"
+    },
+    {
+      "name": "monitor_status",
+      "title": "监控状态",
+      "type": "String"
+    },
+    {
+      "name": "overall_score",
+      "title": "总分",
+      "type": "Number"
+    },
+    {
+      "name": "average_score",
+      "title": "平均分",
+      "type": "Number"
+    },
+    {
+      "name": "passing_count",
+      "title": "及格科目数",
+      "type": "Number"
+    },
+    {
+      "name": "total_subjects",
+      "title": "总科目数",
+      "type": "Number"
+    },
+    {
+      "name": "is_all_passed",
+      "title": "是否全部及格",
+      "type": "Boolean"
+    },
+    {
+      "name": "violation_records",
+      "title": "违规记录",
+      "type": "Array",
+      "items": {
+        "type": "Object"
+      }
+    },
+    {
+      "name": "reminder_records",
+      "title": "提醒记录",
+      "type": "Array",
+      "items": {
+        "type": "Object"
+      }
+    },
+    {
+      "name": "semester_id",
+      "title": "关联学期ID",
+      "type": "Number"
+    },
+    {
+      "name": "semester_name",
+      "title": "学期名称",
+      "type": "String"
+    }
+  ]
+}

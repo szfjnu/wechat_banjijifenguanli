@@ -61,90 +61,6 @@ const DEDUCTION_ITEMS = [{
   category: '纪律'
 }];
 
-// 模拟住宿生数据（仅包含住宿生）
-const MOCK_DORM_STUDENTS = [{
-  id: 1,
-  name: '张三',
-  studentId: '202401001',
-  group: '第一组',
-  dormRoom: '301',
-  isBoarding: true,
-  dormPoints: 100,
-  convertedPoints: 0,
-  // 默认折算比例30%
-  totalPoints: 156
-}, {
-  id: 2,
-  name: '李四',
-  studentId: '202401002',
-  group: '第二组',
-  dormRoom: '301',
-  isBoarding: true,
-  dormPoints: 85,
-  convertedPoints: -4.5,
-  totalPoints: 148
-}, {
-  id: 3,
-  name: '王五',
-  studentId: '202401003',
-  group: '第一组',
-  dormRoom: '302',
-  isBoarding: true,
-  dormPoints: 70,
-  convertedPoints: -9,
-  totalPoints: 142
-}, {
-  id: 4,
-  name: '赵六',
-  studentId: '202401004',
-  group: '第三组',
-  dormRoom: '303',
-  isBoarding: true,
-  dormPoints: 55,
-  convertedPoints: -13.5,
-  totalPoints: 135
-}, {
-  id: 5,
-  name: '孙七',
-  studentId: '202401005',
-  group: '第二组',
-  dormRoom: '304',
-  isBoarding: true,
-  dormPoints: 100,
-  convertedPoints: 0,
-  totalPoints: 130
-}, {
-  id: 6,
-  name: '周八',
-  studentId: '202401006',
-  group: '第三组',
-  dormRoom: '305',
-  isBoarding: true,
-  dormPoints: 90,
-  convertedPoints: -3,
-  totalPoints: 125
-}, {
-  id: 7,
-  name: '吴九',
-  studentId: '202401007',
-  group: '第一组',
-  dormRoom: '306',
-  isBoarding: true,
-  dormPoints: 38,
-  convertedPoints: -18.6,
-  totalPoints: 118
-}, {
-  id: 8,
-  name: '郑十',
-  studentId: '202401008',
-  group: '第二组',
-  dormRoom: '307',
-  isBoarding: true,
-  dormPoints: 100,
-  convertedPoints: 0,
-  totalPoints: 145
-}];
-
 // 折算比例配置（默认30%）
 const CONVERSION_RATE = 0.3;
 export default function DormPointsPage(props) {
@@ -280,8 +196,8 @@ export default function DormPointsPage(props) {
           id: student._id,
           studentId: student.student_id,
           name: student.name,
-          group: student.group || '未分组',
-          dormRoom: student.dorm_room || '未分配',
+          group: student.group_id || student.group || '未分组',
+          dormRoom: student.dorm_info?.room ? `${student.dorm_info.building || ''}${student.dorm_info.room}` : '未分配',
           isBoarding: student.is_boarding,
           dormPoints: student.dorm_score || 100,
           convertedPoints: ((student.dorm_score || 100) - 100) * conversionRate,
@@ -312,7 +228,7 @@ export default function DormPointsPage(props) {
       if (result.data && result.data.length > 0) {
         const transformedHistory = result.data.map(record => ({
           id: record._id,
-          studentId: record.student_id_number,
+          studentId: record.student_id_number || record.student_id || '',
           studentName: record.student_name || '未知',
           itemName: record.item_name || '宿舍扣分',
           points: record.score_change,
@@ -345,7 +261,7 @@ export default function DormPointsPage(props) {
       // 1. 添加扣分记录到宿舍扣分记录表
       const recordResult = await db.collection('dorm_deduction_record').add({
         record_id: `DP${Date.now()}`,
-        student_id: student.id,
+        student_id: parseInt(student.studentId) || 0,
         student_name: student.name,
         student_id_number: student.studentId,
         dorm_room: student.dormRoom || '未分配',
