@@ -49,6 +49,56 @@ export default function DocumentsPage({
   $w = {
     auth: {
       currentUser: {
+  // 加载文件数据
+  useEffect(() => {
+    loadFiles();
+  }, []);
+
+  const loadFiles = async () => {
+    try {
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('policy_document').orderBy('upload_date', 'desc').limit(50).get();
+      if (result.data && result.data.length > 0) {
+        const transformedFiles = result.data.map(file => ({
+          id: file._id,
+          title: file.title || '',
+          category: file.category || '其他',
+          description: file.description || '',
+          fileName: file.file_name || '',
+          fileSize: file.file_size || '0KB',
+          fileType: file.file_type || '未知',
+          fileUrl: file.file_url || '',
+          isPinned: file.is_pinned || false,
+          permission: file.permission === '公开' ? 'public' : file.permission === '仅学生可见' ? 'student' : file.permission === '仅家长可见' ? 'parent' : 'public',
+          uploadDate: file.upload_date ? file.upload_date.split('T')[0] : '',
+          updateDate: file.update_date ? file.update_date.split('T')[0] : '',
+          expiryDate: file.expiry_date ? file.expiry_date.split('T')[0] : null,
+          uploader: file.uploader || '未知',
+          status: file.status || '正常',
+          viewCount: file.view_count || 0,
+          downloadCount: file.download_count || 0,
+          semesterId: file.semester_id || 0,
+          semesterName: file.semester_name || ''
+        }));
+        setFiles(transformedFiles);
+      }
+    } catch (error) {
+      console.error('加载文件数据失败:', error);
+      toast({
+        title: '加载失败',
+        description: '无法加载文件数据，请重试',
+        variant: 'destructive'
+      });
+    }
+  };
+
+export default function DocumentsPage({
+  className = '',
+  style = {},
+  $w = {
+    auth: {
+      currentUser: {
         userId: 'teacher001',
         name: '班主任',
         type: 'teacher'
@@ -81,37 +131,41 @@ export default function DocumentsPage({
       params: {}
     });
   };
-
   // 文件列表
   const [files, setFiles] = useState([]);
   const [filteredFiles, setFilteredFiles] = useState([]);
 
   // 加载文件数据
   useEffect(() => {
-    loadDocuments();
+    loadFiles();
   }, []);
-  const loadDocuments = async () => {
+
+  const loadFiles = async () => {
     try {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
-      const result = await db.collection('policy_document').orderBy('upload_date', 'desc').limit(100).get();
+      const result = await db.collection('policy_document').orderBy('upload_date', 'desc').limit(50).get();
       if (result.data && result.data.length > 0) {
-        const transformedFiles = result.data.map(doc => ({
-          id: doc._id,
-          title: doc.title || '',
-          category: doc.category || '其他',
-          description: doc.description || '',
-          fileName: doc.file_name || '',
-          fileSize: doc.file_size || '',
-          fileType: doc.file_type || '',
-          fileUrl: doc.file_url || '',
-          isPinned: doc.is_pinned || false,
-          permission: doc.permission === '公开' ? 'public' : doc.permission === '仅学生可见' ? 'student' : doc.permission === '仅家长可见' ? 'parent' : 'public',
-          uploadDate: doc.upload_date ? doc.upload_date.split('T')[0] : '',
-          expiryDate: doc.expiry_date ? doc.expiry_date.split('T')[0] : null,
-          uploader: doc.uploader || '',
-          viewCount: doc.view_count || 0,
-          downloadCount: doc.download_count || 0
+        const transformedFiles = result.data.map(file => ({
+          id: file._id,
+          title: file.title || '',
+          category: file.category || '其他',
+          description: file.description || '',
+          fileName: file.file_name || '',
+          fileSize: file.file_size || '0KB',
+          fileType: file.file_type || '未知',
+          fileUrl: file.file_url || '',
+          isPinned: file.is_pinned || false,
+          permission: file.permission === '公开' ? 'public' : file.permission === '仅学生可见' ? 'student' : file.permission === '仅家长可见' ? 'parent' : 'public',
+          uploadDate: file.upload_date ? file.upload_date.split('T')[0] : '',
+          updateDate: file.update_date ? file.update_date.split('T')[0] : '',
+          expiryDate: file.expiry_date ? file.expiry_date.split('T')[0] : null,
+          uploader: file.uploader || '未知',
+          status: file.status || '正常',
+          viewCount: file.view_count || 0,
+          downloadCount: file.download_count || 0,
+          semesterId: file.semester_id || 0,
+          semesterName: file.semester_name || ''
         }));
         setFiles(transformedFiles);
       }
