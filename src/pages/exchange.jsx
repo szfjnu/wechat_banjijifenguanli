@@ -186,7 +186,10 @@ export default function ExchangePage({
 
   // 提交投标
   const handleSubmitBid = async () => {
-    if (!bidPoints || !selectedItem || !selectedItem.name) {
+    // 保存当前选中项和学生信息的副本，避免异步操作中被清空
+    const item = selectedItem;
+    const student = currentStudent;
+    if (!bidPoints || !item || !item.name) {
       toast({
         title: '提示',
         description: '请填写投标积分',
@@ -195,7 +198,7 @@ export default function ExchangePage({
       return;
     }
     const points = parseInt(bidPoints);
-    if (points > currentStudent.totalPoints) {
+    if (points > student.totalPoints) {
       toast({
         title: '积分不足',
         description: '您的当前积分不足',
@@ -203,7 +206,7 @@ export default function ExchangePage({
       });
       return;
     }
-    if (points <= (selectedItem.currentHighestPoints || 0)) {
+    if (points <= (item.currentHighestPoints || 0)) {
       toast({
         title: '投标失败',
         description: '投标积分必须高于当前最高分',
@@ -218,10 +221,10 @@ export default function ExchangePage({
       // 创建投标兑换申请记录
       const result = await db.collection('redemption_requests').add({
         request_id: `RR${Date.now()}`,
-        student_id: currentStudent.studentId,
-        student_name: currentStudent.name,
-        item_id: selectedItem.id,
-        item_name: selectedItem.name,
+        student_id: student.studentId,
+        student_name: student.name,
+        item_id: item.id,
+        item_name: item.name,
         points_required: points,
         redemption_mode: '投标竞拍',
         status: '待审核',
@@ -233,7 +236,7 @@ export default function ExchangePage({
 
       // 更新物品的最高投标分
       await db.collection('redemption_items').where({
-        item_id: selectedItem.id
+        item_id: item.id
       }).update({
         winner_bid_score: points
       });
@@ -241,23 +244,23 @@ export default function ExchangePage({
       // 创建新投标记录
       const newBidding = {
         id: result.id || result._id,
-        itemId: selectedItem.id,
-        studentId: currentStudent.studentId,
-        studentName: currentStudent.name,
+        itemId: item.id,
+        studentId: student.studentId,
+        studentName: student.name,
         points: points,
         biddingTime: new Date().toLocaleString('zh-CN')
       };
       setBiddings([...biddings, newBidding]);
 
       // 更新物品当前最高分
-      setItems(items.map(item => item.id === selectedItem.id ? {
-        ...item,
+      setItems(items.map(i => i.id === item.id ? {
+        ...i,
         currentHighestPoints: points,
-        biddingCount: item.biddingCount + 1
-      } : item));
+        biddingCount: i.biddingCount + 1
+      } : i));
       toast({
         title: '投标成功',
-        description: `您已成功参与"${selectedItem?.name || '该物品'}"的投标，投标积分：${points}分`
+        description: `您已成功参与"${item?.name || '该物品'}"的投标，投标积分：${points}分`
       });
       setBidDialogOpen(false);
     } catch (error) {
@@ -294,7 +297,10 @@ export default function ExchangePage({
 
   // 提交兑换申请
   const handleSubmitExchange = async () => {
-    if (!selectedItem || !selectedItem.name || !currentStudent) {
+    // 保存当前选中项和学生信息的副本，避免异步操作中被清空
+    const item = selectedItem;
+    const student = currentStudent;
+    if (!item || !item.name || !student) {
       toast({
         title: '提示',
         description: '请选择要兑换的物品',
@@ -305,16 +311,16 @@ export default function ExchangePage({
     try {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
-      const newTotalPoints = currentStudent.totalPoints - (selectedItem.pointsRequired || 0);
+      const newTotalPoints = student.totalPoints - (item.pointsRequired || 0);
 
       // 添加兑换记录到数据库
       const result = await db.collection('redemption_requests').add({
         request_id: `RR${Date.now()}`,
-        student_id: currentStudent.studentId,
-        student_name: currentStudent.name,
-        item_id: selectedItem.id,
-        item_name: selectedItem.name,
-        points_required: selectedItem.pointsRequired,
+        student_id: student.studentId,
+        student_name: student.name,
+        item_id: item.id,
+        item_name: item.name,
+        points_required: item.pointsRequired,
         redemption_mode: '直接兑换',
         status: '已兑换',
         redemption_time: new Date().toISOString(),
@@ -327,18 +333,18 @@ export default function ExchangePage({
       });
 
       // 更新学生积分
-      await db.collection('students').doc(currentStudent.id).update({
+      await db.collection('students').doc(student.id).update({
         current_score: newTotalPoints
       });
 
       // 创建兑换记录
       const newExchange = {
         id: result.id || result._id,
-        itemId: selectedItem.id,
-        itemName: selectedItem.name,
-        studentId: currentStudent.studentId,
-        studentName: currentStudent.name,
-        pointsUsed: selectedItem.pointsRequired,
+        itemId: item.id,
+        itemName: item.name,
+        studentId: student.studentId,
+        studentName: student.name,
+        pointsUsed: item.pointsRequired,
         exchangeDate: new Date().toLocaleDateString('zh-CN'),
         status: 'completed'
       };
@@ -346,27 +352,27 @@ export default function ExchangePage({
 
       // 更新当前学生积分
       setCurrentStudent({
-        ...currentStudent,
+        ...student,
         totalPoints: newTotalPoints
       });
 
       // 更新物品库存和状态
-      if (selectedItem.quantity) {
-        const newQuantity = selectedItem.quantity - 1;
-        setItems(items.map(item => item.id === selectedItem.id ? {
-          ...item,
+      if (item.quantity) {
+        const newQuantity = item.quantity - 1;
+        setItems(items.map(i => i.id === item.id ? {
+          ...i,
           quantity: newQuantity,
-          status: newQuantity <= 0 ? 'exchanged' : item.status
-        } : item));
+          status: newQuantity <= 0 ? 'exchanged' : i.status
+        } : i));
       } else {
-        setItems(items.map(item => item.id === selectedItem.id ? {
-          ...item,
+        setItems(items.map(i => i.id === item.id ? {
+          ...i,
           status: 'exchanged'
-        } : item));
+        } : i));
       }
       toast({
         title: '兑换成功',
-        description: `您已成功兑换"${selectedItem?.name || '该物品'}"，消耗${selectedItem?.pointsRequired || 0}积分`
+        description: `您已成功兑换"${item?.name || '该物品'}"，消耗${item?.pointsRequired || 0}积分`
       });
       setExchangeDialogOpen(false);
     } catch (error) {
@@ -741,7 +747,7 @@ export default function ExchangePage({
                 
                 <div className="bg-gray-50 rounded-lg p-3 mt-4">
                   <div className="text-sm text-gray-600 mb-1">兑换后剩余积分</div>
-                  <div className="text-lg font-bold text-gray-900">{currentStudent.totalPoints - (selectedItem.pointsRequired || 0)} 分</div>
+                  <div className="text-lg font-bold text-gray-900">{currentStudent && selectedItem ? currentStudent.totalPoints - (selectedItem.pointsRequired || 0) : 0} 分</div>
                 </div>
               </div>}
             
