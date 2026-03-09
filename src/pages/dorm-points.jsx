@@ -692,7 +692,8 @@ export default function DormPointsPage(props) {
           </div>
         </div>;
   }
-  return <div className="min-h-screen bg-gray-50 pb-16">
+  return <>
+        <div className="min-h-screen bg-gray-50 pb-16">
         {/* 页面头部 - 紧凑 */}
         <header className="bg-white border-b border-gray-200 p-3 sticky top-0 z-40">
           <div className="flex items-center justify-between">
@@ -1060,6 +1061,9 @@ export default function DormPointsPage(props) {
             </div>
           </div>}
 
+          <TabBar currentPage={currentPage} onPageChange={handlePageChange} />
+          </div>
+
           {/* 项目管理模态框 */}
           {showItemManager && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
               <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[80vh] overflow-hidden">
@@ -1159,9 +1163,7 @@ export default function DormPointsPage(props) {
                   </Button>
                 </div>
               </div>
-            </div>}
-
-        <TabBar currentPage={currentPage} onPageChange={handlePageChange} />
+            </div>
       </div>
     </>
   );
