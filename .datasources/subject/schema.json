@@ -1,0 +1,86 @@
+{
+  "name": "subject",
+  "title": "科目",
+  "schemas": [
+    {
+      "name": "subject_id",
+      "title": "科目ID",
+      "type": "String"
+    },
+    {
+      "name": "subject_code",
+      "title": "科目编号",
+      "type": "String"
+    },
+    {
+      "name": "subject_name",
+      "title": "科目名称",
+      "type": "String"
+    },
+    {
+      "name": "subject_type",
+      "title": "科目类型",
+      "type": "String"
+    },
+    {
+      "name": "subject_category",
+      "title": "科目分类",
+      "type": "String"
+    },
+    {
+      "name": "description",
+      "title": "科目描述",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "teacher_name",
+      "title": "任课教师",
+      "type": "String"
+    },
+    {
+      "name": "hours",
+      "title": "课时",
+      "type": "Number"
+    },
+    {
+      "name": "credits",
+      "title": "学分",
+      "type": "Number"
+    },
+    {
+      "name": "passing_score",
+      "title": "及格分数",
+      "type": "Number"
+    },
+    {
+      "name": "classroom",
+      "title": "上课地点",
+      "type": "String"
+    },
+    {
+      "name": "is_exam_subject",
+      "title": "是否转段考科目",
+      "type": "Boolean"
+    },
+    {
+      "name": "priority",
+      "title": "科目优先级",
+      "type": "Number"
+    },
+    {
+      "name": "semester_id",
+      "title": "学期ID",
+      "type": "Number"
+    },
+    {
+      "name": "semester_name",
+      "title": "学期名称",
+      "type": "String"
+    },
+    {
+      "name": "remark",
+      "title": "备注",
+      "type": "MultiLineString"
+    }
+  ]
+}

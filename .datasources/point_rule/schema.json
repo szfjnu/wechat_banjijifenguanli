@@ -1,0 +1,100 @@
+{
+  "name": "point_rule",
+  "title": "积分规则",
+  "schemas": [
+    {
+      "name": "rule_id",
+      "title": "规则ID",
+      "type": "String"
+    },
+    {
+      "name": "rule_code",
+      "title": "规则编号",
+      "type": "String"
+    },
+    {
+      "name": "rule_name",
+      "title": "规则名称",
+      "type": "String"
+    },
+    {
+      "name": "rule_type",
+      "title": "规则类型",
+      "type": "String"
+    },
+    {
+      "name": "rule_category",
+      "title": "规则分类",
+      "type": "String"
+    },
+    {
+      "name": "description",
+      "title": "适用条件描述",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "score_value",
+      "title": "积分值",
+      "type": "Number"
+    },
+    {
+      "name": "priority",
+      "title": "优先级",
+      "type": "Number"
+    },
+    {
+      "name": "icon_name",
+      "title": "图标名称",
+      "type": "String"
+    },
+    {
+      "name": "is_enabled",
+      "title": "是否启用",
+      "type": "Boolean"
+    },
+    {
+      "name": "effective_date",
+      "title": "生效日期",
+      "type": "Date",
+      "format": "string"
+    },
+    {
+      "name": "expiry_date",
+      "title": "失效日期",
+      "type": "Date",
+      "format": "string"
+    },
+    {
+      "name": "creator",
+      "title": "创建人",
+      "type": "String"
+    },
+    {
+      "name": "created_date",
+      "title": "创建日期",
+      "type": "DateTime",
+      "format": "string"
+    },
+    {
+      "name": "update_date",
+      "title": "更新日期",
+      "type": "DateTime",
+      "format": "string"
+    },
+    {
+      "name": "semester_id",
+      "title": "关联学期ID",
+      "type": "Number"
+    },
+    {
+      "name": "semester_name",
+      "title": "学期名称",
+      "type": "String"
+    },
+    {
+      "name": "remark",
+      "title": "备注",
+      "type": "MultiLineString"
+    }
+  ]
+}

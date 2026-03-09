@@ -1,0 +1,145 @@
+{
+  "name": "growth_record",
+  "title": "成长记录",
+  "schemas": [
+    {
+      "name": "record_id",
+      "title": "记录ID",
+      "type": "String"
+    },
+    {
+      "name": "record_code",
+      "title": "记录编号",
+      "type": "String"
+    },
+    {
+      "name": "record_date",
+      "title": "记录日期时间",
+      "type": "DateTime",
+      "format": "string"
+    },
+    {
+      "name": "growth_title",
+      "title": "成长标题",
+      "type": "String"
+    },
+    {
+      "name": "growth_type",
+      "title": "成长类型",
+      "type": "String"
+    },
+    {
+      "name": "growth_category",
+      "title": "成长分类",
+      "type": "String"
+    },
+    {
+      "name": "growth_stage",
+      "title": "成长阶段",
+      "type": "String"
+    },
+    {
+      "name": "growth_content",
+      "title": "成长内容",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "student_id",
+      "title": "关联学生ID",
+      "type": "String"
+    },
+    {
+      "name": "student_name",
+      "title": "学生姓名",
+      "type": "String"
+    },
+    {
+      "name": "student_id_number",
+      "title": "学号",
+      "type": "String"
+    },
+    {
+      "name": "growth_score",
+      "title": "成长评分",
+      "type": "Number"
+    },
+    {
+      "name": "max_score",
+      "title": "最高分",
+      "type": "Number"
+    },
+    {
+      "name": "attachments",
+      "title": "附件列表",
+      "type": "Array",
+      "items": {
+        "type": "String"
+      }
+    },
+    {
+      "name": "attachment_types",
+      "title": "附件类型",
+      "type": "Array",
+      "items": {
+        "type": "String"
+      }
+    },
+    {
+      "name": "status",
+      "title": "状态",
+      "type": "String"
+    },
+    {
+      "name": "recorder_name",
+      "title": "记录人姓名",
+      "type": "String"
+    },
+    {
+      "name": "recorder_type",
+      "title": "记录人类型",
+      "type": "String"
+    },
+    {
+      "name": "create_date",
+      "title": "创建日期",
+      "type": "Date",
+      "format": "string"
+    },
+    {
+      "name": "approver_name",
+      "title": "审核人姓名",
+      "type": "String"
+    },
+    {
+      "name": "approval_status",
+      "title": "审核状态",
+      "type": "String"
+    },
+    {
+      "name": "approval_comment",
+      "title": "审核意见",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "approval_time",
+      "title": "审核时间",
+      "type": "DateTime",
+      "format": "string"
+    },
+    {
+      "name": "semester_id",
+      "title": "关联学期ID",
+      "type": "Number"
+    },
+    {
+      "name": "semester_name",
+      "title": "学期名称",
+      "type": "String"
+    },
+    {
+      "name": "remark",
+      "title": "备注",
+      "type": "MultiLineString"
+    }
+  ]
+}

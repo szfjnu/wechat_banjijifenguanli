@@ -1,0 +1,125 @@
+{
+  "name": "notice",
+  "title": "通知",
+  "schemas": [
+    {
+      "name": "notice_id",
+      "title": "通知ID",
+      "type": "String"
+    },
+    {
+      "name": "notice_code",
+      "title": "通知编号",
+      "type": "String"
+    },
+    {
+      "name": "notice_title",
+      "title": "通知标题",
+      "type": "String"
+    },
+    {
+      "name": "notice_content",
+      "title": "通知正文",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "notice_category",
+      "title": "通知分类",
+      "type": "String"
+    },
+    {
+      "name": "publisher_id",
+      "title": "发布人ID",
+      "type": "String"
+    },
+    {
+      "name": "publisher_name",
+      "title": "发布人姓名",
+      "type": "String"
+    },
+    {
+      "name": "publish_time",
+      "title": "发布时间",
+      "type": "DateTime",
+      "format": "string"
+    },
+    {
+      "name": "publisher_type",
+      "title": "发布人类型",
+      "type": "String"
+    },
+    {
+      "name": "target_type",
+      "title": "接收对象类型",
+      "type": "String"
+    },
+    {
+      "name": "target_ids",
+      "title": "接收对象ID数组",
+      "type": "Array",
+      "items": {
+        "type": "String"
+      }
+    },
+    {
+      "name": "target_names",
+      "title": "接收对象名称数组",
+      "type": "Array",
+      "items": {
+        "type": "String"
+      }
+    },
+    {
+      "name": "read_status",
+      "title": "阅读状态",
+      "type": "String"
+    },
+    {
+      "name": "read_records",
+      "title": "阅读记录数组",
+      "type": "Array",
+      "items": {
+        "type": "Object"
+      }
+    },
+    {
+      "name": "read_count",
+      "title": "已读数量",
+      "type": "Number"
+    },
+    {
+      "name": "status",
+      "title": "状态",
+      "type": "String"
+    },
+    {
+      "name": "send_status",
+      "title": "发送状态",
+      "type": "String"
+    },
+    {
+      "name": "priority",
+      "title": "优先级",
+      "type": "Number"
+    },
+    {
+      "name": "expiry_time",
+      "title": "失效时间",
+      "type": "DateTime",
+      "format": "string"
+    },
+    {
+      "name": "attachments",
+      "title": "附件列表",
+      "type": "Array",
+      "items": {
+        "type": "String"
+      }
+    },
+    {
+      "name": "remark",
+      "title": "备注",
+      "type": "MultiLineString"
+    }
+  ]
+}
