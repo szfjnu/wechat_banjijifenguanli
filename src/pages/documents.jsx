@@ -108,6 +108,7 @@ export default function DocumentsPage({
 
   // 文件操作
   const [isUploading, setIsUploading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // 加载数据
   useEffect(() => {
@@ -550,7 +551,7 @@ export default function DocumentsPage({
                   {/* 文件上传 */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">选择文件 *</label>
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-emerald-500 transition-colors">
+                    <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-emerald-500 transition-colors">
                       <Upload className="w-12 h-12 text-gray-400 mx-auto mb-2" />
                       <p className="text-sm text-gray-600 mb-2">点击或拖拽文件到此处上传</p>
                       <p className="text-xs text-gray-400">支持 PDF、Word、图片格式，最大10MB</p>
