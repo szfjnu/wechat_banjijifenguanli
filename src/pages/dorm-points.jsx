@@ -852,9 +852,10 @@ export default function DormPointsPage(props) {
         </main>
 
         <TabBar currentPage={currentPage} onPageChange={handlePageChange} />
+      </div>
 
-        {/* 扣分对话框 */}
-        {showDeductionDialog && selectedStudent && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      {/* 扣分对话框 */}
+      {showDeductionDialog && selectedStudent && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
               <div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-4 rounded-t-xl">
                 <h3 className="text-xl font-bold">宿舍扣分</h3>
@@ -949,9 +950,12 @@ export default function DormPointsPage(props) {
                     </Button>
                   </div>
                 </>}
+              </div>
+            </div>
+          </div>}
 
-        {/* 设置对话框 */}
-        {showSettingsModal && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      {/* 设置对话框 */}
+      {showSettingsModal && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
               <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4 rounded-t-xl">
                 <h3 className="text-xl font-bold">折算比例设置</h3>
@@ -983,29 +987,9 @@ export default function DormPointsPage(props) {
                     保存设置
                   </Button>
                 </div>
-
-                {/* 加减分项目管理 */}
-                <div className="border-t border-gray-200 pt-4 mt-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="font-semibold text-gray-800">加减分项目</h4>
-                    <Button onClick={() => {
-                setShowItemManager(true);
-              }} className="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
-                      管理项目
-                    </Button>
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    共 {deductionItems.length} 个项目：
-                    {deductionItems.slice(0, 3).map((item, index) => <span key={item.id} className="inline-block px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-[10px] mr-1">
-                        {item.name}（{item.points}）
-                      </span>)}
-                    {deductionItems.length > 3 && <span className="text-gray-400">...</span>}
-                  </div>
-                </div>
               </div>
             </div>
-          </div>
-        </div>}
+          </div>}
 
         {/* 学期重置确认对话框 */}
         {showResetConfirm && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -1041,29 +1025,9 @@ export default function DormPointsPage(props) {
                     {loading ? '重置中...' : '确认重置'}
                   </Button>
                 </div>
-
-                {/* 加减分项目管理 */}
-                <div className="border-t border-gray-200 pt-4 mt-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="font-semibold text-gray-800">加减分项目</h4>
-                    <Button onClick={() => {
-                setShowItemManager(true);
-              }} className="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
-                      管理项目
-                    </Button>
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    共 {deductionItems.length} 个项目：
-                    {deductionItems.slice(0, 3).map((item, index) => <span key={item.id} className="inline-block px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-[10px] mr-1">
-                        {item.name}（{item.points}）
-                      </span>)}
-                    {deductionItems.length > 3 && <span className="text-gray-400">...</span>}
-                  </div>
-                </div>
               </div>
             </div>
           </div>}
-        </div>
 
         {/* 项目管理模态框 */}
         {showItemManager && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -1165,6 +1129,6 @@ export default function DormPointsPage(props) {
               </div>
             </div>
           </div>}
-      </>
+    </>
   );
 }
