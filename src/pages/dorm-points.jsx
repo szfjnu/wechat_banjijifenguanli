@@ -990,7 +990,8 @@ export default function DormPointsPage(props) {
                 </div>
               </div>
             </div>
-          </div>}
+          </div>
+        </div>}
 
       {/* 学期重置确认对话框 */}
       {showResetConfirm && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
