@@ -227,9 +227,9 @@ export default function DormPointsPage(props) {
           group: student.group_id || student.group || '未分组',
           dormRoom: student.dorm_info?.room ? `${student.dorm_info.building || ''}${student.dorm_info.room}` : '未分配',
           isBoarding: student.is_boarding,
-          dormPoints: student.dorm_score || 100,
-          convertedPoints: ((student.dorm_score || 100) - 100) * conversionRate,
-          totalPoints: student.current_score || 0
+          dormPoints: parseFloat(student.dorm_score) || 100,
+          convertedPoints: ((parseFloat(student.dorm_score) || 100) - 100) * conversionRate,
+          totalPoints: parseFloat(student.current_score) || 0
         }));
         setStudents(transformedStudents);
       } else {
@@ -261,7 +261,7 @@ export default function DormPointsPage(props) {
           itemName: record.item_name || '宿舍扣分',
           points: record.score_change,
           originalDormPoints: record.original_score || 100,
-          convertedPoints: record.converted_points,
+          convertedPoints: parseFloat(record.converted_points) || 0,
           date: record.deduction_date ? new Date(record.deduction_date).toLocaleString('zh-CN') : '',
           operator: record.recorder_name || '宿管员',
           remark: record.reason || '',
