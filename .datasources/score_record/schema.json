@@ -1,0 +1,139 @@
+{
+  "name": "score_record",
+  "title": "积分记录管理",
+  "schemas": [
+    {
+      "name": "record_id",
+      "title": "记录ID",
+      "type": "String"
+    },
+    {
+      "name": "student_id",
+      "title": "关联学生ID",
+      "type": "String"
+    },
+    {
+      "name": "student_name",
+      "title": "学生姓名",
+      "type": "String"
+    },
+    {
+      "name": "student_id_number",
+      "title": "学号",
+      "type": "String"
+    },
+    {
+      "name": "group",
+      "title": "所属分组",
+      "type": "String"
+    },
+    {
+      "name": "item_id",
+      "title": "积分项目ID",
+      "type": "String"
+    },
+    {
+      "name": "item_name",
+      "title": "积分项目名称",
+      "type": "String"
+    },
+    {
+      "name": "rule_id",
+      "title": "关联规则ID",
+      "type": "String"
+    },
+    {
+      "name": "score_change",
+      "title": "分数变化",
+      "type": "Number"
+    },
+    {
+      "name": "category",
+      "title": "分类",
+      "type": "String"
+    },
+    {
+      "name": "source_type",
+      "title": "来源类型",
+      "type": "String"
+    },
+    {
+      "name": "record_time",
+      "title": "记录时间",
+      "type": "DateTime",
+      "format": "string"
+    },
+    {
+      "name": "record_date",
+      "title": "记录日期",
+      "type": "Date",
+      "format": "string"
+    },
+    {
+      "name": "reason_detail",
+      "title": "原因详情",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "remark",
+      "title": "备注",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "approval_status",
+      "title": "审批状态",
+      "type": "String"
+    },
+    {
+      "name": "approval_time",
+      "title": "审批时间",
+      "type": "DateTime",
+      "format": "string"
+    },
+    {
+      "name": "approver_name",
+      "title": "审批人姓名",
+      "type": "String"
+    },
+    {
+      "name": "approver_id",
+      "title": "审批人ID",
+      "type": "String"
+    },
+    {
+      "name": "approval_remark",
+      "title": "审批备注",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "recorder_name",
+      "title": "记录人姓名",
+      "type": "String"
+    },
+    {
+      "name": "recorder_id",
+      "title": "记录人ID",
+      "type": "String"
+    },
+    {
+      "name": "semester_id",
+      "title": "关联学期ID",
+      "type": "Number"
+    },
+    {
+      "name": "semester_name",
+      "title": "学期名称",
+      "type": "String"
+    },
+    {
+      "name": "is_effective",
+      "title": "是否有效",
+      "type": "Boolean"
+    },
+    {
+      "name": "is_applied",
+      "title": "是否已应用到学生积分",
+      "type": "Boolean"
+    }
+  ]
+}

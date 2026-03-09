@@ -1,0 +1,170 @@
+{
+  "name": "score_item",
+  "title": "积分规则设置",
+  "schemas": [
+    {
+      "name": "rule_id",
+      "title": "规则ID",
+      "type": "String"
+    },
+    {
+      "name": "rule_name",
+      "title": "规则名称",
+      "type": "String"
+    },
+    {
+      "name": "rule_type",
+      "title": "规则类型",
+      "type": "String"
+    },
+    {
+      "name": "rule_category",
+      "title": "规则分类",
+      "type": "String"
+    },
+    {
+      "name": "score_value",
+      "title": "积分值",
+      "type": "Number"
+    },
+    {
+      "name": "is_enabled",
+      "title": "是否启用",
+      "type": "Boolean"
+    },
+    {
+      "name": "description",
+      "title": "描述说明",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "icon_name",
+      "title": "图标名称",
+      "type": "String"
+    },
+    {
+      "name": "priority",
+      "title": "规则优先级",
+      "type": "Number"
+    },
+    {
+      "name": "applicable_groups",
+      "title": "适用分组列表",
+      "type": "Array",
+      "items": {
+        "type": "String"
+      }
+    },
+    {
+      "name": "applicable_semesters",
+      "title": "适用学期列表",
+      "type": "Array",
+      "items": {
+        "type": "Number"
+      }
+    },
+    {
+      "name": "applicable_classes",
+      "title": "适用班级列表",
+      "type": "Array",
+      "items": {
+        "type": "String"
+      }
+    },
+    {
+      "name": "is_universal",
+      "title": "是否通用规则",
+      "type": "Boolean"
+    },
+    {
+      "name": "max_daily_count",
+      "title": "每日最大次数",
+      "type": "Number"
+    },
+    {
+      "name": "max_monthly_count",
+      "title": "每月最大次数",
+      "type": "Number"
+    },
+    {
+      "name": "max_semester_count",
+      "title": "每学期最大次数",
+      "type": "Number"
+    },
+    {
+      "name": "min_score_required",
+      "title": "最低积分要求",
+      "type": "Number"
+    },
+    {
+      "name": "max_score_limit",
+      "title": "最高积分限制",
+      "type": "Number"
+    },
+    {
+      "name": "auto_apply",
+      "title": "是否自动应用",
+      "type": "Boolean"
+    },
+    {
+      "name": "manual_apply",
+      "title": "是否手动应用",
+      "type": "Boolean"
+    },
+    {
+      "name": "requires_approval",
+      "title": "是否需要审批",
+      "type": "Boolean"
+    },
+    {
+      "name": "approval_level",
+      "title": "审批级别",
+      "type": "String"
+    },
+    {
+      "name": "usage_count",
+      "title": "使用次数",
+      "type": "Number"
+    },
+    {
+      "name": "total_points_added",
+      "title": "总添加积分",
+      "type": "Number"
+    },
+    {
+      "name": "total_points_deducted",
+      "title": "总扣除积分",
+      "type": "Number"
+    },
+    {
+      "name": "created_by",
+      "title": "创建人ID",
+      "type": "String"
+    },
+    {
+      "name": "created_by_name",
+      "title": "创建人姓名",
+      "type": "String"
+    },
+    {
+      "name": "updated_by",
+      "title": "最后修改人ID",
+      "type": "String"
+    },
+    {
+      "name": "updated_by_name",
+      "title": "最后修改人姓名",
+      "type": "String"
+    },
+    {
+      "name": "semester_id",
+      "title": "关联学期ID",
+      "type": "Number"
+    },
+    {
+      "name": "semester_name",
+      "title": "学期名称",
+      "type": "String"
+    }
+  ]
+}

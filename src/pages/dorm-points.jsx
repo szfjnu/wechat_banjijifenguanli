@@ -9,210 +9,56 @@ import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 
 // 宿舍扣分项目预设数据
-const DEDUCTION_ITEMS = [
-// 纪律类
-{
+const DEDUCTION_ITEMS = [{
   id: 1,
-  name: '迟离宿舍，迟归宿舍',
-  points: -3,
-  category: '纪律',
-  remark: ''
-}, {
-  id: 2,
-  name: '不按学校要求贴宿舍门牌照片',
-  points: -3,
-  category: '纪律',
-  remark: ''
-}, {
-  id: 3,
-  name: '不穿校服，不按要求穿校服、穿拖鞋',
-  points: -3,
-  category: '纪律',
-  remark: ''
-}, {
-  id: 4,
-  name: '打牌',
-  points: -30,
-  category: '纪律',
-  remark: '为首或提供者扣-40'
-}, {
-  id: 5,
-  name: '抽烟',
-  points: -20,
-  category: '纪律',
-  remark: ''
-}, {
-  id: 6,
-  name: '留不住宿人员过夜',
-  points: -10,
-  category: '纪律',
-  remark: '带走读生回宿舍'
-}, {
-  id: 7,
-  name: '以粗言秽语辱骂、攻击他人，引起误会和矛盾',
-  points: -20,
-  category: '纪律',
-  remark: ''
-}, {
-  id: 8,
-  name: '不服从或不顶撞管理人员',
-  points: -20,
-  category: '纪律',
-  remark: ''
-}, {
-  id: 9,
-  name: '喝酒',
-  points: -30,
-  category: '纪律',
-  remark: '一次扣20分，提供酒类、为首者、喝酒造成恶劣影响扣-30'
-}, {
-  id: 10,
-  name: '在宿舍打架',
-  points: -40,
-  category: '纪律',
-  remark: '为策划或为首者扣-40'
-}, {
-  id: 11,
-  name: '持械打架',
-  points: -50,
-  category: '纪律',
-  remark: '持械打架扣-50'
-}, {
-  id: 12,
-  name: '晚上不交手机',
-  points: -10,
-  category: '纪律',
-  remark: '第一次扣-10分'
-}, {
-  id: 13,
-  name: '交模型机',
-  points: -20,
-  category: '纪律',
-  remark: '第二、三次扣-20'
-}, {
-  id: 14,
-  name: '迟交手机',
-  points: -20,
-  category: '纪律',
-  remark: '第二、三次扣-20'
-}, {
-  id: 15,
-  name: '加分',
-  points: 2,
-  category: '纪律',
-  remark: '可通过连续日劳动，每次加回2分，其他加分等'
-},
-// 卫生类
-{
-  id: 16,
   name: '宿舍卫生不合格',
   points: -5,
-  category: '卫生',
-  remark: ''
+  category: '卫生'
 }, {
-  id: 17,
-  name: '床位整理不规范',
-  points: -2,
-  category: '卫生',
-  remark: ''
-}, {
-  id: 18,
-  name: '未按时熄灯',
-  points: -3,
-  category: '卫生',
-  remark: ''
-}, {
-  id: 19,
-  name: '个人内务卫生差、值日生差',
-  points: -3,
-  category: '卫生',
-  remark: '个人物品问题（比如上课离开宿舍没拨充电器，晚修离开宿舍没关灯，故意遮挡宿舍门窗等）'
-}, {
-  id: 20,
-  name: '异常留校',
-  points: -3,
-  category: '卫生',
-  remark: '一次扣3分，顶替违纪一次扣10分'
-},
-// 安全类
-{
-  id: 21,
-  name: '缺宿',
-  points: -10,
-  category: '安全',
-  remark: ''
-}, {
-  id: 22,
-  name: '窜宿舍',
-  points: -5,
-  category: '安全',
-  remark: ''
-}, {
-  id: 23,
+  id: 2,
   name: '晚归',
   points: -3,
-  category: '安全',
-  remark: ''
+  category: '纪律'
 }, {
-  id: 24,
-  name: '妨碍他人休息',
-  points: -5,
-  category: '安全',
-  remark: '一次扣5分，严重者扣10'
-}, {
-  id: 25,
-  name: '妨碍他人休息（严重）',
+  id: 3,
+  name: '夜不归宿',
   points: -10,
-  category: '安全',
-  remark: '一次扣5分，严重者扣10'
+  category: '纪律'
 }, {
-  id: 26,
-  name: '私带或使用宿舍管理违禁品',
-  points: -20,
-  category: '安全',
-  remark: ''
-}, {
-  id: 27,
-  name: '破坏宿舍公物及私拆公共设施封条',
-  points: -20,
-  category: '安全',
-  remark: ''
-}, {
-  id: 28,
-  name: '宿舍内发现烟、烟头、烟盒、打火机',
-  points: -10,
-  category: '安全',
-  remark: ''
-}, {
-  id: 29,
-  name: '私自调换宿舍',
-  points: -10,
-  category: '安全',
-  remark: '主动认错一次扣5分'
-}, {
-  id: 30,
-  name: '在宿舍贩卖烟酒食品，私自派发传单',
-  points: -50,
-  category: '安全',
-  remark: ''
-}, {
-  id: 31,
-  name: '私自带入危险品（如刀具等）',
-  points: -50,
-  category: '安全',
-  remark: '（注：原表未明确列出，但属于安全类高风险行为，建议补充）'
-}, {
-  id: 32,
+  id: 4,
   name: '使用违规电器',
   points: -8,
-  category: '安全',
-  remark: ''
+  category: '安全'
 }, {
-  id: 33,
+  id: 5,
+  name: '宿舍内吸烟',
+  points: -15,
+  category: '纪律'
+}, {
+  id: 6,
+  name: '干扰他人休息',
+  points: -4,
+  category: '纪律'
+}, {
+  id: 7,
   name: '私接电线',
   points: -6,
-  category: '安全',
-  remark: ''
+  category: '安全'
+}, {
+  id: 8,
+  name: '宿舍内饮酒',
+  points: -12,
+  category: '纪律'
+}, {
+  id: 9,
+  name: '床位整理不规范',
+  points: -2,
+  category: '卫生'
+}, {
+  id: 10,
+  name: '未按时熄灯',
+  points: -3,
+  category: '纪律'
 }];
 
 // 折算比例配置（默认30%）
@@ -254,8 +100,7 @@ export default function DormPointsPage(props) {
     id: null,
     name: '',
     points: 0,
-    category: '卫生',
-    remark: ''
+    category: '卫生'
   });
 
   // 项目分类
@@ -273,8 +118,7 @@ export default function DormPointsPage(props) {
       id: null,
       name: '',
       points: 0,
-      category: '卫生',
-      remark: ''
+      category: '卫生'
     });
   };
   const handleEditItem = item => {
@@ -692,9 +536,7 @@ export default function DormPointsPage(props) {
           </div>
         </div>;
   }
-  return <>
-  return <>
-        <div className="min-h-screen bg-gray-50 pb-16">
+  return <div className="min-h-screen bg-gray-50 pb-16">
         {/* 页面头部 - 紧凑 */}
         <header className="bg-white border-b border-gray-200 p-3 sticky top-0 z-40">
           <div className="flex items-center justify-between">
@@ -746,9 +588,9 @@ export default function DormPointsPage(props) {
             </div>
             <div className="divide-y divide-gray-100">
               {filteredStudents.map(student => {
-              const warning = getWarningLevel(student.dormPoints);
-              const WarningIcon = warning?.icon;
-              return <div key={student.id} className={`p-2.5 hover:bg-gray-50 transition-colors ${warning?.bgColor || ''}`}>
+            const warning = getWarningLevel(student.dormPoints);
+            const WarningIcon = warning?.icon;
+            return <div key={student.id} className={`p-2.5 hover:bg-gray-50 transition-colors ${warning?.bgColor || ''}`}>
                     <div className="flex items-center justify-between gap-2">
                       {/* 学生信息 */}
                       <div className="flex-1">
@@ -795,7 +637,7 @@ export default function DormPointsPage(props) {
                       </Button>
                     </div>
                   </div>;
-            })}
+          })}
             </div>
           </div>
 
@@ -852,11 +694,8 @@ export default function DormPointsPage(props) {
           </div>
         </main>
 
-        <TabBar currentPage={currentPage} onPageChange={handlePageChange} />
-      </div>
-
-      {/* 扣分对话框 */}
-      {showDeductionDialog && selectedStudent && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        {/* 扣分对话框 */}
+        {showDeductionDialog && selectedStudent && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
               <div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-4 rounded-t-xl">
                 <h3 className="text-xl font-bold">宿舍扣分</h3>
@@ -868,23 +707,19 @@ export default function DormPointsPage(props) {
                   <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" value={selectedDeductionItem?.id || ''} onChange={e => setSelectedDeductionItem(DEDUCTION_ITEMS.find(item => item.id === parseInt(e.target.value)))}>
                     <option value="">请选择扣分项目</option>
                     {DEDUCTION_ITEMS.map(item => <option key={item.id} value={item.id}>
-                        {item.name}（{item.points > 0 ? '+' : ''}{item.points}分）{item.remark ? ` - ${item.remark}` : ''}
+                        {item.name}（{item.points > 0 ? '+' : ''}{item.points}分）
                       </option>)}
                   </select>
                 </div>
 
-                {selectedDeductionItem && <>
-                  <div className="mb-4 p-4 bg-red-50 rounded-lg border border-red-200">
+                {selectedDeductionItem && <div className="mb-4 p-4 bg-red-50 rounded-lg border border-red-200">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-gray-700">预计变化</span>
                       <span className={`text-lg font-bold ${selectedDeductionItem.points < 0 ? 'text-red-600' : 'text-green-600'}`}>
                         {selectedDeductionItem.points > 0 ? '+' : ''}{selectedDeductionItem.points}分
                       </span>
                     </div>
-                    {selectedDeductionItem.remark && <div className="text-sm text-gray-600 mt-2 p-2 bg-white rounded border border-red-200">
-                        <span className="font-medium">备注：</span>{selectedDeductionItem.remark}
-                      </div>}
-                    <div className="flex items-center justify-between text-sm text-gray-600 mt-2">
+                    <div className="flex items-center justify-between text-sm text-gray-600">
                       <span>折算到总积分</span>
                       <span className={`font-medium ${selectedDeductionItem.points * conversionRate < 0 ? 'text-orange-600' : 'text-green-600'}`}>
                         {(selectedDeductionItem.points * conversionRate).toFixed(1)}分
@@ -896,67 +731,66 @@ export default function DormPointsPage(props) {
                         {selectedStudent.dormPoints + selectedDeductionItem.points}分
                       </span>
                     </div>
-                  </div>
+                  </div>}
 
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">备注（可选）</label>
-                    <textarea className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 resize-none" rows={3} placeholder="输入备注信息..." id="deduction-remark" />
-                  </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">备注（可选）</label>
+                  <textarea className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 resize-none" rows={3} placeholder="输入备注信息..." id="deduction-remark" />
+                </div>
 
-                  {/* 上传违规证明 */}
-                  <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">违规证明材料（可选）</label>
-                    <div className="space-y-3">
-                      {uploadedImages.length > 0 && <div className="grid grid-cols-2 gap-3">
-                          {uploadedImages.map(image => <div key={image.id} className="relative group">
-                              <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200">
-                                <img src={image.url} alt={image.name} className="w-full h-full object-cover" />
-                              </div>
-                              <button type="button" onClick={() => handleDeleteImage(image.id)} className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-red-600">
-                                <X className="w-3 h-3" />
-                              </button>
-                              <p className="text-xs text-gray-500 mt-1 truncate">{image.name}</p>
-                            </div>)}
-                        </div>}
+                {/* 上传违规证明 */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">违规证明材料（可选）</label>
+                  <div className="space-y-3">
+                    {uploadedImages.length > 0 && <div className="grid grid-cols-2 gap-3">
+                        {uploadedImages.map(image => <div key={image.id} className="relative group">
+                            <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200">
+                              <img src={image.url} alt={image.name} className="w-full h-full object-cover" />
+                            </div>
+                            <button type="button" onClick={() => handleDeleteImage(image.id)} className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-red-600">
+                              <X className="w-3 h-3" />
+                            </button>
+                            <p className="text-xs text-gray-500 mt-1 truncate">{image.name}</p>
+                          </div>)}
+                      </div>}
 
-                      {uploadedImages.length < 4 && <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors">
-                          <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" id="image-upload" />
-                          <Camera className="w-8 h-8 text-gray-400 mb-2" />
-                          <span className="text-sm text-gray-600">点击上传图片</span>
-                          <span className="text-xs text-gray-400 mt-1">最多4张</span>
-                        </label>}
-                    </div>
+                    {uploadedImages.length < 4 && <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                        <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" id="image-upload" />
+                        <Camera className="w-8 h-8 text-gray-400 mb-2" />
+                        <span className="text-sm text-gray-600">点击上传图片</span>
+                        <span className="text-xs text-gray-400 mt-1">最多4张</span>
+                      </label>}
                   </div>
+                </div>
 
-                  <div className="flex gap-3">
-                    <Button onClick={() => {
-                setShowDeductionDialog(false);
-                setSelectedStudent(null);
-                setSelectedDeductionItem(null);
-              }} className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors">
-                      取消
-                    </Button>
-                    <Button onClick={() => {
-                if (!selectedDeductionItem) {
-                  toast({
-                    title: '请选择扣分项目',
-                    variant: 'destructive'
-                  });
-                  return;
-                }
-                const remark = document.getElementById('deduction-remark')?.value || '';
-                handleDeduction(selectedStudent, selectedDeductionItem, remark);
-              }} disabled={!selectedDeductionItem} className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 disabled:bg-gray-300 text-white rounded-lg transition-colors">
-                      确认扣分
-                    </Button>
-                  </div>
-                </>}
+                <div className="flex gap-3">
+                  <Button onClick={() => {
+              setShowDeductionDialog(false);
+              setSelectedStudent(null);
+              setSelectedDeductionItem(null);
+            }} className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors">
+                    取消
+                  </Button>
+                  <Button onClick={() => {
+              if (!selectedDeductionItem) {
+                toast({
+                  title: '请选择扣分项目',
+                  variant: 'destructive'
+                });
+                return;
+              }
+              const remark = document.getElementById('deduction-remark')?.value || '';
+              handleDeduction(selectedStudent, selectedDeductionItem, remark);
+            }} disabled={!selectedDeductionItem} className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 disabled:bg-gray-300 text-white rounded-lg transition-colors">
+                    确认扣分
+                  </Button>
+                </div>
               </div>
             </div>
           </div>}
 
-      {/* 设置对话框 */}
-      {showSettingsModal && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        {/* 设置对话框 */}
+        {showSettingsModal && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
               <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4 rounded-t-xl">
                 <h3 className="text-xl font-bold">折算比例设置</h3>
@@ -988,13 +822,31 @@ export default function DormPointsPage(props) {
                     保存设置
                   </Button>
                 </div>
+
+                {/* 加减分项目管理 */}
+                <div className="border-t border-gray-200 pt-4 mt-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-semibold text-gray-800">加减分项目</h4>
+                    <Button onClick={() => {
+                setShowItemManager(true);
+              }} className="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                      管理项目
+                    </Button>
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    共 {deductionItems.length} 个项目：
+                    {deductionItems.slice(0, 3).map((item, index) => <span key={item.id} className="inline-block px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-[10px] mr-1">
+                        {item.name}（{item.points}）
+                      </span>)}
+                    {deductionItems.length > 3 && <span className="text-gray-400">...</span>}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>}
+          </div>}
 
-      {/* 学期重置确认对话框 */}
-      {showResetConfirm && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        {/* 学期重置确认对话框 */}
+        {showResetConfirm && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
               <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-4 rounded-t-xl">
                 <h3 className="text-xl font-bold">学期重置确认</h3>
@@ -1027,109 +879,122 @@ export default function DormPointsPage(props) {
                     {loading ? '重置中...' : '确认重置'}
                   </Button>
                 </div>
+
+                {/* 加减分项目管理 */}
+                <div className="border-t border-gray-200 pt-4 mt-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-semibold text-gray-800">加减分项目</h4>
+                    <Button onClick={() => {
+                setShowItemManager(true);
+              }} className="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                      管理项目
+                    </Button>
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    共 {deductionItems.length} 个项目：
+                    {deductionItems.slice(0, 3).map((item, index) => <span key={item.id} className="inline-block px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-[10px] mr-1">
+                        {item.name}（{item.points}）
+                      </span>)}
+                    {deductionItems.length > 3 && <span className="text-gray-400">...</span>}
+                  </div>
+                </div>
               </div>
             </div>
           </div>}
 
-      {/* 项目管理模态框 */}
-      {showItemManager && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[80vh] overflow-hidden">
-            <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-4 rounded-t-xl">
-              <h3 className="text-xl font-bold">加减分项目管理</h3>
-              <p className="text-purple-100 text-sm mt-1">管理宿舍积分的加减分项目</p>
-            </div>
-            <div className="p-6 overflow-y-auto max-h-[60vh]">
-              <div className="flex gap-2 mb-4">
-                <Button onClick={handleAddItem} className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors flex items-center justify-center gap-2">
-                  <Plus className="w-4 h-4" />
-                  添加项目
-                </Button>
-              </div>
+          {/* 项目管理模态框 */}
+          {showItemManager && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[80vh] overflow-hidden">
+                <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-4 rounded-t-xl">
+                  <h3 className="text-xl font-bold">加减分项目管理</h3>
+                  <p className="text-purple-100 text-sm mt-1">管理宿舍积分的加减分项目</p>
+                </div>
+                <div className="p-6 overflow-y-auto max-h-[60vh]">
+                  <div className="flex gap-2 mb-4">
+                    <Button onClick={handleAddItem} className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors flex items-center justify-center gap-2">
+                      <Plus className="w-4 h-4" />
+                      添加项目
+                    </Button>
+                  </div>
 
-              {(editingItem !== null || showAddForm) && <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-4">
-                  <h4 className="font-semibold text-gray-800 mb-3">{editingItem ? '编辑项目' : '添加新项目'}</h4>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">项目名称</label>
-                      <input type="text" value={itemFormData.name} onChange={e => setItemFormData({
+                  {(editingItem !== null || showAddForm) && <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-4">
+                      <h4 className="font-semibold text-gray-800 mb-3">{editingItem ? '编辑项目' : '添加新项目'}</h4>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">项目名称</label>
+                          <input type="text" value={itemFormData.name} onChange={e => setItemFormData({
                   ...itemFormData,
                   name: e.target.value
                 })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="例如：宿舍卫生不合格" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">分数</label>
-                      <input type="number" value={itemFormData.points} onChange={e => setItemFormData({
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">分数</label>
+                          <input type="number" value={itemFormData.points} onChange={e => setItemFormData({
                   ...itemFormData,
                   points: parseInt(e.target.value) || 0
                 })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="负数表示扣分" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">分类</label>
-                      <select value={itemFormData.category} onChange={e => setItemFormData({
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">分类</label>
+                          <select value={itemFormData.category} onChange={e => setItemFormData({
                   ...itemFormData,
                   category: e.target.value
                 })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
-                        {itemCategories.map(cat => <option key={cat} value={cat}>
-                            {cat}
-                          </option>)}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">备注说明</label>
-                      <textarea value={itemFormData.remark || ''} onChange={e => setItemFormData({
-                  ...itemFormData,
-                  remark: e.target.value
-                })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none" rows={2} placeholder="例如：为首或提供者扣-40" />
-                    </div>
-                    <div className="flex gap-2">
-                      <Button onClick={() => {
+                            {itemCategories.map(cat => <option key={cat} value={cat}>
+                                {cat}
+                              </option>)}
+                          </select>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button onClick={() => {
                   setEditingItem(null);
                   setShowAddForm(false);
                 }} className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors">
-                        取消
-                      </Button>
-                      <Button onClick={handleSaveItem} className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors">
-                        <Save className="w-4 h-4 mr-1" />
-                        保存
-                      </Button>
-                    </div>
-                  </div>
-                </div>}
-
-              <div className="space-y-2">
-                <h4 className="font-semibold text-gray-800 text-sm">项目列表</h4>
-                {deductionItems.map(item => <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
-                    <div className="flex items-center gap-3 flex-1">
-                      <div className={`px-2 py-0.5 rounded text-xs font-semibold ${item.category === '卫生' ? 'bg-green-100 text-green-700' : item.category === '纪律' ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'}`}>
-                        {item.category}
-                      </div>
-                      <div className="flex-1">
-                        <div className="text-sm font-medium text-gray-800">{item.name}</div>
-                        <div className={`text-xs font-semibold ${item.points < 0 ? 'text-red-600' : 'text-green-600'}`}>
-                          {item.points > 0 ? '+' : ''}{item.points} 分
+                            取消
+                          </Button>
+                          <Button onClick={handleSaveItem} className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors">
+                            <Save className="w-4 h-4 mr-1" />
+                            保存
+                          </Button>
                         </div>
-                        {item.remark && <div className="text-xs text-gray-500 mt-0.5">备注：{item.remark}</div>}
                       </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button onClick={() => handleEditItem(item)} variant="outline" size="icon" className="h-8 w-8">
-                        <Edit2 className="w-4 h-4" />
-                      </Button>
-                      <Button onClick={() => handleDeleteItem(item.id)} variant="outline" size="icon" className="h-8 w-8 text-red-600 hover:bg-red-50 hover:border-red-300">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>)}
-              </div>
-            </div>
-            <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
-              <Button onClick={() => {
+                    </div>}
+
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-gray-800 text-sm">项目列表</h4>
+                    {deductionItems.map(item => <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div className="flex items-center gap-3">
+                          <div className={`px-2 py-0.5 rounded text-xs font-semibold ${item.category === '卫生' ? 'bg-green-100 text-green-700' : item.category === '纪律' ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'}`}>
+                            {item.category}
+                          </div>
+                          <div>
+                            <div className="text-sm font-medium text-gray-800">{item.name}</div>
+                            <div className={`text-xs font-semibold ${item.points < 0 ? 'text-red-600' : 'text-green-600'}`}>
+                              {item.points > 0 ? '+' : ''}{item.points} 分
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button onClick={() => handleEditItem(item)} variant="outline" size="icon" className="h-8 w-8">
+                            <Edit2 className="w-4 h-4" />
+                          </Button>
+                          <Button onClick={() => handleDeleteItem(item.id)} variant="outline" size="icon" className="h-8 w-8 text-red-600 hover:bg-red-50 hover:border-red-300">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>)}
+                  </div>
+                </div>
+                <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
+                  <Button onClick={() => {
             setShowItemManager(false);
           }} className="w-full px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors">
-                关闭
-              </Button>
-            </div>
-          </div>
-        </div>}
-    </>
-  );
+                    关闭
+                  </Button>
+                </div>
+              </div>
+            </div>}
+
+        <TabBar currentPage={currentPage} onPageChange={handlePageChange} />
+      </div>;
+}

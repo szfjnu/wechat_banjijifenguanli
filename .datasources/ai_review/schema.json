@@ -1,0 +1,143 @@
+{
+  "name": "ai_review",
+  "title": "AI评价管理",
+  "schemas": [
+    {
+      "name": "review_id",
+      "title": "评价ID",
+      "type": "String"
+    },
+    {
+      "name": "review_title",
+      "title": "评价主题",
+      "type": "String"
+    },
+    {
+      "name": "review_type",
+      "title": "评价类型",
+      "type": "String"
+    },
+    {
+      "name": "review_date",
+      "title": "评价日期",
+      "type": "Date",
+      "format": "string"
+    },
+    {
+      "name": "time_range",
+      "title": "时间范围",
+      "type": "String"
+    },
+    {
+      "name": "time_range_name",
+      "title": "时间范围名称",
+      "type": "String"
+    },
+    {
+      "name": "target_type",
+      "title": "评价对象类型",
+      "type": "String"
+    },
+    {
+      "name": "student_id",
+      "title": "关联学生ID",
+      "type": "String"
+    },
+    {
+      "name": "student_name",
+      "title": "学生姓名",
+      "type": "String"
+    },
+    {
+      "name": "student_id_number",
+      "title": "学号",
+      "type": "String"
+    },
+    {
+      "name": "class_name",
+      "title": "班级名称",
+      "type": "String"
+    },
+    {
+      "name": "review_content",
+      "title": "评价内容",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "learning_attitude",
+      "title": "学习态度评价",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "academic_performance",
+      "title": "学业成绩评价",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "discipline_behavior",
+      "title": "纪律表现评价",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "comprehensive_quality",
+      "title": "综合素养评价",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "total_points",
+      "title": "总积分",
+      "type": "Number"
+    },
+    {
+      "name": "gpa",
+      "title": "平均绩点",
+      "type": "Number"
+    },
+    {
+      "name": "certificates_count",
+      "title": "证书数量",
+      "type": "Number"
+    },
+    {
+      "name": "volunteer_hours",
+      "title": "志愿服务时长",
+      "type": "Number"
+    },
+    {
+      "name": "growth_suggestions",
+      "title": "成长建议",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "future_outlook",
+      "title": "未来展望",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "is_edited",
+      "title": "是否编辑过",
+      "type": "Boolean"
+    },
+    {
+      "name": "edited_by",
+      "title": "编辑人",
+      "type": "String"
+    },
+    {
+      "name": "edited_at",
+      "title": "编辑时间",
+      "type": "Date",
+      "format": "string"
+    },
+    {
+      "name": "semester_id",
+      "title": "关联学期ID",
+      "type": "Number"
+    },
+    {
+      "name": "semester_name",
+      "title": "学期名称",
+      "type": "String"
+    }
+  ]
+}
