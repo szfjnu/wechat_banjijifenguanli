@@ -1062,8 +1062,9 @@ export default function DormPointsPage(props) {
               </div>
             </div>
           </div>}
+        </div>
 
-          {/* 项目管理模态框 */}
+        {/* 项目管理模态框 */}
           {showItemManager && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
               <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[80vh] overflow-hidden">
                 <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-4 rounded-t-xl">
@@ -1163,6 +1164,7 @@ export default function DormPointsPage(props) {
                 </div>
               </div>
             </div>
+          </div>}
     </>
   );
 }
