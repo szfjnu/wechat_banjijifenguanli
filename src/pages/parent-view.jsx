@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, Badge, Butto
 // @ts-ignore;
 import { User, TrendingUp, Calendar, Target, Award, ShieldAlert, Mail, Phone, MapPin } from 'lucide-react';
 
+import { TabBar } from '@/components/TabBar';
 import StudentComparison from '@/components/StudentComparison';
 import ExcelExport from '@/components/ExcelExport';
 import ReportGenerator from '@/components/ReportGenerator';
@@ -13,6 +14,14 @@ import GrowthChart from '@/components/GrowthChart';
 const ParentView = ({
   $w
 }) => {
+  const [currentPage, setCurrentPage] = useState('parent-view');
+  const handlePageChange = pageId => {
+    setCurrentPage(pageId);
+    $w.utils.navigateTo({
+      pageId,
+      params: {}
+    });
+  };
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [growthRecords, setGrowthRecords] = useState([]);
@@ -132,7 +141,8 @@ const ParentView = ({
         </div>
       </div>;
   }
-  return <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-rose-50 pb-20">
+  return <>
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-rose-50 pb-20">
       {/* 头部标题 */}
       <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-6">
         <h1 className="text-2xl font-bold">家长查看</h1>
@@ -154,9 +164,9 @@ const ParentView = ({
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {parentStudents.map(student => {
-              const isSelected = selectedStudent?.student_id === student.student_id;
-              const scoreLevel = calculateScoreLevel(student.current_score);
-              return <Card key={student.student_id} className={`cursor-pointer transition-all hover:shadow-md ${isSelected ? 'border-2 border-orange-500 bg-orange-50' : ''}`} onClick={() => setSelectedStudent(student)}>
+                const isSelected = selectedStudent?.student_id === student.student_id;
+                const scoreLevel = calculateScoreLevel(student.current_score);
+                return <Card key={student.student_id} className={`cursor-pointer transition-all hover:shadow-md ${isSelected ? 'border-2 border-orange-500 bg-orange-50' : ''}`} onClick={() => setSelectedStudent(student)}>
                     <CardContent className="p-4">
                       <div className="text-center">
                         <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-2">
@@ -167,15 +177,15 @@ const ParentView = ({
                           {student.class_name}
                         </p>
                         <Badge className="mt-2" style={{
-                      backgroundColor: scoreLevel.bgColor,
-                      color: scoreLevel.color
-                    }}>
+                        backgroundColor: scoreLevel.bgColor,
+                        color: scoreLevel.color
+                      }}>
                           {student.current_score}分
                         </Badge>
                       </div>
                     </CardContent>
                   </Card>;
-            })}
+              })}
             </div>
           </CardContent>
         </Card>
@@ -413,6 +423,8 @@ const ParentView = ({
 
           <ReportGenerator open={showReport} onOpenChange={setShowReport} studentData={selectedStudent} growthData={growthRecords} />
         </>}
-    </div>;
+      </div>
+      <TabBar currentPage={currentPage} onPageChange={handlePageChange} />
+    </>;
 };
 export default ParentView;

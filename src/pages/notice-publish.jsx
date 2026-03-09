@@ -24,6 +24,10 @@ export default function NoticePublish(props) {
   const [noticeHistory, setNoticeHistory] = useState([]);
   const handlePageChange = pageId => {
     setCurrentPage(pageId);
+    $w.utils.navigateTo({
+      pageId,
+      params: {}
+    });
   };
 
   // 表单管理
