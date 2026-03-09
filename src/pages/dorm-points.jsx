@@ -8,59 +8,6 @@ import { Button, useToast } from '@/components/ui';
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 
-// 宿舍扣分项目预设数据
-const DEDUCTION_ITEMS = [{
-  id: 1,
-  name: '宿舍卫生不合格',
-  points: -5,
-  category: '卫生'
-}, {
-  id: 2,
-  name: '晚归',
-  points: -3,
-  category: '纪律'
-}, {
-  id: 3,
-  name: '夜不归宿',
-  points: -10,
-  category: '纪律'
-}, {
-  id: 4,
-  name: '使用违规电器',
-  points: -8,
-  category: '安全'
-}, {
-  id: 5,
-  name: '宿舍内吸烟',
-  points: -15,
-  category: '纪律'
-}, {
-  id: 6,
-  name: '干扰他人休息',
-  points: -4,
-  category: '纪律'
-}, {
-  id: 7,
-  name: '私接电线',
-  points: -6,
-  category: '安全'
-}, {
-  id: 8,
-  name: '宿舍内饮酒',
-  points: -12,
-  category: '纪律'
-}, {
-  id: 9,
-  name: '床位整理不规范',
-  points: -2,
-  category: '卫生'
-}, {
-  id: 10,
-  name: '未按时熄灯',
-  points: -3,
-  category: '纪律'
-}];
-
 // 折算比例配置（默认30%）
 const CONVERSION_RATE = 0.3;
 export default function DormPointsPage(props) {
@@ -93,7 +40,8 @@ export default function DormPointsPage(props) {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showItemManager, setShowItemManager] = useState(false);
   const [newConversionRate, setNewConversionRate] = useState(CONVERSION_RATE);
-  const [deductionItems, setDeductionItems] = useState([...DEDUCTION_ITEMS]);
+  const [deductionItems, setDeductionItems] = useState([]);
+  const [loadingDeductionItems, setLoadingDeductionItems] = useState(true);
   const [editingItem, setEditingItem] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [itemFormData, setItemFormData] = useState({
@@ -105,7 +53,40 @@ export default function DormPointsPage(props) {
 
   // 项目分类
   const itemCategories = ['卫生', '纪律', '安全'];
+
+  // 加载扣分项目数据
+  const loadDeductionItems = async () => {
+    try {
+      setLoadingDeductionItems(true);
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('dorm_deduction_items').where({
+        is_enabled: true
+      }).orderBy('priority', 'asc').get();
+      const items = result.data.map(item => ({
+        id: item.item_id,
+        name: item.item_name,
+        points: item.points,
+        category: item.item_category,
+        description: item.description,
+        icon_name: item.icon_name,
+        priority: item.priority,
+        item_code: item.item_code
+      }));
+      setDeductionItems(items);
+    } catch (error) {
+      console.error('加载扣分项目失败:', error);
+      toast({
+        title: '加载失败',
+        description: '无法加载扣分项目数据，请稍后重试',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoadingDeductionItems(false);
+    }
+  };
   useEffect(() => {
+    loadDeductionItems();
     loadDormStudentsData();
     loadDeductionHistory();
   }, []);
@@ -118,7 +99,16 @@ export default function DormPointsPage(props) {
       id: null,
       name: '',
       points: 0,
-      category: '卫生'
+      category: '卫生',
+      description: '',
+      priority: 5
+    });
+  };
+  const handleRefreshItems = () => {
+    loadDeductionItems();
+    toast({
+      title: '刷新成功',
+      description: '扣分项目列表已更新'
     });
   };
   const handleEditItem = item => {
@@ -128,7 +118,7 @@ export default function DormPointsPage(props) {
       ...item
     });
   };
-  const handleSaveItem = () => {
+  const handleSaveItem = async () => {
     if (!itemFormData.name || itemFormData.points === 0) {
       toast({
         title: '请填写完整信息',
@@ -137,50 +127,88 @@ export default function DormPointsPage(props) {
       });
       return;
     }
-    if (editingItem) {
-      // 编辑
-      setDeductionItems(items => items.map(item => item.id === editingItem.id ? {
-        ...itemFormData,
-        id: editingItem.id
-      } : item));
-      toast({
-        title: '保存成功',
-        description: '项目已更新'
+    try {
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+      if (editingItem) {
+        // 编辑
+        await db.collection('dorm_deduction_items').doc(editingItem.id).update({
+          item_name: itemFormData.name,
+          points: itemFormData.points,
+          item_category: itemFormData.category,
+          description: itemFormData.description,
+          priority: itemFormData.priority,
+          update_date: new Date().toISOString().split('T')[0]
+        });
+        toast({
+          title: '保存成功',
+          description: '项目已更新到数据库'
+        });
+      } else {
+        // 新增
+        const newItem = {
+          item_id: `DDI${Date.now()}`,
+          item_code: `D${String(deductionItems.length + 1).padStart(3, '0')}`,
+          item_name: itemFormData.name,
+          item_category: itemFormData.category,
+          description: itemFormData.description,
+          points: itemFormData.points,
+          is_enabled: true,
+          priority: itemFormData.priority || 5,
+          icon_name: 'AlertTriangle',
+          creator: '系统管理员',
+          created_date: new Date().toISOString().split('T')[0],
+          update_date: new Date().toISOString().split('T')[0]
+        };
+        await db.collection('dorm_deduction_items').add(newItem);
+        toast({
+          title: '添加成功',
+          description: '新项目已添加到数据库'
+        });
+      }
+      await loadDeductionItems();
+      setEditingItem(null);
+      setShowAddForm(false);
+      setItemFormData({
+        id: null,
+        name: '',
+        points: 0,
+        category: '卫生',
+        description: '',
+        priority: 5
       });
-    } else {
-      // 新增
-      const newItem = {
-        ...itemFormData,
-        id: Math.max(...deductionItems.map(i => i.id), 0) + 1
-      };
-      setDeductionItems([...deductionItems, newItem]);
+    } catch (error) {
+      console.error('保存扣分项目失败:', error);
       toast({
-        title: '添加成功',
-        description: '新项目已添加'
+        title: '操作失败',
+        description: error.message || '操作失败，请稍后重试',
+        variant: 'destructive'
       });
     }
-    setEditingItem(null);
-    setShowAddForm(false);
-    setItemFormData({
-      id: null,
-      name: '',
-      points: 0,
-      category: '卫生'
-    });
   };
-  const handleDeleteItem = id => {
+  const handleDeleteItem = async id => {
     if (confirm('确定要删除这个项目吗？')) {
-      setDeductionItems(items => items.filter(item => item.id !== id));
-      toast({
-        title: '删除成功',
-        description: '项目已删除'
-      });
+      try {
+        const tcb = await props.$w.cloud.getCloudInstance();
+        const db = tcb.database();
+        await db.collection('dorm_deduction_items').doc(id).update({
+          is_enabled: false
+        });
+        await loadDeductionItems();
+        toast({
+          title: '删除成功',
+          description: '项目已禁用'
+        });
+      } catch (error) {
+        console.error('删除扣分项目失败:', error);
+        toast({
+          title: '删除失败',
+          description: error.message || '删除失败，请稍后重试',
+          variant: 'destructive'
+        });
+      }
     }
   };
-  useEffect(() => {
-    loadDormStudentsData();
-    loadDeductionHistory();
-  }, []);
   const loadDormStudentsData = async () => {
     try {
       setLoading(true);
@@ -704,9 +732,9 @@ export default function DormPointsPage(props) {
               <div className="p-6">
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">选择扣分项目</label>
-                  <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" value={selectedDeductionItem?.id || ''} onChange={e => setSelectedDeductionItem(DEDUCTION_ITEMS.find(item => item.id === parseInt(e.target.value)))}>
+                  <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" value={selectedDeductionItem?.id || ''} onChange={e => setSelectedDeductionItem(deductionItems.find(item => item.id === e.target.value))}>
                     <option value="">请选择扣分项目</option>
-                    {DEDUCTION_ITEMS.map(item => <option key={item.id} value={item.id}>
+                    {deductionItems.map(item => <option key={item.id} value={item.id}>
                         {item.name}（{item.points > 0 ? '+' : ''}{item.points}分）
                       </option>)}
                   </select>
@@ -944,6 +972,20 @@ export default function DormPointsPage(props) {
                                 {cat}
                               </option>)}
                           </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">优先级</label>
+                          <input type="number" value={itemFormData.priority || 5} onChange={e => setItemFormData({
+                  ...itemFormData,
+                  priority: parseInt(e.target.value)
+                })} min="1" max="10" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="1-10，越小越优先" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">描述</label>
+                          <textarea value={itemFormData.description || ''} onChange={e => setItemFormData({
+                  ...itemFormData,
+                  description: e.target.value
+                })} rows="2" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="请输入项目描述" />
                         </div>
                         <div className="flex gap-2">
                           <Button onClick={() => {

@@ -1,0 +1,73 @@
+{
+  "name": "dorm_deduction_items",
+  "title": "宿舍扣分项目",
+  "schemas": [
+    {
+      "name": "item_id",
+      "title": "扣分项目ID",
+      "type": "String"
+    },
+    {
+      "name": "item_code",
+      "title": "扣分项目编号",
+      "type": "String"
+    },
+    {
+      "name": "item_name",
+      "title": "扣分项目名称",
+      "type": "String"
+    },
+    {
+      "name": "item_category",
+      "title": "扣分项目分类",
+      "type": "String"
+    },
+    {
+      "name": "description",
+      "title": "描述",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "points",
+      "title": "分值",
+      "type": "Number"
+    },
+    {
+      "name": "is_enabled",
+      "title": "是否启用",
+      "type": "Boolean"
+    },
+    {
+      "name": "priority",
+      "title": "优先级",
+      "type": "Number"
+    },
+    {
+      "name": "icon_name",
+      "title": "图标名称",
+      "type": "String"
+    },
+    {
+      "name": "creator",
+      "title": "创建人",
+      "type": "String"
+    },
+    {
+      "name": "created_date",
+      "title": "创建日期",
+      "type": "Date",
+      "format": "string"
+    },
+    {
+      "name": "update_date",
+      "title": "更新日期",
+      "type": "Date",
+      "format": "string"
+    },
+    {
+      "name": "remark",
+      "title": "备注",
+      "type": "MultiLineString"
+    }
+  ]
+}
