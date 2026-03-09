@@ -1,59 +1,11 @@
 // @ts-ignore;
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 // @ts-ignore;
 import { Brain, Sparkles, User, Users, Calendar, TrendingUp, Award, ShieldAlert, Heart, BookOpen, Download, Share2, Edit3, Save, CheckCircle, AlertCircle, FileText } from 'lucide-react';
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
 
 import { TabBar } from '@/components/TabBar';
-
-// 模拟学生数据
-const MOCK_STUDENTS = [{
-  id: 1,
-  name: '张三',
-  studentId: '2024001',
-  group: '第一组',
-  totalPoints: 156,
-  gpa: 3.8,
-  certificates: 3,
-  volunteerHours: 15
-}, {
-  id: 2,
-  name: '李四',
-  studentId: '2024002',
-  group: '第一组',
-  totalPoints: 134,
-  gpa: 3.5,
-  certificates: 2,
-  volunteerHours: 20
-}, {
-  id: 3,
-  name: '王五',
-  studentId: '2024003',
-  group: '第二组',
-  totalPoints: 145,
-  gpa: 3.6,
-  certificates: 4,
-  volunteerHours: 18
-}, {
-  id: 4,
-  name: '赵六',
-  studentId: '2024004',
-  group: '第二组',
-  totalPoints: 128,
-  gpa: 3.3,
-  certificates: 1,
-  volunteerHours: 12
-}, {
-  id: 5,
-  name: '钱七',
-  studentId: '2024005',
-  group: '第三组',
-  totalPoints: 167,
-  gpa: 4.0,
-  certificates: 5,
-  volunteerHours: 25
-}];
 
 // 时间范围选项
 const TIME_RANGE_OPTIONS = [{
@@ -91,9 +43,153 @@ export default function AIReviewPage(props) {
   const [reviewContent, setReviewContent] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [savedReviews, setSavedReviews] = useState([]);
+  const [students, setStudents] = useState([]);
+  const [loadingStudents, setLoadingStudents] = useState(false);
+  const [loadingReviews, setLoadingReviews] = useState(false);
+  const [studentDetail, setStudentDetail] = useState(null);
+
+  // 加载学生数据
+  const loadStudents = async () => {
+    try {
+      setLoadingStudents(true);
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('student').get();
+      const studentsData = result.data.map(student => ({
+        id: student._id,
+        name: student.name || '未命名',
+        studentId: student.student_id || '',
+        group: student.group || '未分组',
+        totalPoints: parseFloat(student.current_score) || 0
+      }));
+      setStudents(studentsData);
+    } catch (error) {
+      console.error('加载学生数据失败:', error);
+      toast({
+        title: '加载失败',
+        description: '无法加载学生数据，请稍后重试',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoadingStudents(false);
+    }
+  };
+
+  // 加载学生成绩数据（按时间范围）
+  const loadStudentGrades = async (studentId, timeRange) => {
+    try {
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+      let query = {
+        student_id: studentId
+      };
+      const result = await db.collection('grade').where(query).get();
+      if (result.data.length === 0) {
+        return 0;
+      }
+      const gpas = result.data.map(grade => grade.gpa).filter(gpa => gpa != null && !isNaN(parseFloat(gpa)));
+      if (gpas.length === 0) {
+        return 0;
+      }
+      const sumGpa = gpas.reduce((sum, gpa) => sum + parseFloat(gpa), 0);
+      return (sumGpa / gpas.length).toFixed(2);
+    } catch (error) {
+      console.error('加载学生成绩失败:', error);
+      return 0;
+    }
+  };
+
+  // 加载学生证书数量
+  const loadStudentCertificates = async studentId => {
+    try {
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('certificate').where({
+        student_id: parseInt(studentId)
+      }).get();
+      return result.data.length;
+    } catch (error) {
+      console.error('加载学生证书失败:', error);
+      return 0;
+    }
+  };
+
+  // 加载学生志愿时长（按时间范围）
+  const loadStudentVolunteerHours = async (studentId, timeRange) => {
+    try {
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('volunteer_record').where({
+        student_id: studentId
+      }).get();
+      if (result.data.length === 0) {
+        return 0;
+      }
+      const totalHours = result.data.reduce((sum, record) => sum + (parseFloat(record.duration) || 0), 0);
+      return totalHours;
+    } catch (error) {
+      console.error('加载志愿时长失败:', error);
+      return 0;
+    }
+  };
+
+  // 加载已保存的点评记录
+
+  // 加载学生详细数据（GPA、证书、志愿时长）
+  const loadStudentDetail = async student => {
+    try {
+      const gpa = await loadStudentGrades(student.studentId, selectedTimeRange);
+      const certificates = await loadStudentCertificates(student.studentId);
+      const volunteerHours = await loadStudentVolunteerHours(student.studentId, selectedTimeRange);
+      setStudentDetail({
+        ...student,
+        gpa,
+        certificates,
+        volunteerHours
+      });
+    } catch (error) {
+      console.error('加载学生详细信息失败:', error);
+      setStudentDetail({
+        ...student,
+        gpa: 0,
+        certificates: 0,
+        volunteerHours: 0
+      });
+    }
+  };
+  const loadSavedReviews = async () => {
+    try {
+      setLoadingReviews(true);
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('ai_review_record').orderBy('created_date', 'desc').get();
+      const reviews = result.data.map(record => ({
+        id: record.record_id,
+        studentId: record.student_id,
+        studentName: record.student_name,
+        timeRange: record.time_range,
+        content: record.content,
+        createdAt: record.created_date || new Date().toISOString()
+      }));
+      setSavedReviews(reviews);
+    } catch (error) {
+      console.error('加载历史记录失败:', error);
+      toast({
+        title: '加载失败',
+        description: '无法加载历史记录，请稍后重试',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoadingReviews(false);
+    }
+  };
+  useEffect(() => {
+    loadStudents();
+    loadSavedReviews();
+  }, []);
 
   // 生成AI点评
-  const generateReview = () => {
+  const generateReview = async () => {
     if (!isClassReview && !selectedStudent) {
       toast({
         title: '请选择学生',
@@ -103,16 +199,47 @@ export default function AIReviewPage(props) {
       return;
     }
     setIsGenerating(true);
-
-    // 模拟AI生成过程
-    setTimeout(() => {
+    try {
+      let studentData;
       const studentName = isClassReview ? '全班同学' : selectedStudent.name;
-      const studentData = isClassReview ? {
-        totalPoints: 145,
-        gpa: 3.64,
-        certificates: 3.2,
-        volunteerHours: 18
-      } : selectedStudent;
+      if (isClassReview) {
+        // 班级点评：聚合所有学生的数据
+        if (students.length === 0) {
+          throw new Error('没有可用的学生数据');
+        }
+        const allStudentsData = await Promise.all(students.map(async student => {
+          const gpa = await loadStudentGrades(student.studentId, selectedTimeRange);
+          const certificates = await loadStudentCertificates(student.studentId);
+          const volunteerHours = await loadStudentVolunteerHours(student.studentId, selectedTimeRange);
+          return {
+            ...student,
+            gpa,
+            certificates,
+            volunteerHours
+          };
+        }));
+        const totalPoints = allStudentsData.reduce((sum, s) => sum + s.totalPoints, 0);
+        const avgGpa = allStudentsData.reduce((sum, s) => sum + parseFloat(s.gpa), 0) / allStudentsData.length;
+        const avgCertificates = allStudentsData.reduce((sum, s) => sum + s.certificates, 0) / allStudentsData.length;
+        const avgVolunteerHours = allStudentsData.reduce((sum, s) => sum + s.volunteerHours, 0) / allStudentsData.length;
+        studentData = {
+          totalPoints,
+          gpa: avgGpa.toFixed(2),
+          certificates: avgCertificates.toFixed(1),
+          volunteerHours: avgVolunteerHours.toFixed(1)
+        };
+      } else {
+        // 个人点评：加载该学生的详细数据
+        const gpa = await loadStudentGrades(selectedStudent.studentId, selectedTimeRange);
+        const certificates = await loadStudentCertificates(selectedStudent.studentId);
+        const volunteerHours = await loadStudentVolunteerHours(selectedStudent.studentId, selectedTimeRange);
+        studentData = {
+          ...selectedStudent,
+          gpa,
+          certificates,
+          volunteerHours
+        };
+      }
       const review = generateMockReview(studentName, studentData, selectedTimeRange);
       setReviewContent(review);
       setIsGenerating(false);
@@ -121,7 +248,15 @@ export default function AIReviewPage(props) {
         title: 'AI点评已生成',
         description: '点评内容已生成，您可以进行编辑和保存'
       });
-    }, 2000);
+    } catch (error) {
+      console.error('生成点评失败:', error);
+      setIsGenerating(false);
+      toast({
+        title: '生成失败',
+        description: error.message || '生成点评时出错，请稍后重试',
+        variant: 'destructive'
+      });
+    }
   };
 
   // 生成模拟点评内容
@@ -208,20 +343,40 @@ ${name}同学在本学期表现优异，总积分达到${data.totalPoints}分，
   };
 
   // 保存点评
-  const saveReview = () => {
-    const review = {
-      id: Date.now(),
-      studentId: isClassReview ? 'class' : selectedStudent.id,
-      studentName: isClassReview ? '全班' : selectedStudent.name,
-      timeRange: selectedTimeRange,
-      content: reviewContent,
-      createdAt: new Date().toISOString()
-    };
-    setSavedReviews([...savedReviews, review]);
-    toast({
-      title: '点评已保存',
-      description: '点评内容已成功保存到历史记录'
-    });
+  const saveReview = async () => {
+    try {
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const newReview = {
+        record_id: `AR${Date.now()}`,
+        student_id: isClassReview ? 'class' : selectedStudent.studentId,
+        student_name: isClassReview ? '全班' : selectedStudent.name,
+        group: isClassReview ? '全部' : selectedStudent.group,
+        review_type: isClassReview ? 'class' : 'personal',
+        time_range: selectedTimeRange,
+        content: reviewContent,
+        total_points: isClassReview ? 0 : parseFloat(selectedStudent.totalPoints) || 0,
+        gpa: 0,
+        certificates_count: 0,
+        volunteer_hours: 0,
+        created_date: new Date().toISOString().split('T')[0],
+        created_by: props.$w?.auth?.currentUser?.name || '系统管理员',
+        remark: ''
+      };
+      await db.collection('ai_review_record').add(newReview);
+      await loadSavedReviews();
+      toast({
+        title: '点评已保存',
+        description: '点评内容已成功保存到数据库'
+      });
+    } catch (error) {
+      console.error('保存点评失败:', error);
+      toast({
+        title: '保存失败',
+        description: error.message || '保存点评失败，请稍后重试',
+        variant: 'destructive'
+      });
+    }
   };
 
   // 导出点评
@@ -287,12 +442,17 @@ ${name}同学在本学期表现优异，总积分达到${data.totalPoints}分，
           {!isClassReview && <div className="mt-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">选择学生</label>
               <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500" value={selectedStudent?.id || ''} onChange={e => {
-            const student = MOCK_STUDENTS.find(s => s.id === parseInt(e.target.value));
+            const student = students.find(s => s.id === e.target.value);
             setSelectedStudent(student);
             setReviewContent('');
+            if (student) {
+              loadStudentDetail(student);
+            } else {
+              setStudentDetail(null);
+            }
           }}>
                 <option value="">请选择学生</option>
-                {MOCK_STUDENTS.map(student => <option key={student.id} value={student.id}>
+                {students.map(student => <option key={student.id} value={student.id}>
                     {student.name}（{student.studentId}）- {student.group} - 当前积分：{student.totalPoints}分
                   </option>)}
               </select>
@@ -312,15 +472,15 @@ ${name}同学在本学期表现优异，总积分达到${data.totalPoints}分，
                       <div className="text-xs text-gray-600">当前积分</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-rose-600">{selectedStudent.gpa}</div>
+                      <div className="text-2xl font-bold text-rose-600">{studentDetail?.gpa || '加载中...'}</div>
                       <div className="text-xs text-gray-600">GPA</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-purple-600">{selectedStudent.certificates}</div>
+                      <div className="text-2xl font-bold text-purple-600">{studentDetail?.certificates || '加载中...'}</div>
                       <div className="text-xs text-gray-600">证书数</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-blue-600">{selectedStudent.volunteerHours}</div>
+                      <div className="text-2xl font-bold text-blue-600">{studentDetail?.volunteerHours || '加载中...'}</div>
                       <div className="text-xs text-gray-600">志愿时长</div>
                     </div>
                   </div>

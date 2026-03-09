@@ -1,0 +1,87 @@
+{
+  "name": "ai_review_record",
+  "title": "AI 点评记录管理",
+  "schemas": [
+    {
+      "name": "record_id",
+      "title": "记录ID",
+      "type": "String"
+    },
+    {
+      "name": "student_id",
+      "title": "关联学生ID",
+      "type": "String"
+    },
+    {
+      "name": "student_name",
+      "title": "学生姓名",
+      "type": "String"
+    },
+    {
+      "name": "group",
+      "title": "分组",
+      "type": "String"
+    },
+    {
+      "name": "review_type",
+      "title": "点评类型",
+      "type": "String"
+    },
+    {
+      "name": "time_range",
+      "title": "时间范围",
+      "type": "String"
+    },
+    {
+      "name": "content",
+      "title": "点评内容",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "semester_id",
+      "title": "关联学期ID",
+      "type": "Number"
+    },
+    {
+      "name": "semester_name",
+      "title": "学期名称",
+      "type": "String"
+    },
+    {
+      "name": "total_points",
+      "title": "总积分",
+      "type": "Number"
+    },
+    {
+      "name": "gpa",
+      "title": "GPA",
+      "type": "Number"
+    },
+    {
+      "name": "certificates_count",
+      "title": "证书数",
+      "type": "Number"
+    },
+    {
+      "name": "volunteer_hours",
+      "title": "志愿时长",
+      "type": "Number"
+    },
+    {
+      "name": "created_date",
+      "title": "创建日期",
+      "type": "Date",
+      "format": "string"
+    },
+    {
+      "name": "created_by",
+      "title": "创建人",
+      "type": "String"
+    },
+    {
+      "name": "remark",
+      "title": "备注",
+      "type": "MultiLineString"
+    }
+  ]
+}
