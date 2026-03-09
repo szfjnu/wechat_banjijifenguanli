@@ -9,56 +9,210 @@ import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 
 // 宿舍扣分项目预设数据
-const DEDUCTION_ITEMS = [{
+const DEDUCTION_ITEMS = [
+// 纪律类
+{
   id: 1,
-  name: '宿舍卫生不合格',
-  points: -5,
-  category: '卫生'
+  name: '迟离宿舍，迟归宿舍',
+  points: -3,
+  category: '纪律',
+  remark: ''
 }, {
   id: 2,
-  name: '晚归',
+  name: '不按学校要求贴宿舍门牌照片',
   points: -3,
-  category: '纪律'
+  category: '纪律',
+  remark: ''
 }, {
   id: 3,
-  name: '夜不归宿',
-  points: -10,
-  category: '纪律'
+  name: '不穿校服，不按要求穿校服、穿拖鞋',
+  points: -3,
+  category: '纪律',
+  remark: ''
 }, {
   id: 4,
-  name: '使用违规电器',
-  points: -8,
-  category: '安全'
+  name: '打牌',
+  points: -30,
+  category: '纪律',
+  remark: '为首或提供者扣-40'
 }, {
   id: 5,
-  name: '宿舍内吸烟',
-  points: -15,
-  category: '纪律'
+  name: '抽烟',
+  points: -20,
+  category: '纪律',
+  remark: ''
 }, {
   id: 6,
-  name: '干扰他人休息',
-  points: -4,
-  category: '纪律'
+  name: '留不住宿人员过夜',
+  points: -10,
+  category: '纪律',
+  remark: '带走读生回宿舍'
 }, {
   id: 7,
-  name: '私接电线',
-  points: -6,
-  category: '安全'
+  name: '以粗言秽语辱骂、攻击他人，引起误会和矛盾',
+  points: -20,
+  category: '纪律',
+  remark: ''
 }, {
   id: 8,
-  name: '宿舍内饮酒',
-  points: -12,
-  category: '纪律'
+  name: '不服从或不顶撞管理人员',
+  points: -20,
+  category: '纪律',
+  remark: ''
 }, {
   id: 9,
-  name: '床位整理不规范',
-  points: -2,
-  category: '卫生'
+  name: '喝酒',
+  points: -30,
+  category: '纪律',
+  remark: '一次扣20分，提供酒类、为首者、喝酒造成恶劣影响扣-30'
 }, {
   id: 10,
+  name: '在宿舍打架',
+  points: -40,
+  category: '纪律',
+  remark: '为策划或为首者扣-40'
+}, {
+  id: 11,
+  name: '持械打架',
+  points: -50,
+  category: '纪律',
+  remark: '持械打架扣-50'
+}, {
+  id: 12,
+  name: '晚上不交手机',
+  points: -10,
+  category: '纪律',
+  remark: '第一次扣-10分'
+}, {
+  id: 13,
+  name: '交模型机',
+  points: -20,
+  category: '纪律',
+  remark: '第二、三次扣-20'
+}, {
+  id: 14,
+  name: '迟交手机',
+  points: -20,
+  category: '纪律',
+  remark: '第二、三次扣-20'
+}, {
+  id: 15,
+  name: '加分',
+  points: 2,
+  category: '纪律',
+  remark: '可通过连续日劳动，每次加回2分，其他加分等'
+},
+// 卫生类
+{
+  id: 16,
+  name: '宿舍卫生不合格',
+  points: -5,
+  category: '卫生',
+  remark: ''
+}, {
+  id: 17,
+  name: '床位整理不规范',
+  points: -2,
+  category: '卫生',
+  remark: ''
+}, {
+  id: 18,
   name: '未按时熄灯',
   points: -3,
-  category: '纪律'
+  category: '卫生',
+  remark: ''
+}, {
+  id: 19,
+  name: '个人内务卫生差、值日生差',
+  points: -3,
+  category: '卫生',
+  remark: '个人物品问题（比如上课离开宿舍没拨充电器，晚修离开宿舍没关灯，故意遮挡宿舍门窗等）'
+}, {
+  id: 20,
+  name: '异常留校',
+  points: -3,
+  category: '卫生',
+  remark: '一次扣3分，顶替违纪一次扣10分'
+},
+// 安全类
+{
+  id: 21,
+  name: '缺宿',
+  points: -10,
+  category: '安全',
+  remark: ''
+}, {
+  id: 22,
+  name: '窜宿舍',
+  points: -5,
+  category: '安全',
+  remark: ''
+}, {
+  id: 23,
+  name: '晚归',
+  points: -3,
+  category: '安全',
+  remark: ''
+}, {
+  id: 24,
+  name: '妨碍他人休息',
+  points: -5,
+  category: '安全',
+  remark: '一次扣5分，严重者扣10'
+}, {
+  id: 25,
+  name: '妨碍他人休息（严重）',
+  points: -10,
+  category: '安全',
+  remark: '一次扣5分，严重者扣10'
+}, {
+  id: 26,
+  name: '私带或使用宿舍管理违禁品',
+  points: -20,
+  category: '安全',
+  remark: ''
+}, {
+  id: 27,
+  name: '破坏宿舍公物及私拆公共设施封条',
+  points: -20,
+  category: '安全',
+  remark: ''
+}, {
+  id: 28,
+  name: '宿舍内发现烟、烟头、烟盒、打火机',
+  points: -10,
+  category: '安全',
+  remark: ''
+}, {
+  id: 29,
+  name: '私自调换宿舍',
+  points: -10,
+  category: '安全',
+  remark: '主动认错一次扣5分'
+}, {
+  id: 30,
+  name: '在宿舍贩卖烟酒食品，私自派发传单',
+  points: -50,
+  category: '安全',
+  remark: ''
+}, {
+  id: 31,
+  name: '私自带入危险品（如刀具等）',
+  points: -50,
+  category: '安全',
+  remark: '（注：原表未明确列出，但属于安全类高风险行为，建议补充）'
+}, {
+  id: 32,
+  name: '使用违规电器',
+  points: -8,
+  category: '安全',
+  remark: ''
+}, {
+  id: 33,
+  name: '私接电线',
+  points: -6,
+  category: '安全',
+  remark: ''
 }];
 
 // 折算比例配置（默认30%）
@@ -100,7 +254,8 @@ export default function DormPointsPage(props) {
     id: null,
     name: '',
     points: 0,
-    category: '卫生'
+    category: '卫生',
+    remark: ''
   });
 
   // 项目分类
@@ -118,7 +273,8 @@ export default function DormPointsPage(props) {
       id: null,
       name: '',
       points: 0,
-      category: '卫生'
+      category: '卫生',
+      remark: ''
     });
   };
   const handleEditItem = item => {
@@ -707,19 +863,23 @@ export default function DormPointsPage(props) {
                   <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" value={selectedDeductionItem?.id || ''} onChange={e => setSelectedDeductionItem(DEDUCTION_ITEMS.find(item => item.id === parseInt(e.target.value)))}>
                     <option value="">请选择扣分项目</option>
                     {DEDUCTION_ITEMS.map(item => <option key={item.id} value={item.id}>
-                        {item.name}（{item.points > 0 ? '+' : ''}{item.points}分）
+                        {item.name}（{item.points > 0 ? '+' : ''}{item.points}分）{item.remark ? ` - ${item.remark}` : ''}
                       </option>)}
                   </select>
                 </div>
 
-                {selectedDeductionItem && <div className="mb-4 p-4 bg-red-50 rounded-lg border border-red-200">
+                {selectedDeductionItem && <>
+                  <div className="mb-4 p-4 bg-red-50 rounded-lg border border-red-200">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-gray-700">预计变化</span>
                       <span className={`text-lg font-bold ${selectedDeductionItem.points < 0 ? 'text-red-600' : 'text-green-600'}`}>
                         {selectedDeductionItem.points > 0 ? '+' : ''}{selectedDeductionItem.points}分
                       </span>
                     </div>
-                    <div className="flex items-center justify-between text-sm text-gray-600">
+                    {selectedDeductionItem.remark && <div className="text-sm text-gray-600 mt-2 p-2 bg-white rounded border border-red-200">
+                        <span className="font-medium">备注：</span>{selectedDeductionItem.remark}
+                      </div>}
+                    <div className="flex items-center justify-between text-sm text-gray-600 mt-2">
                       <span>折算到总积分</span>
                       <span className={`font-medium ${selectedDeductionItem.points * conversionRate < 0 ? 'text-orange-600' : 'text-green-600'}`}>
                         {(selectedDeductionItem.points * conversionRate).toFixed(1)}分
@@ -731,63 +891,61 @@ export default function DormPointsPage(props) {
                         {selectedStudent.dormPoints + selectedDeductionItem.points}分
                       </span>
                     </div>
-                  </div>}
-
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">备注（可选）</label>
-                  <textarea className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 resize-none" rows={3} placeholder="输入备注信息..." id="deduction-remark" />
-                </div>
-
-                {/* 上传违规证明 */}
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">违规证明材料（可选）</label>
-                  <div className="space-y-3">
-                    {uploadedImages.length > 0 && <div className="grid grid-cols-2 gap-3">
-                        {uploadedImages.map(image => <div key={image.id} className="relative group">
-                            <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200">
-                              <img src={image.url} alt={image.name} className="w-full h-full object-cover" />
-                            </div>
-                            <button type="button" onClick={() => handleDeleteImage(image.id)} className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-red-600">
-                              <X className="w-3 h-3" />
-                            </button>
-                            <p className="text-xs text-gray-500 mt-1 truncate">{image.name}</p>
-                          </div>)}
-                      </div>}
-
-                    {uploadedImages.length < 4 && <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors">
-                        <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" id="image-upload" />
-                        <Camera className="w-8 h-8 text-gray-400 mb-2" />
-                        <span className="text-sm text-gray-600">点击上传图片</span>
-                        <span className="text-xs text-gray-400 mt-1">最多4张</span>
-                      </label>}
                   </div>
-                </div>
 
-                <div className="flex gap-3">
-                  <Button onClick={() => {
-              setShowDeductionDialog(false);
-              setSelectedStudent(null);
-              setSelectedDeductionItem(null);
-            }} className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors">
-                    取消
-                  </Button>
-                  <Button onClick={() => {
-              if (!selectedDeductionItem) {
-                toast({
-                  title: '请选择扣分项目',
-                  variant: 'destructive'
-                });
-                return;
-              }
-              const remark = document.getElementById('deduction-remark')?.value || '';
-              handleDeduction(selectedStudent, selectedDeductionItem, remark);
-            }} disabled={!selectedDeductionItem} className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 disabled:bg-gray-300 text-white rounded-lg transition-colors">
-                    确认扣分
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">备注（可选）</label>
+                    <textarea className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 resize-none" rows={3} placeholder="输入备注信息..." id="deduction-remark" />
+                  </div>
+
+                  {/* 上传违规证明 */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">违规证明材料（可选）</label>
+                    <div className="space-y-3">
+                      {uploadedImages.length > 0 && <div className="grid grid-cols-2 gap-3">
+                          {uploadedImages.map(image => <div key={image.id} className="relative group">
+                              <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200">
+                                <img src={image.url} alt={image.name} className="w-full h-full object-cover" />
+                              </div>
+                              <button type="button" onClick={() => handleDeleteImage(image.id)} className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-red-600">
+                                <X className="w-3 h-3" />
+                              </button>
+                              <p className="text-xs text-gray-500 mt-1 truncate">{image.name}</p>
+                            </div>)}
+                        </div>}
+
+                      {uploadedImages.length < 4 && <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                          <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" id="image-upload" />
+                          <Camera className="w-8 h-8 text-gray-400 mb-2" />
+                          <span className="text-sm text-gray-600">点击上传图片</span>
+                          <span className="text-xs text-gray-400 mt-1">最多4张</span>
+                        </label>}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <Button onClick={() => {
+                setShowDeductionDialog(false);
+                setSelectedStudent(null);
+                setSelectedDeductionItem(null);
+              }} className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors">
+                      取消
+                    </Button>
+                    <Button onClick={() => {
+                if (!selectedDeductionItem) {
+                  toast({
+                    title: '请选择扣分项目',
+                    variant: 'destructive'
+                  });
+                  return;
+                }
+                const remark = document.getElementById('deduction-remark')?.value || '';
+                handleDeduction(selectedStudent, selectedDeductionItem, remark);
+              }} disabled={!selectedDeductionItem} className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 disabled:bg-gray-300 text-white rounded-lg transition-colors">
+                      确认扣分
+                    </Button>
+                  </div>
+                </>}
 
         {/* 设置对话框 */}
         {showSettingsModal && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -945,6 +1103,13 @@ export default function DormPointsPage(props) {
                               </option>)}
                           </select>
                         </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">备注说明</label>
+                          <textarea value={itemFormData.remark || ''} onChange={e => setItemFormData({
+                  ...itemFormData,
+                  remark: e.target.value
+                })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none" rows={2} placeholder="例如：为首或提供者扣-40" />
+                        </div>
                         <div className="flex gap-2">
                           <Button onClick={() => {
                   setEditingItem(null);
@@ -963,15 +1128,16 @@ export default function DormPointsPage(props) {
                   <div className="space-y-2">
                     <h4 className="font-semibold text-gray-800 text-sm">项目列表</h4>
                     {deductionItems.map(item => <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 flex-1">
                           <div className={`px-2 py-0.5 rounded text-xs font-semibold ${item.category === '卫生' ? 'bg-green-100 text-green-700' : item.category === '纪律' ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'}`}>
                             {item.category}
                           </div>
-                          <div>
+                          <div className="flex-1">
                             <div className="text-sm font-medium text-gray-800">{item.name}</div>
                             <div className={`text-xs font-semibold ${item.points < 0 ? 'text-red-600' : 'text-green-600'}`}>
                               {item.points > 0 ? '+' : ''}{item.points} 分
                             </div>
+                            {item.remark && <div className="text-xs text-gray-500 mt-0.5">备注：{item.remark}</div>}
                           </div>
                         </div>
                         <div className="flex gap-2">
@@ -996,5 +1162,7 @@ export default function DormPointsPage(props) {
             </div>}
 
         <TabBar currentPage={currentPage} onPageChange={handlePageChange} />
-      </div>;
+      </div>
+    </>
+  );
 }
