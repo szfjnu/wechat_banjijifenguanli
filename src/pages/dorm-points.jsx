@@ -318,7 +318,7 @@ export default function DormPointsPage(props) {
       const updatedStudents = students.map(s => s.id === student.id ? {
         ...s,
         dormPoints: newDormPoints,
-        convertedPoints: student.convertedPoints + convertedPoints,
+        convertedPoints: (parseFloat(student.convertedPoints) || 0) + convertedPoints,
         totalPoints: newTotalPoints
       } : s);
       setStudents(updatedStudents);
@@ -331,7 +331,7 @@ export default function DormPointsPage(props) {
         itemName: deductionItem.name,
         points: deductionItem.points,
         originalDormPoints: student.dormPoints,
-        convertedPoints: convertedPoints.toFixed(1),
+        convertedPoints: convertedPoints,
         date: new Date().toLocaleString('zh-CN'),
         operator: $w?.auth?.currentUser?.name || '宿管员',
         remark: remark || '',
@@ -650,7 +650,7 @@ export default function DormPointsPage(props) {
                         <div>
                           <p className="text-[10px] text-gray-500">折算</p>
                           <p className={`text-sm font-bold ${student.convertedPoints < 0 ? 'text-orange-600' : 'text-gray-800'}`}>
-                            {student.convertedPoints.toFixed(1)}
+                            {(parseFloat(student.convertedPoints) || 0).toFixed(1)}
                           </p>
                         </div>
                         <div>
@@ -713,7 +713,7 @@ export default function DormPointsPage(props) {
                       <div className="text-right text-xs">
                         <p className="text-gray-500">{record.date}</p>
                         <p className={`font-medium ${record.convertedPoints < 0 ? 'text-orange-600' : 'text-gray-600'}`}>
-                          折算：{record.convertedPoints.toFixed(1)}分
+                          折算：{(parseFloat(record.convertedPoints) || 0).toFixed(1)}分
                         </p>
                       </div>
                     </div>
