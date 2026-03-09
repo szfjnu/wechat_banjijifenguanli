@@ -851,6 +851,8 @@ export default function DormPointsPage(props) {
           </div>
         </main>
 
+        <TabBar currentPage={currentPage} onPageChange={handlePageChange} />
+
         {/* 扣分对话框 */}
         {showDeductionDialog && selectedStudent && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
@@ -1061,9 +1063,6 @@ export default function DormPointsPage(props) {
             </div>
           </div>}
 
-          <TabBar currentPage={currentPage} onPageChange={handlePageChange} />
-          </div>
-
           {/* 项目管理模态框 */}
           {showItemManager && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
               <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[80vh] overflow-hidden">
@@ -1164,7 +1163,6 @@ export default function DormPointsPage(props) {
                 </div>
               </div>
             </div>
-      </div>
     </>
   );
 }
