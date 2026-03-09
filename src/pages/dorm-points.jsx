@@ -693,6 +693,7 @@ export default function DormPointsPage(props) {
         </div>;
   }
   return <>
+  return <>
         <div className="min-h-screen bg-gray-50 pb-16">
         {/* 页面头部 - 紧凑 */}
         <header className="bg-white border-b border-gray-200 p-3 sticky top-0 z-40">
@@ -745,9 +746,9 @@ export default function DormPointsPage(props) {
             </div>
             <div className="divide-y divide-gray-100">
               {filteredStudents.map(student => {
-            const warning = getWarningLevel(student.dormPoints);
-            const WarningIcon = warning?.icon;
-            return <div key={student.id} className={`p-2.5 hover:bg-gray-50 transition-colors ${warning?.bgColor || ''}`}>
+              const warning = getWarningLevel(student.dormPoints);
+              const WarningIcon = warning?.icon;
+              return <div key={student.id} className={`p-2.5 hover:bg-gray-50 transition-colors ${warning?.bgColor || ''}`}>
                     <div className="flex items-center justify-between gap-2">
                       {/* 学生信息 */}
                       <div className="flex-1">
@@ -794,7 +795,7 @@ export default function DormPointsPage(props) {
                       </Button>
                     </div>
                   </div>;
-          })}
+            })}
             </div>
           </div>
 
@@ -1122,13 +1123,12 @@ export default function DormPointsPage(props) {
             </div>
             <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
               <Button onClick={() => {
-          setShowItemManager(false);
-        }} className="w-full px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors">
+            setShowItemManager(false);
+          }} className="w-full px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors">
                 关闭
               </Button>
             </div>
           </div>
         </div>}
-  </>
+    </>
   );
-}
