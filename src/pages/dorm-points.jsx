@@ -40,6 +40,7 @@ export default function DormPointsPage(props) {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showItemManager, setShowItemManager] = useState(false);
   const [newConversionRate, setNewConversionRate] = useState(CONVERSION_RATE);
+  const [currentSemester, setCurrentSemester] = useState(null);
   const [deductionItems, setDeductionItems] = useState([]);
   const [loadingDeductionItems, setLoadingDeductionItems] = useState(true);
   const [editingItem, setEditingItem] = useState(null);
@@ -66,6 +67,10 @@ export default function DormPointsPage(props) {
         const semester = result.data[0];
         setConversionRate(semester.dorm_conversion_ratio !== undefined ? semester.dorm_conversion_ratio : CONVERSION_RATE);
         setNewConversionRate(semester.dorm_conversion_ratio !== undefined ? semester.dorm_conversion_ratio : CONVERSION_RATE);
+        setCurrentSemester({
+          id: semester._id,
+          name: semester.semester_name || '未知学期'
+        });
       }
     } catch (error) {
       console.error('加载学期配置失败:', error);
@@ -321,8 +326,8 @@ export default function DormPointsPage(props) {
         evidence_images: uploadedImages.map(img => img.url),
         deduction_date: new Date().toISOString(),
         recorder_name: $w?.auth?.currentUser?.name || '宿管员',
-        semester_id: 2,
-        semester_name: '2024-2025第二学期',
+        semester_id: currentSemester?.id || 2,
+        semester_name: currentSemester?.name || '未设置学期',
         approval_status: '已通过',
         remark: remark || ''
       });
@@ -588,7 +593,8 @@ export default function DormPointsPage(props) {
       if (result.data && result.data.length > 0) {
         const semester = result.data[0];
         await db.collection('semester').doc(semester._id).update({
-          dorm_conversion_ratio: newConversionRate
+          dorm_conversion_ratio: newConversionRate,
+          updated_at: new Date().toISOString()
         });
       }
       setConversionRate(newConversionRate);

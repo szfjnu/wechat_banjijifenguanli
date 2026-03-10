@@ -78,6 +78,16 @@ export default function SemesterPage(props) {
     endDate: ''
   });
 
+  // 新建学期的默认配置
+  const DEFAULT_DORM_CONFIG = {
+    dormConversionRatio: 0.3,
+    dormCriticalThreshold: 40,
+    dormInitialScore: 100,
+    dormWarningThreshold: 60,
+    initialScore: 100,
+    isInitialized: false
+  };
+
   // 编辑学期对话框
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingSemester, setEditingSemester] = useState(null);
@@ -167,7 +177,7 @@ export default function SemesterPage(props) {
       const tcb = await props.$w.cloud.getCloudInstance();
       const db = tcb.database();
 
-      // 添加学期到数据库
+      // 添加学期到数据库，包含完整的字段
       const result = await db.collection('semester').add({
         semester_name: newSemester.name,
         start_date: newSemester.startDate,
@@ -180,7 +190,19 @@ export default function SemesterPage(props) {
           reset_tasks: true,
           reset_date: newSemester.endDate
         },
-        note: ''
+        note: '',
+        // 宿舍积分配置字段 - 使用默认值
+        dorm_conversion_ratio: DEFAULT_DORM_CONFIG.dormConversionRatio,
+        dorm_critical_threshold: DEFAULT_DORM_CONFIG.dormCriticalThreshold,
+        dorm_initial_score: DEFAULT_DORM_CONFIG.dormInitialScore,
+        dorm_warning_threshold: DEFAULT_DORM_CONFIG.dormWarningThreshold,
+        initial_score: DEFAULT_DORM_CONFIG.initialScore,
+        is_initialized: DEFAULT_DORM_CONFIG.isInitialized,
+        // 其他必要字段
+        status: 'pending',
+        description: newSemester.name,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       });
       const createdSemester = {
         id: result.id || result.ids?.[0] || `SEM${Date.now()}`,
@@ -196,7 +218,9 @@ export default function SemesterPage(props) {
           reset_date: newSemester.endDate
         },
         note: '',
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        // 宿舍积分配置 - 使用默认值
+        ...DEFAULT_DORM_CONFIG
       };
       setSemesters([...semesters, createdSemester]);
       setNewSemester({
@@ -279,7 +303,7 @@ export default function SemesterPage(props) {
       const tcb = await props.$w.cloud.getCloudInstance();
       const db = tcb.database();
 
-      // 更新数据库中的学期信息
+      // 更新数据库中的学期信息，包含所有必要字段
       await db.collection('semester').doc(editingSemester.id).update({
         semester_name: editingSemester.name,
         start_date: editingSemester.startDate,
@@ -288,7 +312,11 @@ export default function SemesterPage(props) {
         dorm_critical_threshold: editingSemester.dormCriticalThreshold,
         dorm_initial_score: editingSemester.dormInitialScore,
         dorm_warning_threshold: editingSemester.dormWarningThreshold,
-        initial_score: editingSemester.initialScore
+        initial_score: editingSemester.initialScore,
+        is_initialized: editingSemester.isInitialized,
+        status: 'active',
+        description: editingSemester.name,
+        updated_at: new Date().toISOString()
       });
       const updatedSemesters = semesters.map(sem => sem.id === editingSemester.id ? editingSemester : sem);
       setSemesters(updatedSemesters);
