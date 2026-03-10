@@ -109,7 +109,7 @@
   },
   {
     "_id": "7",
-    "student_id": 6,
+    "student_id": "2024006",
     "student_name": "孙八",
     "certificate_name": "日语N1",
     "category": "语言类",
@@ -127,7 +127,7 @@
   },
   {
     "_id": "8",
-    "student_id": 2,
+    "student_id": "2024002",
     "student_name": "李四",
     "certificate_name": "微软Office专家",
     "category": "计算机类",

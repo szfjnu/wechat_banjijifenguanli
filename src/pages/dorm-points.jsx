@@ -256,7 +256,7 @@ export default function DormPointsPage(props) {
       if (result.data && result.data.length > 0) {
         const transformedHistory = result.data.map(record => ({
           id: record._id,
-          studentId: record.student_id_number || record.student_id || '',
+          studentId: record.student_id || '',
           studentName: record.student_name || '未知',
           itemName: record.item_name || '宿舍扣分',
           points: record.score_change,

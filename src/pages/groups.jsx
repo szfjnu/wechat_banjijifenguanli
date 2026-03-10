@@ -212,13 +212,13 @@ export default function GroupsPage(props) {
     try {
       setLoadingAction(true);
       const semester = SEMESTERS.find(s => s.id === parseInt(formData.semesterId));
-      const leader = MOCK_STUDENTS.find(s => s.id === parseInt(formData.leaderId));
+      const leader = MOCK_STUDENTS.find(s => s.id === formData.leaderId);
       const newGroup = {
         id: Math.max(...groups.map(g => g.id), 0) + 1,
         name: formData.name,
         semesterId: parseInt(formData.semesterId),
         semesterName: semester.name,
-        leaderId: parseInt(formData.leaderId),
+        leaderId: formData.leaderId,
         leaderName: leader.name,
         memberCount: formData.memberIds.length + 1,
         createdAt: new Date().toISOString().split('T')[0],
@@ -261,13 +261,13 @@ export default function GroupsPage(props) {
     try {
       setLoadingAction(true);
       const semester = SEMESTERS.find(s => s.id === parseInt(formData.semesterId));
-      const leader = MOCK_STUDENTS.find(s => s.id === parseInt(formData.leaderId));
+      const leader = MOCK_STUDENTS.find(s => s.id === formData.leaderId);
       const updatedGroups = groups.map(g => g.id === selectedGroup.id ? {
         ...g,
         name: formData.name,
         semesterId: parseInt(formData.semesterId),
         semesterName: semester.name,
-        leaderId: parseInt(formData.leaderId),
+        leaderId: formData.leaderId,
         leaderName: leader.name,
         memberCount: formData.memberIds.length + 1,
         members: [parseInt(formData.leaderId), ...formData.memberIds.map(id => parseInt(id))]
@@ -504,7 +504,7 @@ export default function GroupsPage(props) {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">组员</label>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {MOCK_STUDENTS.filter(s => s.id !== parseInt(formData.leaderId)).map(student => <label key={student.id} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
+                    {MOCK_STUDENTS.filter(s => s.id !== formData.leaderId).map(student => <label key={student.id} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
                         <input type="checkbox" checked={formData.memberIds.includes(student.id)} onChange={() => toggleMember(student.id)} className="w-4 h-4 text-rose-600 rounded border-gray-300 focus:ring-rose-500" />
                         <span className="text-sm text-gray-700">{student.name}</span>
                         <span className="text-xs text-gray-500">({student.studentId})</span>

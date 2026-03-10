@@ -253,7 +253,7 @@ export default function GradesPage(props) {
     try {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
-      const student = students.find(s => s.studentId === formData.studentId);
+      const student = students.find(s => s.id === formData.studentId);
       const subject = SUBJECTS.find(sub => sub.id === parseInt(formData.subjectId));
       const semester = SEMESTERS.find(sem => sem.id === parseInt(formData.semesterId));
 

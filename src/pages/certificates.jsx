@@ -286,7 +286,7 @@ export default function CertificatesPage(props) {
       setUploading(true);
       const tcb = await props.$w.cloud.getCloudInstance();
       const db = tcb.database();
-      const student = students.find(s => s.id === parseInt(formData.studentId));
+      const student = students.find(s => s.id === formData.studentId);
       const level = CERTIFICATE_LEVELS.find(l => l.id === parseInt(formData.levelId));
 
       // 添加证书到数据库

@@ -237,13 +237,13 @@ export default function DisciplinePage(props) {
     try {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
-      const student = students.find(s => s.id === parseInt(newRecord.studentId));
+      const student = students.find(s => s.id === newRecord.studentId);
       const level = DISCIPLINE_LEVELS.find(l => l.id === parseInt(newRecord.levelId));
 
       // 添加处分记录到数据库
       const recordResult = await db.collection('discipline_record').add({
         record_id: `DR${Date.now()}`,
-        student_id: parseInt(newRecord.studentId) || 0,
+        student_id: newRecord.studentId || '',
         student_name: student.name,
         student_no: student.studentId || '',
         group_name: student.group || '',
@@ -259,7 +259,7 @@ export default function DisciplinePage(props) {
       });
       const createdRecord = {
         id: recordResult.id || recordResult.ids?.[0] || `DR${Date.now()}`,
-        studentId: parseInt(newRecord.studentId),
+        studentId: newRecord.studentId,
         studentName: student.name,
         levelId: level.id,
         levelName: level.name,
