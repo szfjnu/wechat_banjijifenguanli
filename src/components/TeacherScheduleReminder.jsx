@@ -141,7 +141,7 @@ export function TeacherScheduleReminder(props) {
       const weekDay = today.getDay(); // 0-6
 
       // 查询今天星期对应的课程
-      const result = await db.collection('class_schedule').where({
+      const result = await db.collection('schedule').where({
         week_day: weekDay
       }).orderBy('section', 'asc').get();
       if (result.data && result.data.length > 0) {

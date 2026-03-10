@@ -126,120 +126,147 @@ export default function ScheduleManage(props) {
   const loadTimetableData = async () => {
     try {
       setLoading(true);
-      const mockTimetable = [{
-        id: 1,
-        period: '上午',
-        items: [{
-          name: '起床',
-          time: '06:30',
-          note: ''
+      // 先尝试从数据库加载
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('daily_schedule').orderBy('period_order', 'asc').orderBy('item_order', 'asc').get();
+      if (result.data && result.data.length > 0) {
+        // 将数据库数据转换为表格格式
+        const timetableMap = {};
+        result.data.forEach(item => {
+          const period = item.period;
+          if (!timetableMap[period]) {
+            timetableMap[period] = {
+              id: item.period_order,
+              period: period,
+              items: []
+            };
+          }
+          timetableMap[period].items.push({
+            name: item.item_name,
+            time: item.time_range,
+            note: item.note || ''
+          });
+        });
+        const timetableList = Object.values(timetableMap);
+        setTimetableData(timetableList);
+      } else {
+        // 如果数据库中没有数据，使用默认作息时间
+        const defaultTimetable = [{
+          id: 1,
+          period: '上午',
+          items: [{
+            name: '起床',
+            time: '06:30',
+            note: ''
+          }, {
+            name: '早餐',
+            time: '07:00-07:50',
+            note: ''
+          }, {
+            name: '教职工上班',
+            time: '周一 08:00 / 周二至周五 08:10',
+            note: ''
+          }, {
+            name: '升旗仪式',
+            time: '周一 08:00-08:40 / 周二至周五 08:10-08:20',
+            note: ''
+          }, {
+            name: '第一节',
+            time: '08:50-10:10',
+            note: '周一1、2节实训课不安排晨读'
+          }, {
+            name: '第二节',
+            time: '09:10-09:50',
+            note: ''
+          }, {
+            name: '课间操',
+            time: '09:50-10:10',
+            note: ''
+          }, {
+            name: '第三节',
+            time: '10:20-11:00',
+            note: ''
+          }, {
+            name: '眼保健操',
+            time: '11:00-11:05',
+            note: ''
+          }, {
+            name: '第四节',
+            time: '11:15-11:55',
+            note: ''
+          }]
         }, {
-          name: '早餐',
-          time: '07:00-07:50',
-          note: ''
+          id: 2,
+          period: '中午',
+          items: [{
+            name: '午餐',
+            time: '第一批 11:40-12:00 / 第二批 12:00-12:30',
+            note: ''
+          }, {
+            name: '午休',
+            time: '12:45-13:45',
+            note: ''
+          }, {
+            name: '起床',
+            time: '13:45',
+            note: ''
+          }, {
+            name: '教职工上班',
+            time: '13:55',
+            note: ''
+          }]
         }, {
-          name: '教职工上班',
-          time: '周一 08:00 / 周二至周五 08:10',
-          note: ''
+          id: 3,
+          period: '下午',
+          items: [{
+            name: '第五节',
+            time: '14:00-14:40',
+            note: ''
+          }, {
+            name: '眼保健操',
+            time: '14:40-14:45',
+            note: ''
+          }, {
+            name: '第六节',
+            time: '14:50-15:30',
+            note: ''
+          }, {
+            name: '第七节',
+            time: '15:40-16:20',
+            note: ''
+          }, {
+            name: '阳光体育活动',
+            time: '16:30-18:00',
+            note: ''
+          }, {
+            name: '教职工下班',
+            time: '16:30',
+            note: ''
+          }]
         }, {
-          name: '升旗仪式',
-          time: '周一 08:00-08:40 / 周二至周五 08:10-08:20',
-          note: ''
-        }, {
-          name: '第一节',
-          time: '08:50-10:10',
-          note: '周一1、2节实训课不安排晨读'
-        }, {
-          name: '第二节',
-          time: '09:10-09:50',
-          note: ''
-        }, {
-          name: '课间操',
-          time: '09:50-10:10',
-          note: ''
-        }, {
-          name: '第三节',
-          time: '10:20-11:00',
-          note: ''
-        }, {
-          name: '眼保健操',
-          time: '11:00-11:05',
-          note: ''
-        }, {
-          name: '第四节',
-          time: '11:15-11:55',
-          note: ''
-        }]
-      }, {
-        id: 2,
-        period: '中午',
-        items: [{
-          name: '午餐',
-          time: '第一批 11:40-12:00 / 第二批 12:00-12:30',
-          note: ''
-        }, {
-          name: '午休',
-          time: '12:45-13:45',
-          note: ''
-        }, {
-          name: '起床',
-          time: '13:45',
-          note: ''
-        }, {
-          name: '教职工上班',
-          time: '13:55',
-          note: ''
-        }]
-      }, {
-        id: 3,
-        period: '下午',
-        items: [{
-          name: '第五节',
-          time: '14:00-14:40',
-          note: ''
-        }, {
-          name: '眼保健操',
-          time: '14:40-14:45',
-          note: ''
-        }, {
-          name: '第六节',
-          time: '14:50-15:30',
-          note: ''
-        }, {
-          name: '第七节',
-          time: '15:40-16:20',
-          note: ''
-        }, {
-          name: '阳光体育活动',
-          time: '16:30-18:00',
-          note: ''
-        }, {
-          name: '教职工下班',
-          time: '16:30',
-          note: ''
-        }]
-      }, {
-        id: 4,
-        period: '晚上',
-        items: [{
-          name: '晚餐',
-          time: '17:30-18:30',
-          note: ''
-        }, {
-          name: '晚自修',
-          time: '19:30-21:00',
-          note: ''
-        }, {
-          name: '教室熄灯',
-          time: '22:00',
-          note: ''
-        }, {
-          name: '宿舍熄灯',
-          time: '22:30',
-          note: ''
-        }]
-      }];
-      setTimetableData(mockTimetable);
+          id: 4,
+          period: '晚上',
+          items: [{
+            name: '晚餐',
+            time: '17:30-18:30',
+            note: ''
+          }, {
+            name: '晚自修',
+            time: '19:30-21:00',
+            note: ''
+          }, {
+            name: '教室熄灯',
+            time: '22:00',
+            note: ''
+          }, {
+            name: '宿舍熄灯',
+            time: '22:30',
+            note: ''
+          }]
+        }];
+        setTimetableData(defaultTimetable);
+      }
     } catch (error) {
       console.error('加载作息时间表失败:', error);
       toast({
