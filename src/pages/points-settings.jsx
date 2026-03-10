@@ -372,13 +372,16 @@ export default function PointsSettings({
 
   // 删除处分级别
   const handleDeleteDiscipline = async level => {
+    console.log('删除处分级别:', level);
     if (!window.confirm(`确定要删除「${level.level_name}」这个处分级别吗？`)) {
       return;
     }
     try {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
+      console.log('删除数据库记录, ID:', level._id);
       await db.collection('discipline_level_config').doc(level._id).remove();
+      console.log('删除成功, 更新前端列表');
       setDisciplineLevels(disciplineLevels.filter(l => l._id !== level._id));
       toast({
         title: '删除成功',
@@ -397,6 +400,7 @@ export default function PointsSettings({
 
   // 保存处分级别
   const handleSaveDiscipline = async () => {
+    console.log('开始保存处分级别:', disciplineFormData, editingDiscipline);
     if (!disciplineFormData.level_name.trim()) {
       toast({
         title: '验证失败',
@@ -425,6 +429,7 @@ export default function PointsSettings({
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
       if (editingDiscipline) {
+        console.log('更新处分级别, ID:', editingDiscipline._id);
         // 更新数据库
         await db.collection('discipline_level_config').doc(editingDiscipline._id).update({
           level_name: disciplineFormData.level_name,
@@ -447,6 +452,7 @@ export default function PointsSettings({
           variant: 'default'
         });
       } else {
+        console.log('新增处分级别');
         // 新增到数据库
         const result = await db.collection('discipline_level_config').add({
           level_name: disciplineFormData.level_name,
@@ -454,6 +460,7 @@ export default function PointsSettings({
           valid_days: disciplineFormData.valid_days,
           description: disciplineFormData.description
         });
+        console.log('新增结果:', result);
 
         // 更新前端
         const newLevel = {
@@ -461,6 +468,7 @@ export default function PointsSettings({
           ...disciplineFormData,
           createdAt: new Date().toISOString().split('T')[0]
         };
+        console.log('新增级别数据:', newLevel);
         // 按扣分值排序后添加
         const sortedLevels = [...disciplineLevels, newLevel].sort((a, b) => a.deduct_points - b.deduct_points);
         setDisciplineLevels(sortedLevels);
@@ -873,6 +881,108 @@ export default function PointsSettings({
                 <button onClick={handleSave} className="flex-1 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg hover:opacity-90 transition-colors font-semibold flex items-center justify-center gap-2">
                   <Save className="w-4 h-4" />
                   {editingItem ? '更新' : '保存'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>}
+      
+      {/* Edit/Add Dialog - 处分级别 */}
+      {showDisciplineDialog && <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-gradient-to-r from-orange-500 to-red-500 text-white p-6 rounded-t-2xl">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold">{editingDiscipline ? '编辑处分级别' : '添加处分级别'}</h2>
+                <button onClick={() => setShowDisciplineDialog(false)} className="p-2 hover:bg-white/20 rounded-lg transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6 space-y-6">
+              {/* 级别名称 */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  级别名称 <span className="text-red-500">*</span>
+                </label>
+                <input type="text" value={disciplineFormData.level_name} onChange={e => setDisciplineFormData({
+              ...disciplineFormData,
+              level_name: e.target.value
+            })} placeholder="例如：警告、记过等" className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              </div>
+              
+              {/* 扣分值 */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  扣分值 <span className="text-red-500">*</span>
+                </label>
+                <div className="flex items-center gap-4">
+                  <button type="button" onClick={() => setDisciplineFormData({
+                ...disciplineFormData,
+                deduct_points: Math.max(0, disciplineFormData.deduct_points - 1)
+              })} className="w-10 h-10 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center">
+                    <ChevronDown className="w-5 h-5 text-gray-600" />
+                  </button>
+                  <input type="number" value={disciplineFormData.deduct_points} onChange={e => setDisciplineFormData({
+                ...disciplineFormData,
+                deduct_points: Math.max(0, parseInt(e.target.value) || 0)
+              })} className="w-20 text-center text-2xl font-bold px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                  <button type="button" onClick={() => setDisciplineFormData({
+                ...disciplineFormData,
+                deduct_points: disciplineFormData.deduct_points + 1
+              })} className="w-10 h-10 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center">
+                    <ChevronUp className="w-5 h-5 text-gray-600" />
+                  </button>
+                  <span className="text-sm text-gray-500">该处分级别对应的扣分值</span>
+                </div>
+              </div>
+              
+              {/* 有效天数 */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  有效天数 <span className="text-red-500">*</span>
+                </label>
+                <div className="flex items-center gap-4">
+                  <button type="button" onClick={() => setDisciplineFormData({
+                ...disciplineFormData,
+                valid_days: Math.max(1, disciplineFormData.valid_days - 1)
+              })} className="w-10 h-10 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center">
+                    <ChevronDown className="w-5 h-5 text-gray-600" />
+                  </button>
+                  <input type="number" value={disciplineFormData.valid_days} onChange={e => setDisciplineFormData({
+                ...disciplineFormData,
+                valid_days: Math.max(1, parseInt(e.target.value) || 0)
+              })} className="w-20 text-center text-2xl font-bold px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                  <button type="button" onClick={() => setDisciplineFormData({
+                ...disciplineFormData,
+                valid_days: disciplineFormData.valid_days + 10
+              })} className="w-10 h-10 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center">
+                    <ChevronUp className="w-5 h-5 text-gray-600" />
+                  </button>
+                  <span className="text-sm text-gray-500">处分记录的有效期</span>
+                </div>
+              </div>
+              
+              {/* 描述 */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  描述说明
+                </label>
+                <textarea value={disciplineFormData.description} onChange={e => setDisciplineFormData({
+              ...disciplineFormData,
+              description: e.target.value
+            })} placeholder="描述这个处分级别的具体情况" rows={3} className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              </div>
+            </div>
+            
+            <div className="sticky bottom-0 bg-gray-50 p-6 rounded-b-2xl">
+              <div className="flex items-center gap-3">
+                <button onClick={() => setShowDisciplineDialog(false)} className="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-semibold">
+                  取消
+                </button>
+                <button onClick={handleSaveDiscipline} className="flex-1 px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:opacity-90 transition-colors font-semibold flex items-center justify-center gap-2">
+                  <Save className="w-4 h-4" />
+                  {editingDiscipline ? '更新' : '保存'}
                 </button>
               </div>
             </div>
