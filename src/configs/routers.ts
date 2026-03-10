@@ -24,6 +24,7 @@ import STUDENT_GROWTH from '../pages/student-growth.jsx';
 import PARENT_VIEW from '../pages/parent-view.jsx';
 import NOTICE_PUBLISH from '../pages/notice-publish.jsx';
 import INIT_SCHEDULE-DATA from '../pages/init-schedule-data.jsx';
+import INIT_TIMETABLE-DATA from '../pages/init-timetable-data.jsx';
 export const routers = [{
   id: "home",
   component: HOME
@@ -102,4 +103,7 @@ export const routers = [{
 }, {
   id: "init-schedule-data",
   component: INIT_SCHEDULE-DATA
+}, {
+  id: "init-timetable-data",
+  component: INIT_TIMETABLE-DATA
 }]

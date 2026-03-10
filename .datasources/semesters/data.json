@@ -21,7 +21,7 @@
     "semester_name": "2024-2025第二学期",
     "start_date": "2025-02-15",
     "end_date": "2025-07-10",
-    "is_current": false,
+    "is_current": true,
     "is_automated": true,
     "reset_config": {
       "reset_points": true,
@@ -29,7 +29,7 @@
       "reset_tasks": true,
       "reset_date": "2025-07-11"
     },
-    "note": "已结束学期，启用自动重置",
+    "note": "当前学期，启用自动重置",
     "createdAt": 1734220800000,
     "updatedAt": 1741267200000
   },
@@ -46,25 +46,8 @@
       "reset_tasks": true,
       "reset_date": "2026-01-21"
     },
-    "note": "已结束学期，启用自动重置",
+    "note": "未来学期，启用自动重置",
     "createdAt": 1741267200000,
     "updatedAt": 1741267200000
-  },
-  {
-    "_id": "4",
-    "semester_name": "2025-2026学年第二学期",
-    "start_date": "2026-02-15",
-    "end_date": "2026-07-10",
-    "is_current": true,
-    "is_automated": true,
-    "reset_config": {
-      "reset_points": true,
-      "reset_dorm_points": true,
-      "reset_tasks": true,
-      "reset_date": "2026-07-11"
-    },
-    "note": "当前学期，2026年3月2日起执行新作息时间表",
-    "createdAt": 1741497600000,
-    "updatedAt": 1741497600000
   }
 ]

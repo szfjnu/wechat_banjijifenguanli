@@ -1,10 +1,116 @@
 {
   "name": "daily_schedule",
-  "title": "作息时间配置",
+  "title": "日常课表",
   "schemas": [
     {
       "name": "schedule_id",
-      "title": "作息时间配置ID",
+      "title": "日程ID",
+      "type": "String"
+    },
+    {
+      "name": "schedule_date",
+      "title": "日程日期",
+      "type": "Date",
+      "format": "string"
+    },
+    {
+      "name": "week_day",
+      "title": "星期几",
+      "type": "Number"
+    },
+    {
+      "name": "week_day_name",
+      "title": "星期名称",
+      "type": "String"
+    },
+    {
+      "name": "schedule_type",
+      "title": "日程类型",
+      "type": "String"
+    },
+    {
+      "name": "section",
+      "title": "第几节",
+      "type": "Number"
+    },
+    {
+      "name": "section_name",
+      "title": "节次名称",
+      "type": "String"
+    },
+    {
+      "name": "start_time",
+      "title": "开始时间",
+      "type": "String"
+    },
+    {
+      "name": "end_time",
+      "title": "结束时间",
+      "type": "String"
+    },
+    {
+      "name": "time_range",
+      "title": "时间范围",
+      "type": "String"
+    },
+    {
+      "name": "subject_id",
+      "title": "科目ID",
+      "type": "String"
+    },
+    {
+      "name": "subject_name",
+      "title": "科目名称",
+      "type": "String"
+    },
+    {
+      "name": "course_name",
+      "title": "课程名称",
+      "type": "String"
+    },
+    {
+      "name": "content",
+      "title": "日程内容",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "room",
+      "title": "教室/房间",
+      "type": "String"
+    },
+    {
+      "name": "building",
+      "title": "教学楼/建筑",
+      "type": "String"
+    },
+    {
+      "name": "campus",
+      "title": "校区",
+      "type": "String"
+    },
+    {
+      "name": "teacher_id",
+      "title": "教师ID",
+      "type": "String"
+    },
+    {
+      "name": "teacher_name",
+      "title": "教师姓名",
+      "type": "String"
+    },
+    {
+      "name": "class_id",
+      "title": "班级ID",
+      "type": "String"
+    },
+    {
+      "name": "class_name",
+      "title": "班级名称",
+      "type": "String"
+    },
+    {
+      "name": "status",
+      "title": "状态",
       "type": "String"
     },
     {
@@ -18,201 +124,9 @@
       "type": "String"
     },
     {
-      "name": "campus",
-      "title": "校区",
-      "type": "String"
-    },
-    {
-      "name": "wake_up_time",
-      "title": "起床时间",
-      "type": "String"
-    },
-    {
-      "name": "breakfast_start_time",
-      "title": "早餐开始时间",
-      "type": "String"
-    },
-    {
-      "name": "breakfast_end_time",
-      "title": "早餐结束时间",
-      "type": "String"
-    },
-    {
-      "name": "lunch_break_start_time",
-      "title": "午休开始时间",
-      "type": "String"
-    },
-    {
-      "name": "lunch_break_end_time",
-      "title": "午休结束时间",
-      "type": "String"
-    },
-    {
-      "name": "dinner_start_time",
-      "title": "晚餐开始时间",
-      "type": "String"
-    },
-    {
-      "name": "dinner_end_time",
-      "title": "晚餐结束时间",
-      "type": "String"
-    },
-    {
-      "name": "evening_study_start_time",
-      "title": "晚自习开始时间",
-      "type": "String"
-    },
-    {
-      "name": "evening_study_end_time",
-      "title": "晚自习结束时间",
-      "type": "String"
-    },
-    {
-      "name": "lights_out_time",
-      "title": "宿舍熄灯时间",
-      "type": "String"
-    },
-    {
-      "name": "class_1_start_time",
-      "title": "第一节课开始时间",
-      "type": "String"
-    },
-    {
-      "name": "class_1_end_time",
-      "title": "第一节课结束时间",
-      "type": "String"
-    },
-    {
-      "name": "class_2_start_time",
-      "title": "第二节课开始时间",
-      "type": "String"
-    },
-    {
-      "name": "class_2_end_time",
-      "title": "第二节课结束时间",
-      "type": "String"
-    },
-    {
-      "name": "class_3_start_time",
-      "title": "第三节课开始时间",
-      "type": "String"
-    },
-    {
-      "name": "class_3_end_time",
-      "title": "第三节课结束时间",
-      "type": "String"
-    },
-    {
-      "name": "class_4_start_time",
-      "title": "第四节课开始时间",
-      "type": "String"
-    },
-    {
-      "name": "class_4_end_time",
-      "title": "第四节课结束时间",
-      "type": "String"
-    },
-    {
-      "name": "class_5_start_time",
-      "title": "第五节课开始时间",
-      "type": "String"
-    },
-    {
-      "name": "class_5_end_time",
-      "title": "第五节课结束时间",
-      "type": "String"
-    },
-    {
-      "name": "class_6_start_time",
-      "title": "第六节课开始时间",
-      "type": "String"
-    },
-    {
-      "name": "class_6_end_time",
-      "title": "第六节课结束时间",
-      "type": "String"
-    },
-    {
-      "name": "class_7_start_time",
-      "title": "第七节课开始时间",
-      "type": "String"
-    },
-    {
-      "name": "class_7_end_time",
-      "title": "第七节课结束时间",
-      "type": "String"
-    },
-    {
-      "name": "class_8_start_time",
-      "title": "第八节课开始时间",
-      "type": "String"
-    },
-    {
-      "name": "class_8_end_time",
-      "title": "第八节课结束时间",
-      "type": "String"
-    },
-    {
-      "name": "class_9_start_time",
-      "title": "第九节课开始时间",
-      "type": "String"
-    },
-    {
-      "name": "class_9_end_time",
-      "title": "第九节课结束时间",
-      "type": "String"
-    },
-    {
-      "name": "flag_raising_time",
-      "title": "升旗仪式时间",
-      "type": "String"
-    },
-    {
-      "name": "morning_exercise_time",
-      "title": "课间操时间",
-      "type": "String"
-    },
-    {
-      "name": "eye_exercise_morning_time",
-      "title": "上午眼保健操时间",
-      "type": "String"
-    },
-    {
-      "name": "eye_exercise_afternoon_time",
-      "title": "下午眼保健操时间",
-      "type": "String"
-    },
-    {
-      "name": "is_current",
-      "title": "是否当前使用",
-      "type": "Boolean"
-    },
-    {
-      "name": "effective_start_date",
-      "title": "生效开始日期",
-      "type": "Date",
-      "format": "string"
-    },
-    {
-      "name": "effective_end_date",
-      "title": "生效结束日期",
-      "type": "Date",
-      "format": "string"
-    },
-    {
-      "name": "note",
+      "name": "remark",
       "title": "备注",
       "type": "MultiLineString"
-    },
-    {
-      "name": "created_at",
-      "title": "创建时间",
-      "type": "Number"
-    },
-    {
-      "name": "updated_at",
-      "title": "更新时间",
-      "type": "Number"
     }
   ]
 }
