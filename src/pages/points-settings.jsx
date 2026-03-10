@@ -166,9 +166,11 @@ export default function PointsSettings({
     try {
       setDisciplineLoading(true);
       const tcb = await $w.cloud.getCloudInstance();
-      const result = await tcb.database().collection('discipline_level_config').orderBy('deduct_points', 'asc').get();
+      const result = await tcb.database().collection('discipline_level_config').get();
       if (result.data && result.data.length > 0) {
-        setDisciplineLevels(result.data);
+        // 按扣分值升序排序
+        const sortedData = result.data.sort((a, b) => a.deduct_points - b.deduct_points);
+        setDisciplineLevels(sortedData);
       } else {
         setDisciplineLevels([]);
       }
@@ -369,13 +371,26 @@ export default function PointsSettings({
   };
 
   // 删除处分级别
-  const handleDeleteDiscipline = level => {
-    if (window.confirm(`确定要删除「${level.level_name}」这个处分级别吗？`)) {
+  const handleDeleteDiscipline = async level => {
+    if (!window.confirm(`确定要删除「${level.level_name}」这个处分级别吗？`)) {
+      return;
+    }
+    try {
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+      await db.collection('discipline_level_config').doc(level._id).remove();
       setDisciplineLevels(disciplineLevels.filter(l => l._id !== level._id));
       toast({
         title: '删除成功',
         description: '处分级别已删除',
         variant: 'default'
+      });
+    } catch (error) {
+      console.error('删除处分级别失败:', error);
+      toast({
+        title: '删除失败',
+        description: error.message || '请重试',
+        variant: 'destructive'
       });
     }
   };
@@ -415,15 +430,17 @@ export default function PointsSettings({
           level_name: disciplineFormData.level_name,
           deduct_points: disciplineFormData.deduct_points,
           valid_days: disciplineFormData.valid_days,
-          description: disciplineFormData.description,
-          updated_at: new Date().toISOString()
+          description: disciplineFormData.description
         });
 
         // 更新前端
-        setDisciplineLevels(disciplineLevels.map(level => level._id === editingDiscipline._id ? {
+        const updatedLevels = disciplineLevels.map(level => level._id === editingDiscipline._id ? {
           ...level,
           ...disciplineFormData
-        } : level));
+        } : level);
+        // 按扣分值重新排序
+        const sortedLevels = updatedLevels.sort((a, b) => a.deduct_points - b.deduct_points);
+        setDisciplineLevels(sortedLevels);
         toast({
           title: '更新成功',
           description: '处分级别已更新',
@@ -435,9 +452,7 @@ export default function PointsSettings({
           level_name: disciplineFormData.level_name,
           deduct_points: disciplineFormData.deduct_points,
           valid_days: disciplineFormData.valid_days,
-          description: disciplineFormData.description,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          description: disciplineFormData.description
         });
 
         // 更新前端
@@ -446,7 +461,9 @@ export default function PointsSettings({
           ...disciplineFormData,
           createdAt: new Date().toISOString().split('T')[0]
         };
-        setDisciplineLevels([...disciplineLevels, newLevel]);
+        // 按扣分值排序后添加
+        const sortedLevels = [...disciplineLevels, newLevel].sort((a, b) => a.deduct_points - b.deduct_points);
+        setDisciplineLevels(sortedLevels);
         toast({
           title: '添加成功',
           description: '处分级别已添加',
