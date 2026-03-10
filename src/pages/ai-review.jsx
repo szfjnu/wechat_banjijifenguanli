@@ -57,6 +57,7 @@ export default function AIReviewPage(props) {
       const result = await db.collection('student').get();
       const studentsData = result.data.map(student => ({
         id: student._id,
+        _id: student._id,
         name: student.name || '未命名',
         studentId: student.student_id || '',
         group: student.group || '未分组',
@@ -87,11 +88,11 @@ export default function AIReviewPage(props) {
       if (result.data.length === 0) {
         return 0;
       }
-      const gpas = result.data.map(grade => grade.gpa).filter(gpa => gpa != null && !isNaN(parseFloat(gpa)));
+      const gpas = result.data.map(grade => parseFloat(grade.gpa)).filter(gpa => gpa != null && !isNaN(gpa));
       if (gpas.length === 0) {
         return 0;
       }
-      const sumGpa = gpas.reduce((sum, gpa) => sum + parseFloat(gpa), 0);
+      const sumGpa = gpas.reduce((sum, gpa) => sum + gpa, 0);
       return (sumGpa / gpas.length).toFixed(2);
     } catch (error) {
       console.error('加载学生成绩失败:', error);
@@ -100,12 +101,12 @@ export default function AIReviewPage(props) {
   };
 
   // 加载学生证书数量
-  const loadStudentCertificates = async studentId => {
+  const loadStudentCertificates = async (studentId, useId = false) => {
     try {
       const tcb = await props.$w.cloud.getCloudInstance();
       const db = tcb.database();
       const result = await db.collection('certificate').where({
-        student_id: parseInt(studentId)
+        student_id: useId ? parseInt(studentId) : parseInt(studentId)
       }).get();
       return result.data.length;
     } catch (error) {
@@ -139,7 +140,7 @@ export default function AIReviewPage(props) {
   const loadStudentDetail = async student => {
     try {
       const gpa = await loadStudentGrades(student.studentId, selectedTimeRange);
-      const certificates = await loadStudentCertificates(student.studentId);
+      const certificates = await loadStudentCertificates(student._id, true);
       const volunteerHours = await loadStudentVolunteerHours(student.studentId, selectedTimeRange);
       setStudentDetail({
         ...student,
@@ -209,7 +210,7 @@ export default function AIReviewPage(props) {
         }
         const allStudentsData = await Promise.all(students.map(async student => {
           const gpa = await loadStudentGrades(student.studentId, selectedTimeRange);
-          const certificates = await loadStudentCertificates(student.studentId);
+          const certificates = await loadStudentCertificates(student._id, true);
           const volunteerHours = await loadStudentVolunteerHours(student.studentId, selectedTimeRange);
           return {
             ...student,
