@@ -140,7 +140,7 @@ export default function CertificatesPage(props) {
       if (result.data && result.data.length > 0) {
         const transformedCertificates = result.data.map(cert => ({
           id: cert._id,
-          studentId: cert.student_id || 0,
+          studentId: cert.student_id || '',
           studentName: cert.student_name || '未知',
           certificateName: cert.certificate_name || '',
           levelId: cert.level_id || 0,
@@ -175,7 +175,7 @@ export default function CertificatesPage(props) {
     }
     // 学生过滤
     if (filterStudent !== 'all') {
-      result = result.filter(cert => cert.studentId === parseInt(filterStudent));
+      result = result.filter(cert => cert.studentId === filterStudent);
     }
     // 级别过滤
     if (filterLevel !== 'all') {
@@ -291,7 +291,7 @@ export default function CertificatesPage(props) {
 
       // 添加证书到数据库
       const result = await db.collection('certificate').add({
-        student_id: parseInt(formData.studentId) || 0,
+        student_id: formData.studentId || '',
         student_name: student.name,
         certificate_name: formData.certificateName,
         category: '其他',
@@ -307,7 +307,7 @@ export default function CertificatesPage(props) {
       });
       const newCertificate = {
         id: result.id || result.ids?.[0] || `CERT${Date.now()}`,
-        studentId: parseInt(formData.studentId),
+        studentId: formData.studentId,
         studentName: student.name,
         certificateName: formData.certificateName,
         levelId: level.id,

@@ -60,8 +60,7 @@ export default function AIReviewPage(props) {
         name: student.name || '未命名',
         studentId: student.student_id || '',
         group: student.group || '未分组',
-        totalPoints: parseFloat(student.current_score) || 0,
-        certificateId: parseInt(student.student_id.replace(/[^0-9]/g, '')) || 0
+        totalPoints: parseFloat(student.current_score) || 0
       }));
       setStudents(studentsData);
     } catch (error) {
@@ -81,9 +80,8 @@ export default function AIReviewPage(props) {
     try {
       const tcb = await props.$w.cloud.getCloudInstance();
       const db = tcb.database();
-      const numericId = parseInt(studentId.replace(/[^0-9]/g, '')) || 0;
       const result = await db.collection('grade').where({
-        student_id: numericId
+        student_id: studentId
       }).get();
       if (result.data.length === 0) {
         return 0;
@@ -105,9 +103,8 @@ export default function AIReviewPage(props) {
     try {
       const tcb = await props.$w.cloud.getCloudInstance();
       const db = tcb.database();
-      const certificateId = parseInt(studentId.replace(/[^0-9]/g, '')) || 0;
       const result = await db.collection('certificate').where({
-        student_id: certificateId
+        student_id: studentId
       }).get();
       return result.data.length;
     } catch (error) {

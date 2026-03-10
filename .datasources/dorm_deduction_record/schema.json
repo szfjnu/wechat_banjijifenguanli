@@ -10,7 +10,7 @@
     {
       "name": "student_id",
       "title": "关联学生ID",
-      "type": "Number"
+      "type": "String"
     },
     {
       "name": "student_name",

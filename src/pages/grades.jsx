@@ -173,7 +173,7 @@ export default function GradesPage(props) {
       if (result.data && result.data.length > 0) {
         const transformedGrades = result.data.map(g => ({
           id: g._id,
-          studentId: g.student_id || 0,
+          studentId: g.student_id || '',
           studentName: g.student_name || '',
           subjectId: g.subject_id || 0,
           subjectName: g.subject_name || '',
@@ -259,7 +259,7 @@ export default function GradesPage(props) {
 
       // 添加成绩到数据库
       const result = await db.collection('grade').add({
-        student_id: parseInt(formData.studentId) || 0,
+        student_id: formData.studentId || '',
         student_name: student.name,
         subject_id: subject.id,
         subject_name: subject.name,

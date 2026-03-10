@@ -289,7 +289,7 @@ export default function DormPointsPage(props) {
       // 1. 添加扣分记录到宿舍扣分记录表
       const recordResult = await db.collection('dorm_deduction_record').add({
         record_id: `DP${Date.now()}`,
-        student_id: parseInt(student.studentId) || 0,
+        student_id: student.studentId || '',
         student_name: student.name,
         student_id_number: student.studentId,
         dorm_room: student.dormRoom || '未分配',
