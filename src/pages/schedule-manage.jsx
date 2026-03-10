@@ -66,87 +66,37 @@ export default function ScheduleManage(props) {
   const loadScheduleData = async () => {
     try {
       setLoading(true);
-      const mockSchedule = [{
-        id: 1,
-        dayOfWeek: '星期一',
-        section: 1,
-        courseName: '智能仓储大数据分析',
-        className: '2024级物流服务与管理2班',
-        room: '2-2703电子商务实训4室',
-        campus: '大坦沙校区'
-      }, {
-        id: 2,
-        dayOfWeek: '星期一',
-        section: 2,
-        courseName: '智能仓储大数据分析',
-        className: '2024级物流服务与管理2班',
-        room: '2-2703电子商务实训4室',
-        campus: '大坦沙校区'
-      }, {
-        id: 3,
-        dayOfWeek: '星期三',
-        section: 1,
-        courseName: '人工智能基础',
-        className: '2023级物流服务与管理1班',
-        room: '2-2504数字语音实训2室',
-        campus: '大坦沙校区'
-      }, {
-        id: 4,
-        dayOfWeek: '星期三',
-        section: 3,
-        courseName: '智能仓储大数据分析',
-        className: '2023级物流服务与管理1班',
-        room: '2-2703电子商务实训4室',
-        campus: '大坦沙校区'
-      }, {
-        id: 5,
-        dayOfWeek: '星期三',
-        section: 4,
-        courseName: '智能仓储大数据分析',
-        className: '2023级物流服务与管理1班',
-        room: '2-2703电子商务实训4室',
-        campus: '大坦沙校区'
-      }, {
-        id: 6,
-        dayOfWeek: '星期四',
-        section: 5,
-        courseName: '人工智能基础',
-        className: '2023级物流服务与管理1班',
-        room: '2-2504数字语音实训2室',
-        campus: '大坦沙校区'
-      }, {
-        id: 7,
-        dayOfWeek: '星期四',
-        section: 6,
-        courseName: '人工智能基础',
-        className: '2023级物流服务与管理1班',
-        room: '2-2504数字语音实训2室',
-        campus: '大坦沙校区'
-      }, {
-        id: 8,
-        dayOfWeek: '星期五',
-        section: 1,
-        courseName: '中职数字素养通识',
-        className: '2024级物流服务与管理2班',
-        room: '2-2504数字语音实训2室',
-        campus: '大坦沙校区'
-      }, {
-        id: 9,
-        dayOfWeek: '星期五',
-        section: 2,
-        courseName: '智能仓储大数据分析',
-        className: '2024级物流服务与管理2班',
-        room: '2-2703电子商务实训4室',
-        campus: '大坦沙校区'
-      }];
-      setScheduleData(mockSchedule);
+      // 从数据库加载课表数据
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('class_schedule').orderBy('section', 'asc').get();
+      if (result.data && result.data.length > 0) {
+        const scheduleList = result.data.map(item => ({
+          id: item._id,
+          dayOfWeek: item.week_day_name,
+          section: item.section,
+          courseName: item.course_name || item.subject_name,
+          className: item.class_name,
+          room: item.room,
+          campus: item.campus,
+          teacher: item.teacher_name,
+          startTime: item.start_time,
+          endTime: item.end_time,
+          scheduleDate: item.schedule_date
+        }));
+        setScheduleData(scheduleList);
+      } else {
+        // 如果没有数据，使用空数组
+        setScheduleData([]);
+      }
     } catch (error) {
-      console.error('加载课程表失败:', error);
+      console.error('加载课表数据失败:', error);
       toast({
-        variant: 'destructive',
         title: '加载失败',
-        description: '无法加载课程表数据'
+        description: error.message || '加载课表数据失败',
+        variant: 'destructive'
       });
+      setScheduleData([]);
     } finally {
       setLoading(false);
     }
@@ -298,27 +248,66 @@ export default function ScheduleManage(props) {
       });
     }
   };
-  const handleSaveSchedule = () => {
-    if (editingItem) {
-      setScheduleData(scheduleData.map(item => item.id === editingItem.id ? {
-        ...formData,
-        id: editingItem.id
-      } : item));
+  const handleSaveSchedule = async () => {
+    try {
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+      if (editingItem) {
+        // 更新现有记录
+        await db.collection('class_schedule').doc(editingItem.id).update({
+          week_day_name: formData.dayOfWeek,
+          section: formData.section,
+          course_name: formData.courseName,
+          class_name: formData.className,
+          room: formData.room,
+          campus: formData.campus,
+          teacher_name: formData.teacher,
+          subject_name: formData.courseName,
+          schedule_type: '课程',
+          status: 'normal'
+        });
+        setScheduleData(scheduleData.map(item => item.id === editingItem.id ? {
+          ...formData,
+          id: editingItem.id
+        } : item));
+        toast({
+          title: '修改成功',
+          description: '课程已更新'
+        });
+      } else {
+        // 添加新记录
+        const result = await db.collection('class_schedule').add({
+          week_day_name: formData.dayOfWeek,
+          section: formData.section,
+          course_name: formData.courseName,
+          class_name: formData.className,
+          room: formData.room,
+          campus: formData.campus,
+          teacher_name: formData.teacher,
+          subject_name: formData.courseName,
+          schedule_type: '课程',
+          status: 'normal',
+          created_at: new Date().toISOString()
+        });
+        const newItem = {
+          ...formData,
+          id: result.id || result.ids?.[0]
+        };
+        setScheduleData([...scheduleData, newItem]);
+        toast({
+          title: '添加成功',
+          description: '课程已添加'
+        });
+      }
+      setShowAddModal(false);
+    } catch (error) {
+      console.error('保存课程失败:', error);
       toast({
-        title: '修改成功',
-        description: '课程已更新'
-      });
-    } else {
-      setScheduleData([...scheduleData, {
-        ...formData,
-        id: Date.now()
-      }]);
-      toast({
-        title: '添加成功',
-        description: '课程已添加'
+        title: '保存失败',
+        description: error.message || '保存课程数据失败',
+        variant: 'destructive'
       });
     }
-    setShowAddModal(false);
   };
   const handleSaveTimetable = () => {
     toast({
