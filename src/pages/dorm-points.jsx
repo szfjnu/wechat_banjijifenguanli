@@ -60,7 +60,7 @@ export default function DormPointsPage(props) {
     try {
       const tcb = await props.$w.cloud.getCloudInstance();
       const db = tcb.database();
-      const result = await db.collection('semester').where({
+      const result = await db.collection('semesters').where({
         is_current: true
       }).get();
       if (result.data && result.data.length > 0) {
@@ -520,7 +520,7 @@ export default function DormPointsPage(props) {
 
       // 获取当前学期的初始积分配置
       let initialScore = 100;
-      const semesterResult = await db.collection('semester').where({
+      const semesterResult = await db.collection('semesters').where({
         is_current: true
       }).get();
       if (semesterResult.data && semesterResult.data.length > 0) {
@@ -587,12 +587,12 @@ export default function DormPointsPage(props) {
       const db = tcb.database();
 
       // 获取当前学期并更新折算比例
-      const result = await db.collection('semester').where({
+      const result = await db.collection('semesters').where({
         is_current: true
       }).get();
       if (result.data && result.data.length > 0) {
         const semester = result.data[0];
-        await db.collection('semester').doc(semester._id).update({
+        await db.collection('semesters').doc(semester._id).update({
           dorm_conversion_ratio: newConversionRate,
           updated_at: new Date().toISOString()
         });

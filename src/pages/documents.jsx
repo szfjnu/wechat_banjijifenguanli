@@ -214,7 +214,7 @@ export default function DocumentsPage({
       // 获取当前学期信息
       let currentSemesterId = 1;
       let currentSemesterName = '未设置学期';
-      const semesterResult = await db.collection('semester').where({
+      const semesterResult = await db.collection('semesters').where({
         is_current: true
       }).get();
       if (semesterResult.data && semesterResult.data.length > 0) {

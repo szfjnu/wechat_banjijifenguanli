@@ -27,7 +27,7 @@ export default function SemesterPage(props) {
       setLoading(true);
       const tcb = await props.$w.cloud.getCloudInstance();
       const db = tcb.database();
-      const result = await db.collection('semester').orderBy('start_date', 'desc').limit(50).get();
+      const result = await db.collection('semesters').orderBy('start_date', 'desc').limit(50).get();
       if (result.data && result.data.length > 0) {
         const transformedSemesters = result.data.map(sem => ({
           id: sem._id,
@@ -178,7 +178,7 @@ export default function SemesterPage(props) {
       const db = tcb.database();
 
       // 添加学期到数据库，包含完整的字段
-      const result = await db.collection('semester').add({
+      const result = await db.collection('semesters').add({
         semester_name: newSemester.name,
         start_date: newSemester.startDate,
         end_date: newSemester.endDate,
@@ -256,12 +256,12 @@ export default function SemesterPage(props) {
       // 更新数据库中的学期状态
       const semester = semesters.find(s => s.id === semesterId);
       if (semester) {
-        await db.collection('semester').doc(semester.id).update({
+        await db.collection('semesters').doc(semester.id).update({
           is_current: true
         });
 
         // 更新其他学期的状态
-        await Promise.all(semesters.filter(s => s.id !== semesterId).map(s => db.collection('semester').doc(s.id).update({
+        await Promise.all(semesters.filter(s => s.id !== semesterId).map(s => db.collection('semesters').doc(s.id).update({
           is_current: false
         })));
       }
@@ -304,7 +304,7 @@ export default function SemesterPage(props) {
       const db = tcb.database();
 
       // 更新数据库中的学期信息，包含所有必要字段
-      await db.collection('semester').doc(editingSemester.id).update({
+      await db.collection('semesters').doc(editingSemester.id).update({
         semester_name: editingSemester.name,
         start_date: editingSemester.startDate,
         end_date: editingSemester.endDate,
@@ -352,7 +352,7 @@ export default function SemesterPage(props) {
       const db = tcb.database();
 
       // 从数据库中删除学期
-      await db.collection('semester').doc(semesterId).remove();
+      await db.collection('semesters').doc(semesterId).remove();
       const updatedSemesters = semesters.filter(s => s.id !== semesterId);
       setSemesters(updatedSemesters);
       toast({

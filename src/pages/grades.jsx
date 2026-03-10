@@ -129,7 +129,7 @@ export default function GradesPage(props) {
     try {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
-      const result = await db.collection('semester').orderBy('start_date', 'desc').get();
+      const result = await db.collection('semesters').orderBy('start_date', 'desc').get();
       if (result.data && result.data.length > 0) {
         const transformedSemesters = result.data.map(sem => ({
           id: sem._id,

@@ -153,7 +153,7 @@ export default function GroupsPage(props) {
       const db = tcb.database();
 
       // 加载学期数据
-      const semesterResult = await db.collection('semester').orderBy('created_at', 'desc').get();
+      const semesterResult = await db.collection('semesters').orderBy('created_at', 'desc').get();
       const transformedSemesters = semesterResult.data.map(sem => ({
         id: sem._id,
         name: sem.semester_name,
