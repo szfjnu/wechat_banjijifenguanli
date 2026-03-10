@@ -57,11 +57,11 @@ export default function AIReviewPage(props) {
       const result = await db.collection('student').get();
       const studentsData = result.data.map(student => ({
         id: student._id,
-        _id: student._id,
         name: student.name || '未命名',
         studentId: student.student_id || '',
         group: student.group || '未分组',
-        totalPoints: parseFloat(student.current_score) || 0
+        totalPoints: parseFloat(student.current_score) || 0,
+        certificateId: parseInt(student.student_id.replace(/[^0-9]/g, '')) || 0
       }));
       setStudents(studentsData);
     } catch (error) {
@@ -81,18 +81,18 @@ export default function AIReviewPage(props) {
     try {
       const tcb = await props.$w.cloud.getCloudInstance();
       const db = tcb.database();
-      let query = {
-        student_id: studentId
-      };
-      const result = await db.collection('grade').where(query).get();
+      const numericId = parseInt(studentId.replace(/[^0-9]/g, '')) || 0;
+      const result = await db.collection('grade').where({
+        student_id: numericId
+      }).get();
       if (result.data.length === 0) {
         return 0;
       }
-      const gpas = result.data.map(grade => parseFloat(grade.gpa)).filter(gpa => gpa != null && !isNaN(gpa));
+      const gpas = result.data.map(grade => grade.gpa).filter(gpa => gpa != null && !isNaN(parseFloat(gpa)));
       if (gpas.length === 0) {
         return 0;
       }
-      const sumGpa = gpas.reduce((sum, gpa) => sum + gpa, 0);
+      const sumGpa = gpas.reduce((sum, gpa) => sum + parseFloat(gpa), 0);
       return (sumGpa / gpas.length).toFixed(2);
     } catch (error) {
       console.error('加载学生成绩失败:', error);
@@ -101,12 +101,13 @@ export default function AIReviewPage(props) {
   };
 
   // 加载学生证书数量
-  const loadStudentCertificates = async (studentId, useId = false) => {
+  const loadStudentCertificates = async studentId => {
     try {
       const tcb = await props.$w.cloud.getCloudInstance();
       const db = tcb.database();
+      const certificateId = parseInt(studentId.replace(/[^0-9]/g, '')) || 0;
       const result = await db.collection('certificate').where({
-        student_id: useId ? parseInt(studentId) : parseInt(studentId)
+        student_id: certificateId
       }).get();
       return result.data.length;
     } catch (error) {
@@ -140,7 +141,7 @@ export default function AIReviewPage(props) {
   const loadStudentDetail = async student => {
     try {
       const gpa = await loadStudentGrades(student.studentId, selectedTimeRange);
-      const certificates = await loadStudentCertificates(student._id, true);
+      const certificates = await loadStudentCertificates(student.studentId);
       const volunteerHours = await loadStudentVolunteerHours(student.studentId, selectedTimeRange);
       setStudentDetail({
         ...student,
@@ -210,7 +211,7 @@ export default function AIReviewPage(props) {
         }
         const allStudentsData = await Promise.all(students.map(async student => {
           const gpa = await loadStudentGrades(student.studentId, selectedTimeRange);
-          const certificates = await loadStudentCertificates(student._id, true);
+          const certificates = await loadStudentCertificates(student.studentId);
           const volunteerHours = await loadStudentVolunteerHours(student.studentId, selectedTimeRange);
           return {
             ...student,
