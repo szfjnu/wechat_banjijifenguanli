@@ -9,25 +9,8 @@ import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 
 // 学期预设数据
-const SEMESTERS = [{
-  id: 1,
-  name: '2024-2025第一学期',
-  startDate: '2024-09-01',
-  endDate: '2025-01-15',
-  isCurrent: false
-}, {
-  id: 2,
-  name: '2024-2025第二学期',
-  startDate: '2025-02-15',
-  endDate: '2025-07-01',
-  isCurrent: true
-}, {
-  id: 3,
-  name: '2025-2026第一学期',
-  startDate: '2025-09-01',
-  endDate: '2026-01-15',
-  isCurrent: false
-}];
+// 初始化学期列表为空，后续从数据库加载
+const INITIAL_SEMESTERS = [];
 
 // 学生预设数据
 const MOCK_STUDENTS = [{
@@ -157,6 +140,7 @@ export default function GroupsPage(props) {
     leaderId: '',
     memberIds: []
   });
+  const [semesters, setSemesters] = useState(INITIAL_SEMESTERS);
 
   // 加载数据
   useEffect(() => {
@@ -165,10 +149,25 @@ export default function GroupsPage(props) {
   const loadData = async () => {
     try {
       setLoading(true);
-      // 模拟数据加载
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setGroups(MOCK_GROUPS);
-      setStudents(MOCK_STUDENTS);
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+
+      // 加载学期数据
+      const semesterResult = await db.collection('semester').orderBy('created_at', 'desc').get();
+      const transformedSemesters = semesterResult.data.map(sem => ({
+        id: sem._id,
+        name: sem.semester_name,
+        isCurrent: sem.is_current || false
+      }));
+      setSemesters(transformedSemesters);
+
+      // 加载分组数据
+      const groupResult = await db.collection('group').get();
+      setGroups(groupResult.data);
+
+      // 加载学生数据
+      const studentResult = await db.collection('student').get();
+      setStudents(studentResult.data);
     } catch (error) {
       console.error('加载数据失败:', error);
       toast({

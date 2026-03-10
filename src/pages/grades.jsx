@@ -67,25 +67,8 @@ const SUBJECTS = [{
 }];
 
 // 学期预设数据
-const SEMESTERS = [{
-  id: 1,
-  name: '2024-2025第一学期',
-  startDate: '2024-09-01',
-  endDate: '2025-01-15',
-  isCurrent: false
-}, {
-  id: 2,
-  name: '2024-2025第二学期',
-  startDate: '2025-02-15',
-  endDate: '2025-07-01',
-  isCurrent: true
-}, {
-  id: 3,
-  name: '2025-2026第一学期',
-  startDate: '2025-09-01',
-  endDate: '2026-01-15',
-  isCurrent: false
-}];
+// 初始化学期列表为空，后续从数据库加载
+const INITIAL_SEMESTERS = [];
 
 // 计算GPA
 const calculateGPA = score => {
@@ -127,6 +110,7 @@ export default function GradesPage(props) {
   const [filterStudent, setFilterStudent] = useState('all');
   const [filterSubject, setFilterSubject] = useState('all');
   const [filterSemester, setFilterSemester] = useState('all');
+  const [semesters, setSemesters] = useState(INITIAL_SEMESTERS);
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [exportRange, setExportRange] = useState('all');
 
@@ -140,10 +124,32 @@ export default function GradesPage(props) {
     remark: ''
   });
 
+  // 加载学期数据
+  const loadSemesters = async () => {
+    try {
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('semester').orderBy('start_date', 'desc').get();
+      if (result.data && result.data.length > 0) {
+        const transformedSemesters = result.data.map(sem => ({
+          id: sem._id,
+          name: sem.semester_name,
+          startDate: sem.start_date ? sem.start_date.split('T')[0] : '',
+          endDate: sem.end_date ? sem.end_date.split('T')[0] : '',
+          isCurrent: sem.is_current || false
+        }));
+        setSemesters(transformedSemesters);
+      }
+    } catch (error) {
+      console.error('加载学期数据失败:', error);
+    }
+  };
+
   // 加载数据
   useEffect(() => {
     loadData();
     loadStudents();
+    loadSemesters();
   }, []);
   const loadStudents = async () => {
     try {
@@ -209,7 +215,7 @@ export default function GradesPage(props) {
     const matchSearch = grade.studentName.toLowerCase().includes(searchTerm.toLowerCase()) || grade.subjectName.toLowerCase().includes(searchTerm.toLowerCase()) || grade.remark.toLowerCase().includes(searchTerm.toLowerCase());
     const matchStudent = filterStudent === 'all' || grade.studentId === filterStudent;
     const matchSubject = filterSubject === 'all' || grade.subjectId === parseInt(filterSubject);
-    const matchSemester = filterSemester === 'all' || grade.semesterId === parseInt(filterSemester);
+    const matchSemester = filterSemester === 'all' || grade.semesterId === filterSemester;
     return matchSearch && matchStudent && matchSubject && matchSemester;
   });
 
@@ -255,7 +261,7 @@ export default function GradesPage(props) {
       const db = tcb.database();
       const student = students.find(s => s.id === formData.studentId);
       const subject = SUBJECTS.find(sub => sub.id === parseInt(formData.subjectId));
-      const semester = SEMESTERS.find(sem => sem.id === parseInt(formData.semesterId));
+      const semester = semesters.find(sem => sem.id === formData.semesterId);
 
       // 添加成绩到数据库
       const result = await db.collection('grade').add({
@@ -521,7 +527,7 @@ export default function GradesPage(props) {
                 semesterId: e.target.value
               })}>
                     <option value="">请选择学期</option>
-                    {SEMESTERS.map(semester => <option key={semester.id} value={semester.id}>{semester.name}</option>)}
+                    {semesters.map(semester => <option key={semester.id} value={semester.id}>{semester.name}</option>)}
                   </select>
                 </div>
                 <div>

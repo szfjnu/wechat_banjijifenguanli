@@ -211,6 +211,18 @@ export default function DocumentsPage({
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
 
+      // 获取当前学期信息
+      let currentSemesterId = 1;
+      let currentSemesterName = '未设置学期';
+      const semesterResult = await db.collection('semester').where({
+        is_current: true
+      }).get();
+      if (semesterResult.data && semesterResult.data.length > 0) {
+        const semester = semesterResult.data[0];
+        currentSemesterId = semester._id;
+        currentSemesterName = semester.semester_name || '未知学期';
+      }
+
       // 计算文件大小
       const fileSize = uploadForm.file.size < 1024 * 1024 ? `${(uploadForm.file.size / 1024).toFixed(0)}KB` : `${(uploadForm.file.size / (1024 * 1024)).toFixed(2)}MB`;
 
@@ -233,8 +245,8 @@ export default function DocumentsPage({
         status: '正常',
         view_count: 0,
         download_count: 0,
-        semester_id: 2,
-        semester_name: '2024-2025第二学期'
+        semester_id: currentSemesterId,
+        semester_name: currentSemesterName
       });
       const newFile = {
         id: result.id || result._id,

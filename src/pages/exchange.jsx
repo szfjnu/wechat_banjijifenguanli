@@ -218,6 +218,18 @@ export default function ExchangePage({
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
 
+      // 获取当前学期信息
+      let currentSemesterId = 1;
+      let currentSemesterName = '未设置学期';
+      const semesterResult = await db.collection('semester').where({
+        is_current: true
+      }).get();
+      if (semesterResult.data && semesterResult.data.length > 0) {
+        const semester = semesterResult.data[0];
+        currentSemesterId = semester._id;
+        currentSemesterName = semester.semester_name || '未知学期';
+      }
+
       // 创建投标兑换申请记录
       const result = await db.collection('redemption_requests').add({
         request_id: `RR${Date.now()}`,
@@ -229,8 +241,8 @@ export default function ExchangePage({
         redemption_mode: '投标竞拍',
         status: '待审核',
         redemption_time: new Date().toISOString(),
-        semester_id: 2,
-        semester_name: '2024-2025第二学期',
+        semester_id: currentSemesterId,
+        semester_name: currentSemesterName,
         is_winner: false
       });
 
@@ -313,6 +325,18 @@ export default function ExchangePage({
       const db = tcb.database();
       const newTotalPoints = student.totalPoints - (item.pointsRequired || 0);
 
+      // 获取当前学期信息
+      let currentSemesterId = 1;
+      let currentSemesterName = '未设置学期';
+      const semesterResult = await db.collection('semester').where({
+        is_current: true
+      }).get();
+      if (semesterResult.data && semesterResult.data.length > 0) {
+        const semester = semesterResult.data[0];
+        currentSemesterId = semester._id;
+        currentSemesterName = semester.semester_name || '未知学期';
+      }
+
       // 添加兑换记录到数据库
       const result = await db.collection('redemption_requests').add({
         request_id: `RR${Date.now()}`,
@@ -327,8 +351,8 @@ export default function ExchangePage({
         approver_name: '系统',
         approval_time: new Date().toISOString(),
         approval_comment: '直接兑换自动审核通过',
-        semester_id: 2,
-        semester_name: '2024-2025第二学期',
+        semester_id: currentSemesterId,
+        semester_name: currentSemesterName,
         is_winner: null
       });
 

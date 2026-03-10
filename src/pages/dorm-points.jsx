@@ -54,6 +54,24 @@ export default function DormPointsPage(props) {
   // 项目分类
   const itemCategories = ['卫生', '纪律', '安全'];
 
+  // 加载当前学期配置
+  const loadCurrentSemesterConfig = async () => {
+    try {
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('semester').where({
+        is_current: true
+      }).get();
+      if (result.data && result.data.length > 0) {
+        const semester = result.data[0];
+        setConversionRate(semester.dorm_conversion_ratio !== undefined ? semester.dorm_conversion_ratio : CONVERSION_RATE);
+        setNewConversionRate(semester.dorm_conversion_ratio !== undefined ? semester.dorm_conversion_ratio : CONVERSION_RATE);
+      }
+    } catch (error) {
+      console.error('加载学期配置失败:', error);
+    }
+  };
+
   // 加载扣分项目数据
   const loadDeductionItems = async () => {
     try {
@@ -89,6 +107,7 @@ export default function DormPointsPage(props) {
     loadDeductionItems();
     loadDormStudentsData();
     loadDeductionHistory();
+    loadCurrentSemesterConfig();
   }, []);
 
   // 项目管理函数
@@ -494,11 +513,21 @@ export default function DormPointsPage(props) {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
 
-      // 批量更新所有住宿生的宿舍积分为100分
+      // 获取当前学期的初始积分配置
+      let initialScore = 100;
+      const semesterResult = await db.collection('semester').where({
+        is_current: true
+      }).get();
+      if (semesterResult.data && semesterResult.data.length > 0) {
+        const semester = semesterResult.data[0];
+        initialScore = semester.dorm_initial_score !== undefined ? semester.dorm_initial_score : 100;
+      }
+
+      // 批量更新所有住宿生的宿舍积分为学期配置的初始积分
       const boardingStudents = students.filter(s => s.isBoarding);
       for (const student of boardingStudents) {
         await db.collection('students').doc(student.id).update({
-          dorm_score: 100,
+          dorm_score: initialScore,
           current_score: student.totalPoints - student.convertedPoints // 恢复到不含宿舍积分的状态
         });
       }
@@ -512,7 +541,7 @@ export default function DormPointsPage(props) {
       // 更新前端状态
       const updatedStudents = students.map(s => s.isBoarding ? {
         ...s,
-        dormPoints: 100,
+        dormPoints: initialScore,
         convertedPoints: 0,
         totalPoints: s.totalPoints - s.convertedPoints
       } : s);
@@ -522,7 +551,7 @@ export default function DormPointsPage(props) {
       setDeductionHistory([]);
       toast({
         title: '重置成功',
-        description: '所有住宿生宿舍积分已重置为100分，历史记录已清空',
+        description: `所有住宿生宿舍积分已重置为${initialScore}分，历史记录已清空`,
         variant: 'default'
       });
       setShowResetConfirm(false);
@@ -539,7 +568,7 @@ export default function DormPointsPage(props) {
   };
 
   // 更新折算比例
-  const handleUpdateConversionRate = () => {
+  const handleUpdateConversionRate = async () => {
     if (newConversionRate < 0 || newConversionRate > 1) {
       toast({
         title: '无效的折算比例',
@@ -548,13 +577,35 @@ export default function DormPointsPage(props) {
       });
       return;
     }
-    setConversionRate(newConversionRate);
-    toast({
-      title: '设置已更新',
-      description: `折算比例已更新为${(newConversionRate * 100).toFixed(0)}%`,
-      variant: 'default'
-    });
-    setShowSettingsModal(false);
+    try {
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+
+      // 获取当前学期并更新折算比例
+      const result = await db.collection('semester').where({
+        is_current: true
+      }).get();
+      if (result.data && result.data.length > 0) {
+        const semester = result.data[0];
+        await db.collection('semester').doc(semester._id).update({
+          dorm_conversion_ratio: newConversionRate
+        });
+      }
+      setConversionRate(newConversionRate);
+      toast({
+        title: '设置已更新',
+        description: `折算比例已更新为${(newConversionRate * 100).toFixed(0)}%`,
+        variant: 'default'
+      });
+      setShowSettingsModal(false);
+    } catch (error) {
+      console.error('更新折算比例失败:', error);
+      toast({
+        title: '更新失败',
+        description: error.message || '无法更新折算比例',
+        variant: 'destructive'
+      });
+    }
   };
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen bg-gray-50">

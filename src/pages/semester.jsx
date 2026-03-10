@@ -38,7 +38,14 @@ export default function SemesterPage(props) {
           isAutomated: sem.is_automated || false,
           resetConfig: sem.reset_config || {},
           note: sem.note || '',
-          createdAt: sem.createdAt
+          createdAt: sem.createdAt,
+          // 宿舍积分配置
+          dormConversionRatio: sem.dorm_conversion_ratio !== undefined ? sem.dorm_conversion_ratio : 0.3,
+          dormCriticalThreshold: sem.dorm_critical_threshold !== undefined ? sem.dorm_critical_threshold : 40,
+          dormInitialScore: sem.dorm_initial_score !== undefined ? sem.dorm_initial_score : 100,
+          dormWarningThreshold: sem.dorm_warning_threshold !== undefined ? sem.dorm_warning_threshold : 60,
+          initialScore: sem.initial_score !== undefined ? sem.initial_score : 100,
+          isInitialized: sem.is_initialized !== undefined ? sem.is_initialized : false
         }));
         setSemesters(transformedSemesters);
       } else {
@@ -276,7 +283,12 @@ export default function SemesterPage(props) {
       await db.collection('semester').doc(editingSemester.id).update({
         semester_name: editingSemester.name,
         start_date: editingSemester.startDate,
-        end_date: editingSemester.endDate
+        end_date: editingSemester.endDate,
+        dorm_conversion_ratio: editingSemester.dormConversionRatio,
+        dorm_critical_threshold: editingSemester.dormCriticalThreshold,
+        dorm_initial_score: editingSemester.dormInitialScore,
+        dorm_warning_threshold: editingSemester.dormWarningThreshold,
+        initial_score: editingSemester.initialScore
       });
       const updatedSemesters = semesters.map(sem => sem.id === editingSemester.id ? editingSemester : sem);
       setSemesters(updatedSemesters);
@@ -518,6 +530,44 @@ export default function SemesterPage(props) {
               ...editingSemester,
               endDate: e.target.value
             })} className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" />
+              </div>
+              
+              <div className="border-t border-slate-200 pt-4 mt-4">
+                <h3 className="text-sm font-semibold text-slate-700 mb-3">宿舍积分配置</h3>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">折算比例</label>
+                    <input type="number" step="0.01" min="0" max="1" value={editingSemester.dormConversionRatio} onChange={e => setEditingSemester({
+                  ...editingSemester,
+                  dormConversionRatio: parseFloat(e.target.value) || 0.3
+                })} className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" placeholder="0.3" />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">初始积分</label>
+                    <input type="number" value={editingSemester.dormInitialScore} onChange={e => setEditingSemester({
+                  ...editingSemester,
+                  dormInitialScore: parseInt(e.target.value) || 100
+                })} className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" placeholder="100" />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">警告阈值</label>
+                    <input type="number" value={editingSemester.dormWarningThreshold} onChange={e => setEditingSemester({
+                  ...editingSemester,
+                  dormWarningThreshold: parseInt(e.target.value) || 60
+                })} className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" placeholder="60" />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">临界阈值</label>
+                    <input type="number" value={editingSemester.dormCriticalThreshold} onChange={e => setEditingSemester({
+                  ...editingSemester,
+                  dormCriticalThreshold: parseInt(e.target.value) || 40
+                })} className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" placeholder="40" />
+                  </div>
+                </div>
               </div>
             </div>
             
