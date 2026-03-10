@@ -25,51 +25,73 @@ export default function ScheduleManage(props) {
   const [activeTab, setActiveTab] = useState('schedule');
   const [scheduleData, setScheduleData] = useState([]);
   const [timetableData, setTimetableData] = useState([]);
+  const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({});
-  const sections = [{
-    id: 1,
-    name: '第一节',
-    time: '08:50-10:10'
-  }, {
-    id: 2,
-    name: '第二节',
-    time: '09:10-09:50'
-  }, {
-    id: 3,
-    name: '第三节',
-    time: '10:20-11:00'
-  }, {
-    id: 4,
-    name: '第四节',
-    time: '11:15-11:55'
-  }, {
-    id: 5,
-    name: '第五节',
-    time: '14:00-14:40'
-  }, {
-    id: 6,
-    name: '第六节',
-    time: '14:50-15:30'
-  }, {
-    id: 7,
-    name: '第七节',
-    time: '15:40-16:20'
-  }];
   const weekDays = ['星期一', '星期二', '星期三', '星期四', '星期五'];
   useEffect(() => {
     loadScheduleData();
     loadTimetableData();
+    loadSectionsData();
   }, [activeTab]);
+  const loadSectionsData = async () => {
+    try {
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('daily_schedule').where({
+        item_name: /第.*节/
+      }).orderBy('period_order', 'asc').orderBy('item_order', 'asc').get();
+      if (result.data && result.data.length > 0) {
+        const sectionsList = result.data.map((item, index) => ({
+          id: index + 1,
+          name: item.item_name,
+          time: item.time_range
+        }));
+        setSections(sectionsList);
+      } else {
+        setSections([{
+          id: 1,
+          name: '第一节',
+          time: '08:50-10:10'
+        }, {
+          id: 2,
+          name: '第二节',
+          time: '09:10-09:50'
+        }, {
+          id: 3,
+          name: '第三节',
+          time: '10:20-11:00'
+        }, {
+          id: 4,
+          name: '第四节',
+          time: '11:15-11:55'
+        }, {
+          id: 5,
+          name: '第五节',
+          time: '14:00-14:40'
+        }, {
+          id: 6,
+          name: '第六节',
+          time: '14:50-15:30'
+        }, {
+          id: 7,
+          name: '第七节',
+          time: '15:40-16:20'
+        }]);
+      }
+    } catch (error) {
+      console.error('加载课节数据失败:', error);
+    }
+  };
   const loadScheduleData = async () => {
     try {
       setLoading(true);
       // 从数据库加载课表数据
       const tcb = await props.$w.cloud.getCloudInstance();
       const db = tcb.database();
-      const result = await db.collection('class_schedule').orderBy('section', 'asc').get();
+      const result = await db.collection('schedule').orderBy('week_day', 'asc').orderBy('section', 'asc').get();
       if (result.data && result.data.length > 0) {
         const scheduleList = result.data.map(item => ({
           id: item._id,
@@ -254,7 +276,7 @@ export default function ScheduleManage(props) {
       const db = tcb.database();
       if (editingItem) {
         // 更新现有记录
-        await db.collection('class_schedule').doc(editingItem.id).update({
+        await db.collection('schedule').doc(editingItem.id).update({
           week_day_name: formData.dayOfWeek,
           section: formData.section,
           course_name: formData.courseName,
@@ -276,7 +298,7 @@ export default function ScheduleManage(props) {
         });
       } else {
         // 添加新记录
-        const result = await db.collection('class_schedule').add({
+        const result = await db.collection('schedule').add({
           week_day_name: formData.dayOfWeek,
           section: formData.section,
           course_name: formData.courseName,
@@ -309,11 +331,50 @@ export default function ScheduleManage(props) {
       });
     }
   };
-  const handleSaveTimetable = () => {
-    toast({
-      title: '保存成功',
-      description: '作息时间已更新'
-    });
+  const handleSaveTimetable = async () => {
+    try {
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+
+      // 先删除旧数据
+      const oldData = await db.collection('daily_schedule').get();
+      if (oldData.data && oldData.data.length > 0) {
+        await Promise.all(oldData.data.map(item => db.collection('daily_schedule').doc(item._id).remove()));
+      }
+
+      // 添加新数据
+      const periodOrderMap = {
+        '上午': 1,
+        '中午': 2,
+        '下午': 3,
+        '晚上': 4
+      };
+      const addPromises = timetableData.flatMap(timetable => {
+        const periodOrder = periodOrderMap[timetable.period] || 0;
+        return timetable.items.map((item, index) => db.collection('daily_schedule').add({
+          period: timetable.period,
+          period_order: periodOrder,
+          item_order: index + 1,
+          item_name: item.name,
+          time_range: item.time,
+          note: item.note || '',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }));
+      });
+      await Promise.all(addPromises);
+      toast({
+        title: '保存成功',
+        description: '作息时间已更新'
+      });
+    } catch (error) {
+      console.error('保存作息时间失败:', error);
+      toast({
+        title: '保存失败',
+        description: error.message || '保存作息时间失败',
+        variant: 'destructive'
+      });
+    }
   };
   const getScheduleForCell = (day, section) => {
     return scheduleData.find(item => item.dayOfWeek === day && item.section === section.id);
