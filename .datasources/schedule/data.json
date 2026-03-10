@@ -1,5 +1,6 @@
 [
   {
+    "_id": "1",
     "schedule_id": "SCH-001",
     "schedule_date": "2026-03-09",
     "week_day": 1,
@@ -18,9 +19,13 @@
     "campus": "大坦沙校区",
     "status": "normal",
     "semester_name": "2025-2026学年第二学期",
-    "remark": "第2周"
+    "semester_id": 4,
+    "remark": "第2周",
+    "createdAt": 1741497600000,
+    "updatedAt": 1741497600000
   },
   {
+    "_id": "2",
     "schedule_id": "SCH-002",
     "schedule_date": "2026-03-09",
     "week_day": 1,
@@ -39,9 +44,13 @@
     "campus": "大坦沙校区",
     "status": "normal",
     "semester_name": "2025-2026学年第二学期",
-    "remark": "第2周"
+    "semester_id": 4,
+    "remark": "第2周",
+    "createdAt": 1741497600000,
+    "updatedAt": 1741497600000
   },
   {
+    "_id": "3",
     "schedule_id": "SCH-003",
     "schedule_date": "2026-03-11",
     "week_day": 3,
@@ -60,9 +69,13 @@
     "campus": "大坦沙校区",
     "status": "normal",
     "semester_name": "2025-2026学年第二学期",
-    "remark": "第2周"
+    "semester_id": 4,
+    "remark": "第2周",
+    "createdAt": 1741497600000,
+    "updatedAt": 1741497600000
   },
   {
+    "_id": "4",
     "schedule_id": "SCH-004",
     "schedule_date": "2026-03-11",
     "week_day": 3,
@@ -81,9 +94,13 @@
     "campus": "大坦沙校区",
     "status": "normal",
     "semester_name": "2025-2026学年第二学期",
-    "remark": "第2周"
+    "semester_id": 4,
+    "remark": "第2周",
+    "createdAt": 1741497600000,
+    "updatedAt": 1741497600000
   },
   {
+    "_id": "5",
     "schedule_id": "SCH-005",
     "schedule_date": "2026-03-11",
     "week_day": 3,
@@ -102,9 +119,13 @@
     "campus": "大坦沙校区",
     "status": "normal",
     "semester_name": "2025-2026学年第二学期",
-    "remark": "第2周"
+    "semester_id": 4,
+    "remark": "第2周",
+    "createdAt": 1741497600000,
+    "updatedAt": 1741497600000
   },
   {
+    "_id": "6",
     "schedule_id": "SCH-006",
     "schedule_date": "2026-03-11",
     "week_day": 3,
@@ -123,9 +144,13 @@
     "campus": "大坦沙校区",
     "status": "normal",
     "semester_name": "2025-2026学年第二学期",
-    "remark": "第2周"
+    "semester_id": 4,
+    "remark": "第2周",
+    "createdAt": 1741497600000,
+    "updatedAt": 1741497600000
   },
   {
+    "_id": "7",
     "schedule_id": "SCH-007",
     "schedule_date": "2026-03-12",
     "week_day": 4,
@@ -144,9 +169,13 @@
     "campus": "大坦沙校区",
     "status": "normal",
     "semester_name": "2025-2026学年第二学期",
-    "remark": "第2周"
+    "semester_id": 4,
+    "remark": "第2周",
+    "createdAt": 1741497600000,
+    "updatedAt": 1741497600000
   },
   {
+    "_id": "8",
     "schedule_id": "SCH-008",
     "schedule_date": "2026-03-12",
     "week_day": 4,
@@ -165,9 +194,13 @@
     "campus": "大坦沙校区",
     "status": "normal",
     "semester_name": "2025-2026学年第二学期",
-    "remark": "第2周"
+    "semester_id": 4,
+    "remark": "第2周",
+    "createdAt": 1741497600000,
+    "updatedAt": 1741497600000
   },
   {
+    "_id": "9",
     "schedule_id": "SCH-009",
     "schedule_date": "2026-03-12",
     "week_day": 4,
@@ -186,9 +219,13 @@
     "campus": "大坦沙校区",
     "status": "normal",
     "semester_name": "2025-2026学年第二学期",
-    "remark": "第2周"
+    "semester_id": 4,
+    "remark": "第2周",
+    "createdAt": 1741497600000,
+    "updatedAt": 1741497600000
   },
   {
+    "_id": "10",
     "schedule_id": "SCH-010",
     "schedule_date": "2026-03-12",
     "week_day": 4,
@@ -207,9 +244,13 @@
     "campus": "大坦沙校区",
     "status": "normal",
     "semester_name": "2025-2026学年第二学期",
-    "remark": "第2周"
+    "semester_id": 4,
+    "remark": "第2周",
+    "createdAt": 1741497600000,
+    "updatedAt": 1741497600000
   },
   {
+    "_id": "11",
     "schedule_id": "SCH-011",
     "schedule_date": "2026-03-12",
     "week_day": 4,
@@ -228,9 +269,13 @@
     "campus": "大坦沙校区",
     "status": "normal",
     "semester_name": "2025-2026学年第二学期",
-    "remark": "第2周"
+    "semester_id": 4,
+    "remark": "第2周",
+    "createdAt": 1741497600000,
+    "updatedAt": 1741497600000
   },
   {
+    "_id": "12",
     "schedule_id": "SCH-012",
     "schedule_date": "2026-03-12",
     "week_day": 4,
@@ -249,9 +294,13 @@
     "campus": "大坦沙校区",
     "status": "normal",
     "semester_name": "2025-2026学年第二学期",
-    "remark": "第2周"
+    "semester_id": 4,
+    "remark": "第2周",
+    "createdAt": 1741497600000,
+    "updatedAt": 1741497600000
   },
   {
+    "_id": "13",
     "schedule_id": "SCH-013",
     "schedule_date": "2026-03-13",
     "week_day": 5,
@@ -270,9 +319,13 @@
     "campus": "大坦沙校区",
     "status": "normal",
     "semester_name": "2025-2026学年第二学期",
-    "remark": "第2周"
+    "semester_id": 4,
+    "remark": "第2周",
+    "createdAt": 1741497600000,
+    "updatedAt": 1741497600000
   },
   {
+    "_id": "14",
     "schedule_id": "SCH-014",
     "schedule_date": "2026-03-13",
     "week_day": 5,
@@ -291,9 +344,13 @@
     "campus": "大坦沙校区",
     "status": "normal",
     "semester_name": "2025-2026学年第二学期",
-    "remark": "第2周"
+    "semester_id": 4,
+    "remark": "第2周",
+    "createdAt": 1741497600000,
+    "updatedAt": 1741497600000
   },
   {
+    "_id": "15",
     "schedule_id": "SCH-015",
     "schedule_date": "2026-03-13",
     "week_day": 5,
@@ -312,9 +369,13 @@
     "campus": "大坦沙校区",
     "status": "normal",
     "semester_name": "2025-2026学年第二学期",
-    "remark": "第2周"
+    "semester_id": 4,
+    "remark": "第2周",
+    "createdAt": 1741497600000,
+    "updatedAt": 1741497600000
   },
   {
+    "_id": "16",
     "schedule_id": "SCH-016",
     "schedule_date": "2026-03-13",
     "week_day": 5,
@@ -333,9 +394,13 @@
     "campus": "大坦沙校区",
     "status": "normal",
     "semester_name": "2025-2026学年第二学期",
-    "remark": "第2周"
+    "semester_id": 4,
+    "remark": "第2周",
+    "createdAt": 1741497600000,
+    "updatedAt": 1741497600000
   },
   {
+    "_id": "17",
     "schedule_id": "SCH-017",
     "schedule_date": "2026-03-09",
     "week_day": 1,
@@ -354,6 +419,9 @@
     "campus": "大坦沙校区",
     "status": "normal",
     "semester_name": "2025-2026学年第二学期",
-    "remark": "第2周，劳动教育"
+    "semester_id": 4,
+    "remark": "第2周，劳动教育",
+    "createdAt": 1741497600000,
+    "updatedAt": 1741497600000
   }
 ]
