@@ -582,20 +582,19 @@ export default function PointsSettings({
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-6 py-8">
         {/* 积分项目内容 */}
-        {activeTab === 'points' && (
-          <>
+        {activeTab === 'points' && <>
             {/* Filter Bar */}
             <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
               <div className="flex items-center gap-4">
                 <span className="text-sm font-semibold text-gray-600">筛选：</span>
                 <div className="flex items-center gap-2">
                   {categories.map(cat => {
-                  const Icon = cat.icon;
-                  return <button key={cat.id} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all ${cat.id === 'all' ? 'bg-gray-100 text-gray-700' : ''}`}>
+                const Icon = cat.icon;
+                return <button key={cat.id} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all ${cat.id === 'all' ? 'bg-gray-100 text-gray-700' : ''}`}>
                       <Icon className={`w-4 h-4 ${cat.id === 'positive' ? 'text-green-600' : cat.id === 'negative' ? 'text-red-600' : 'text-gray-500'}`} />
                       <span>{cat.name}</span>
                     </button>;
-                })}
+              })}
                 </div>
               </div>
             </div>
@@ -610,70 +609,68 @@ export default function PointsSettings({
             
             {/* Items List */}
             <div className="space-y-4">
-          {items.map(item => {
-          const category = getCategory(item.category);
-          const Icon = getIcon(item.icon);
-          const colors = getColorClasses(category.color);
-          return <div key={item.id} className={`bg-white rounded-xl shadow-sm p-4 transition-all duration-200 hover:shadow-md ${!item.enabled ? 'opacity-60' : ''}`}>
-                <div className="flex items-start gap-4">
-                  {/* Icon */}
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colors.bg} flex items-center justify-center flex-shrink-0`}>
-                    <Icon className="w-6 h-6 text-white" />
-                  </div>
-                  
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="text-lg font-bold text-gray-800">{item.name}</h3>
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${category.id === 'positive' ? 'bg-green-100 text-green-700' : category.id === 'negative' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
-                            {item.points > 0 ? `+${item.points}` : item.points} 分
-                          </span>
+              {items.map(item => {
+            const category = getCategory(item.category);
+            const Icon = getIcon(item.icon);
+            const colors = getColorClasses(category.color);
+            return <div key={item.id} className={`bg-white rounded-xl shadow-sm p-4 transition-all duration-200 hover:shadow-md ${!item.enabled ? 'opacity-60' : ''}`}>
+                  <div className="flex items-start gap-4">
+                    {/* Icon */}
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colors.bg} flex items-center justify-center flex-shrink-0`}>
+                      <Icon className="w-6 h-6 text-white" />
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="text-lg font-bold text-gray-800">{item.name}</h3>
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${category.id === 'positive' ? 'bg-green-100 text-green-700' : category.id === 'negative' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
+                              {item.points > 0 ? `+${item.points}` : item.points} 分
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600 mb-2">{item.description}</p>
+                          <div className="flex items-center gap-4 text-xs text-gray-500">
+                            <span className="flex items-center gap-1">
+                              <TrendingUp className="w-3.5 h-3.5" />
+                              使用 {item.usageCount} 次
+                            </span>
+                            <span>创建于 {item.createdAt}</span>
+                          </div>
                         </div>
-                        <p className="text-sm text-gray-600 mb-2">{item.description}</p>
-                        <div className="flex items-center gap-4 text-xs text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <TrendingUp className="w-3.5 h-3.5" />
-                            使用 {item.usageCount} 次
-                          </span>
-                          <span>创建于 {item.createdAt}</span>
+                        
+                        {/* Actions */}
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => handleToggleEnabled(item)} className={`p-2 rounded-lg transition-colors ${item.enabled ? 'bg-green-100 text-green-600 hover:bg-green-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`} title={item.enabled ? '禁用' : '启用'}>
+                            {item.enabled ? <Shield className="w-4 h-4" /> : <Shield className="w-4 h-4" />}
+                          </button>
+                          <button onClick={() => handleEdit(item)} className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors">
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => handleDelete(item)} className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
-                      </div>
-                      
-                      {/* Actions */}
-                      <div className="flex items-center gap-2">
-                        <button onClick={() => handleToggleEnabled(item)} className={`p-2 rounded-lg transition-colors ${item.enabled ? 'bg-green-100 text-green-600 hover:bg-green-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`} title={item.enabled ? '禁用' : '启用'}>
-                          {item.enabled ? <Shield className="w-4 h-4" /> : <Shield className="w-4 h-4" />}
-                        </button>
-                        <button onClick={() => handleEdit(item)} className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors">
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        <button onClick={() => handleDelete(item)} className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>;
-        })}
-          
-          {items.length === 0 && <div className="text-center py-12">
-              <Target className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 mb-4">暂无积分项目</p>
-              <button onClick={handleAdd} className="inline-flex items-center gap-2 bg-emerald-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-emerald-600 transition-colors">
-                <Plus className="w-5 h-5" />
-                添加第一个项目
-              </button>
+                </div>;
+          })}
+              
+              {items.length === 0 && <div className="text-center py-12">
+                  <Target className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500 mb-4">暂无积分项目</p>
+                  <button onClick={handleAdd} className="inline-flex items-center gap-2 bg-emerald-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-emerald-600 transition-colors">
+                    <Plus className="w-5 h-5" />
+                    添加第一个项目
+                  </button>
+                </div>}
             </div>
-            </div>
-          </>
-        )}
+          </>}
         
         {/* 处分级别内容 */}
-        {activeTab === 'discipline' && (
-          <>
+        {activeTab === 'discipline' && <>
             {/* Add Button */}
             <div className="mb-4">
               <button onClick={handleAddDiscipline} className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-orange-600 transition-colors shadow-md">
@@ -685,7 +682,7 @@ export default function PointsSettings({
             {/* Discipline Levels List */}
             <div className="space-y-4">
               {disciplineLevels.map(level => {
-                return <div key={level._id} className="bg-white rounded-xl shadow-sm p-4 transition-all duration-200 hover:shadow-md">
+            return <div key={level._id} className="bg-white rounded-xl shadow-sm p-4 transition-all duration-200 hover:shadow-md">
                     <div className="flex items-start gap-4">
                       {/* Icon */}
                       <div className={`w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center flex-shrink-0`}>
@@ -724,7 +721,7 @@ export default function PointsSettings({
                       </div>
                     </div>
                   </div>;
-              })}
+          })}
               
               {disciplineLevels.length === 0 && <div className="text-center py-12">
                   <AlertTriangle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -735,8 +732,7 @@ export default function PointsSettings({
                   </button>
                 </div>}
             </div>
-          </>
-        )}
+          </>}
       </div>
       
       {/* Edit/Add Dialog */}
