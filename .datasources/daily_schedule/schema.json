@@ -1,0 +1,132 @@
+{
+  "name": "daily_schedule",
+  "title": "日常课表",
+  "schemas": [
+    {
+      "name": "schedule_id",
+      "title": "日程ID",
+      "type": "String"
+    },
+    {
+      "name": "schedule_date",
+      "title": "日程日期",
+      "type": "Date",
+      "format": "string"
+    },
+    {
+      "name": "week_day",
+      "title": "星期几",
+      "type": "Number"
+    },
+    {
+      "name": "week_day_name",
+      "title": "星期名称",
+      "type": "String"
+    },
+    {
+      "name": "schedule_type",
+      "title": "日程类型",
+      "type": "String"
+    },
+    {
+      "name": "section",
+      "title": "第几节",
+      "type": "Number"
+    },
+    {
+      "name": "section_name",
+      "title": "节次名称",
+      "type": "String"
+    },
+    {
+      "name": "start_time",
+      "title": "开始时间",
+      "type": "String"
+    },
+    {
+      "name": "end_time",
+      "title": "结束时间",
+      "type": "String"
+    },
+    {
+      "name": "time_range",
+      "title": "时间范围",
+      "type": "String"
+    },
+    {
+      "name": "subject_id",
+      "title": "科目ID",
+      "type": "String"
+    },
+    {
+      "name": "subject_name",
+      "title": "科目名称",
+      "type": "String"
+    },
+    {
+      "name": "course_name",
+      "title": "课程名称",
+      "type": "String"
+    },
+    {
+      "name": "content",
+      "title": "日程内容",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "room",
+      "title": "教室/房间",
+      "type": "String"
+    },
+    {
+      "name": "building",
+      "title": "教学楼/建筑",
+      "type": "String"
+    },
+    {
+      "name": "campus",
+      "title": "校区",
+      "type": "String"
+    },
+    {
+      "name": "teacher_id",
+      "title": "教师ID",
+      "type": "String"
+    },
+    {
+      "name": "teacher_name",
+      "title": "教师姓名",
+      "type": "String"
+    },
+    {
+      "name": "class_id",
+      "title": "班级ID",
+      "type": "String"
+    },
+    {
+      "name": "class_name",
+      "title": "班级名称",
+      "type": "String"
+    },
+    {
+      "name": "status",
+      "title": "状态",
+      "type": "String"
+    },
+    {
+      "name": "semester_id",
+      "title": "关联学期ID",
+      "type": "Number"
+    },
+    {
+      "name": "semester_name",
+      "title": "学期名称",
+      "type": "String"
+    },
+    {
+      "name": "remark",
+      "title": "备注",
+      "type": "MultiLineString"
+    }
+  ]
+}
