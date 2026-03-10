@@ -465,18 +465,18 @@ export default function ExchangePage({
 
       <div className="px-3 py-2">
         {/* 学生信息卡片 - 紧凑 */}
-        <div className="bg-gradient-to-r from-amber-400 to-orange-500 rounded-lg p-3 text-white mb-3 shadow-sm">
+        {currentStudent && <div className="bg-gradient-to-r from-amber-400 to-orange-500 rounded-lg p-3 text-white mb-3 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-sm font-semibold mb-0.5">{currentStudent.name}</div>
-              <div className="text-xs opacity-90">学号：{currentStudent.studentId}</div>
+              <div className="text-sm font-semibold mb-0.5">{currentStudent?.name || '-'}</div>
+              <div className="text-xs opacity-90">学号：{currentStudent?.studentId || '-'}</div>
             </div>
             <div className="text-right">
               <div className="text-xs opacity-90 mb-0.5">可用积分</div>
-              <div className="text-2xl font-bold">{currentStudent.totalPoints}</div>
+              <div className="text-2xl font-bold">{currentStudent?.totalPoints || 0}</div>
             </div>
           </div>
-        </div>
+        </div>}
         
         {/* 统计卡片 - 紧凑 */}
         <div className="grid grid-cols-2 gap-2 mb-3">
@@ -487,18 +487,18 @@ export default function ExchangePage({
         </div>
         
         {/* 学生信息卡片 */}
-        <div className="bg-gradient-to-r from-amber-400 to-orange-500 rounded-xl p-6 text-white mb-6 shadow-lg">
+        {currentStudent && <div className="bg-gradient-to-r from-amber-400 to-orange-500 rounded-xl p-6 text-white mb-6 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-lg font-semibold mb-1">{currentStudent.name}</div>
-              <div className="text-sm opacity-90">学号：{currentStudent.studentId} | {currentStudent.group}</div>
+              <div className="text-lg font-semibold mb-1">{currentStudent?.name || '-'}</div>
+              <div className="text-sm opacity-90">学号：{currentStudent?.studentId || '-'} | {currentStudent?.group || '-'}</div>
             </div>
             <div className="text-right">
               <div className="text-sm opacity-90 mb-1">当前可用积分</div>
-              <div className="text-4xl font-bold">{currentStudent.totalPoints}</div>
+              <div className="text-4xl font-bold">{currentStudent?.totalPoints || 0}</div>
             </div>
           </div>
-        </div>
+        </div>}
         
         {/* 物品列表 - 紧凑 */}
         <div className="">
@@ -536,7 +536,7 @@ export default function ExchangePage({
             </div> : <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredItems.map(item => <div key={item.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
                   <div className="relative">
-                    <img src={item.imageUrl} alt={item.name} className="w-full h-40 object-cover" />
+                    <img src={item?.imageUrl || ''} alt={item?.name || '物品'} className="w-full h-40 object-cover" />
                     <div className="absolute top-2 right-2 flex gap-2">
                       {getStatusBadge(item)}
                       {getModeBadge(item)}
@@ -544,30 +544,30 @@ export default function ExchangePage({
                   </div>
                   <div className="p-4">
                     <div className="flex items-start justify-between mb-2">
-                      <h3 className="text-lg font-semibold text-gray-900 flex-1">{item.name}</h3>
-                      <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600">{item.category}</span>
+                      <h3 className="text-lg font-semibold text-gray-900 flex-1">{item?.name || '未知物品'}</h3>
+                      <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600">{item?.category || '-'}</span>
                     </div>
-                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">{item.description}</p>
+                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">{item?.description || '暂无描述'}</p>
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-lg font-bold text-orange-600">{item.pointsRequired} 积分</span>
-                      {item.mode === 'bidding' && item.status === 'bidding' && <div className="text-sm">
-                          <div className="text-gray-500">当前最高：{item.currentHighestPoints}分</div>
-                          <div className="text-gray-400 text-xs">剩余{getRemainingTime(item.biddingEndTime)}</div>
+                      <span className="text-lg font-bold text-orange-600">{item?.pointsRequired || 0} 积分</span>
+                      {item?.mode === 'bidding' && item?.status === 'bidding' && <div className="text-sm">
+                          <div className="text-gray-500">当前最高：{item?.currentHighestPoints || 0}分</div>
+                          <div className="text-gray-400 text-xs">剩余{getRemainingTime(item?.biddingEndTime)}</div>
                         </div>}
                     </div>
                     <div className="flex gap-2">
-                      {item.mode === 'direct' && item.status === 'available' && <Button onClick={() => handleOpenExchangeDialog(item)} className="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white" disabled={item.pointsRequired > currentStudent.totalPoints}>
+                      {item?.mode === 'direct' && item?.status === 'available' && <Button onClick={() => handleOpenExchangeDialog(item)} className="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white" disabled={!currentStudent || (item?.pointsRequired || 0) > (currentStudent?.totalPoints || 0)}>
                           立即兑换
                         </Button>}
-                      {item.mode === 'bidding' && item.status === 'bidding' && <div className="flex gap-2 w-full">
-                          <Button onClick={() => handleOpenBidDialog(item)} className="flex-1 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white" disabled={item.status !== 'bidding'}>
+                      {item?.mode === 'bidding' && item?.status === 'bidding' && <div className="flex gap-2 w-full">
+                          <Button onClick={() => handleOpenBidDialog(item)} className="flex-1 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white" disabled={item?.status !== 'bidding'}>
                             参与投标
                           </Button>
                           <Button onClick={() => handleOpenBiddingRecords(item)} variant="outline" size="icon">
                             <Eye className="w-4 h-4" />
                           </Button>
                         </div>}
-                      {item.status === 'exchanged' && <Button disabled className="flex-1">
+                      {item?.status === 'exchanged' && <Button disabled className="flex-1">
                           已兑换
                         </Button>}
                     </div>
@@ -713,7 +713,7 @@ export default function ExchangePage({
               </div>}
             
             <div className="flex gap-2 pt-2">
-              <Button onClick={handleSubmitBid} disabled={!selectedItem || !selectedItem.name} className="flex-1 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed text-white">
+              <Button onClick={handleSubmitBid} disabled={!selectedItem || !selectedItem?.name} className="flex-1 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed text-white">
                 提交投标
               </Button>
               <Button onClick={() => setBidDialogOpen(false)} variant="outline">
@@ -752,7 +752,7 @@ export default function ExchangePage({
               </div>}
             
             <div className="flex gap-2 pt-2">
-              <Button onClick={handleSubmitExchange} disabled={!selectedItem || !selectedItem.name} className="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed text-white">
+              <Button onClick={handleSubmitExchange} disabled={!selectedItem || !selectedItem?.name} className="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed text-white">
                 确认兑换
               </Button>
               <Button onClick={() => setExchangeDialogOpen(false)} variant="outline">
