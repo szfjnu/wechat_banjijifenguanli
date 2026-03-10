@@ -1,0 +1,26 @@
+{
+  "name": "discipline_level_config",
+  "title": "处分级别配置",
+  "schemas": [
+    {
+      "name": "level_name",
+      "title": "级别名称",
+      "type": "String"
+    },
+    {
+      "name": "deduct_points",
+      "title": "扣分值",
+      "type": "Number"
+    },
+    {
+      "name": "valid_days",
+      "title": "有效天数",
+      "type": "Number"
+    },
+    {
+      "name": "description",
+      "title": "描述",
+      "type": "String"
+    }
+  ]
+}

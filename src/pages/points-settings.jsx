@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 // @ts-ignore;
 import { useToast } from '@/components/ui';
 // @ts-ignore;
-import { Settings2, Target, Plus, Edit2, Trash2, Save, X, TrendingUp, Star, Shield, BookOpen, Heart, Award, Zap, ChevronUp, ChevronDown, CheckCircle, Database } from 'lucide-react';
+import { Settings2, Target, Plus, Edit2, Trash2, Save, X, TrendingUp, Star, Shield, BookOpen, Heart, Award, Zap, ChevronUp, ChevronDown, CheckCircle, Database, AlertTriangle, Calendar } from 'lucide-react';
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
@@ -24,18 +24,26 @@ export default function PointsSettings({
     });
   };
 
-  // 数据状态
-  // 数据状态
+  // 标签页切换
+  const [activeTab, setActiveTab] = useState('points'); // 'points' or 'discipline'
+
+  // 积分项目数据状态
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // 对话框状态
-  // 对话框状态
+  // 处分级别数据状态
+  const [disciplineLevels, setDisciplineLevels] = useState([]);
+  const [disciplineLoading, setDisciplineLoading] = useState(false);
+
+  // 积分项目对话框状态
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
 
-  // 表单状态
-  // 表单状态
+  // 处分级别对话框状态
+  const [showDisciplineDialog, setShowDisciplineDialog] = useState(false);
+  const [editingDiscipline, setEditingDiscipline] = useState(null);
+
+  // 积分项目表单状态
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -43,6 +51,14 @@ export default function PointsSettings({
     category: 'positive',
     icon: 'Star',
     enabled: true
+  });
+
+  // 处分级别表单状态
+  const [disciplineFormData, setDisciplineFormData] = useState({
+    level_name: '',
+    deduct_points: 0,
+    valid_days: 30,
+    description: ''
   });
 
   // 分类选项
@@ -110,6 +126,7 @@ export default function PointsSettings({
   // 加载积分项目数据
   useEffect(() => {
     loadScoreItems();
+    loadDisciplineLevels();
   }, []);
   const loadScoreItems = async () => {
     try {
@@ -141,6 +158,29 @@ export default function PointsSettings({
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  // 加载处分级别数据
+  const loadDisciplineLevels = async () => {
+    try {
+      setDisciplineLoading(true);
+      const tcb = await $w.cloud.getCloudInstance();
+      const result = await tcb.database().collection('discipline_level_config').orderBy('deduct_points', 'asc').get();
+      if (result.data && result.data.length > 0) {
+        setDisciplineLevels(result.data);
+      } else {
+        setDisciplineLevels([]);
+      }
+    } catch (error) {
+      console.error('加载处分级别失败:', error);
+      toast({
+        title: '加载失败',
+        description: error.message || '无法加载处分级别',
+        variant: 'destructive'
+      });
+    } finally {
+      setDisciplineLoading(false);
     }
   };
 
@@ -303,6 +343,127 @@ export default function PointsSettings({
     }
   };
 
+  // 处分级别相关方法
+  // 添加处分级别
+  const handleAddDiscipline = () => {
+    setEditingDiscipline(null);
+    setDisciplineFormData({
+      level_name: '',
+      deduct_points: 0,
+      valid_days: 30,
+      description: ''
+    });
+    setShowDisciplineDialog(true);
+  };
+
+  // 编辑处分级别
+  const handleEditDiscipline = level => {
+    setEditingDiscipline(level);
+    setDisciplineFormData({
+      level_name: level.level_name,
+      deduct_points: level.deduct_points,
+      valid_days: level.valid_days,
+      description: level.description || ''
+    });
+    setShowDisciplineDialog(true);
+  };
+
+  // 删除处分级别
+  const handleDeleteDiscipline = level => {
+    if (window.confirm(`确定要删除「${level.level_name}」这个处分级别吗？`)) {
+      setDisciplineLevels(disciplineLevels.filter(l => l._id !== level._id));
+      toast({
+        title: '删除成功',
+        description: '处分级别已删除',
+        variant: 'default'
+      });
+    }
+  };
+
+  // 保存处分级别
+  const handleSaveDiscipline = async () => {
+    if (!disciplineFormData.level_name.trim()) {
+      toast({
+        title: '验证失败',
+        description: '请输入级别名称',
+        variant: 'destructive'
+      });
+      return;
+    }
+    if (disciplineFormData.deduct_points === 0) {
+      toast({
+        title: '验证失败',
+        description: '请设置扣分值',
+        variant: 'destructive'
+      });
+      return;
+    }
+    if (disciplineFormData.valid_days <= 0) {
+      toast({
+        title: '验证失败',
+        description: '请设置有效天数',
+        variant: 'destructive'
+      });
+      return;
+    }
+    try {
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+      if (editingDiscipline) {
+        // 更新数据库
+        await db.collection('discipline_level_config').doc(editingDiscipline._id).update({
+          level_name: disciplineFormData.level_name,
+          deduct_points: disciplineFormData.deduct_points,
+          valid_days: disciplineFormData.valid_days,
+          description: disciplineFormData.description,
+          updated_at: new Date().toISOString()
+        });
+
+        // 更新前端
+        setDisciplineLevels(disciplineLevels.map(level => level._id === editingDiscipline._id ? {
+          ...level,
+          ...disciplineFormData
+        } : level));
+        toast({
+          title: '更新成功',
+          description: '处分级别已更新',
+          variant: 'default'
+        });
+      } else {
+        // 新增到数据库
+        const result = await db.collection('discipline_level_config').add({
+          level_name: disciplineFormData.level_name,
+          deduct_points: disciplineFormData.deduct_points,
+          valid_days: disciplineFormData.valid_days,
+          description: disciplineFormData.description,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+
+        // 更新前端
+        const newLevel = {
+          _id: result.id || result._id,
+          ...disciplineFormData,
+          createdAt: new Date().toISOString().split('T')[0]
+        };
+        setDisciplineLevels([...disciplineLevels, newLevel]);
+        toast({
+          title: '添加成功',
+          description: '处分级别已添加',
+          variant: 'default'
+        });
+      }
+      setShowDisciplineDialog(false);
+    } catch (error) {
+      console.error('保存处分级别失败:', error);
+      toast({
+        title: '保存失败',
+        description: error.message || '请重试',
+        variant: 'destructive'
+      });
+    }
+  };
+
   // 获取分类信息
   // 获取分类信息
   const getCategory = categoryId => {
@@ -361,13 +522,19 @@ export default function PointsSettings({
   };
 
   // 统计数据
-  // 统计数据
   const stats = {
     total: items.length,
     enabled: items.filter(i => i.enabled).length,
     positive: items.filter(i => i.points > 0).length,
     negative: items.filter(i => i.points < 0).length,
     totalUsage: items.reduce((sum, i) => sum + (i.usageCount || 0), 0)
+  };
+
+  // 处分级别统计
+  const disciplineStats = {
+    total: disciplineLevels.length,
+    avgDeductPoints: disciplineLevels.length > 0 ? Math.round(disciplineLevels.reduce((sum, l) => sum + l.deduct_points, 0) / disciplineLevels.length) : 0,
+    avgValidDays: disciplineLevels.length > 0 ? Math.round(disciplineLevels.reduce((sum, l) => sum + l.valid_days, 0) / disciplineLevels.length) : 0
   };
   return <div className="min-h-screen bg-gray-50 pb-16" style={style}>
       {/* Header */}
@@ -379,46 +546,70 @@ export default function PointsSettings({
                 <Settings2 className="w-6 h-6" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold">积分项目设置</h1>
-                <p className="text-sm text-white/80">管理日常积分项目及其规则</p>
+                <h1 className="text-2xl font-bold">系统设置</h1>
+                <p className="text-sm text-white/80">管理积分项目和处分级别</p>
               </div>
             </div>
-            <button onClick={handleAdd} className="flex items-center gap-2 bg-white text-emerald-600 px-4 py-2 rounded-lg font-semibold hover:bg-white/90 transition-colors shadow-md text-[0.6em]">
-              <Plus className="w-5 h-5" />
-              添加项目
+          </div>
+          
+          {/* Tabs */}
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-1 flex gap-1">
+            <button onClick={() => setActiveTab('points')} className={`flex-1 px-4 py-2.5 rounded-lg font-semibold transition-all ${activeTab === 'points' ? 'bg-white text-emerald-600 shadow-md' : 'text-white/80 hover:text-white'}`}>
+              积分项目
+            </button>
+            <button onClick={() => setActiveTab('discipline')} className={`flex-1 px-4 py-2.5 rounded-lg font-semibold transition-all ${activeTab === 'discipline' ? 'bg-white text-emerald-600 shadow-md' : 'text-white/80 hover:text-white'}`}>
+              处分级别
             </button>
           </div>
           
-          {/* Stats Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-            <StatCard title="项目总数" value={stats.total} icon={Database} color="teal" />
-            <StatCard title="已启用" value={stats.enabled} icon={CheckCircle} color="green" />
-            <StatCard title="加分项" value={stats.positive} icon={TrendingUp} color="amber" />
-            <StatCard title="使用次数" value={stats.totalUsage} icon={Shield} color="blue" />
-          </div>
+          {/* Stats Cards - 积分项目 */}
+          {activeTab === 'points' && <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-4">
+              <StatCard title="项目总数" value={stats.total} icon={Database} color="teal" />
+              <StatCard title="已启用" value={stats.enabled} icon={CheckCircle} color="green" />
+              <StatCard title="加分项" value={stats.positive} icon={TrendingUp} color="amber" />
+              <StatCard title="使用次数" value={stats.totalUsage} icon={Shield} color="blue" />
+            </div>}
+          
+          {/* Stats Cards - 处分级别 */}
+          {activeTab === 'discipline' && <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-4">
+              <StatCard title="级别总数" value={disciplineStats.total} icon={AlertTriangle} color="orange" />
+              <StatCard title="平均扣分" value={disciplineStats.avgDeductPoints} icon={Shield} color="red" />
+              <StatCard title="平均天数" value={disciplineStats.avgValidDays} icon={Calendar} color="blue" />
+            </div>}
         </div>
       </div>
       
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-6 py-8">
-        {/* Filter Bar */}
-        <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
-          <div className="flex items-center gap-4">
-            <span className="text-sm font-semibold text-gray-600">筛选：</span>
-            <div className="flex items-center gap-2">
-              {categories.map(cat => {
-              const Icon = cat.icon;
-              return <button key={cat.id} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all ${cat.id === 'all' ? 'bg-gray-100 text-gray-700' : ''}`}>
-                  <Icon className={`w-4 h-4 ${cat.id === 'positive' ? 'text-green-600' : cat.id === 'negative' ? 'text-red-600' : 'text-gray-500'}`} />
-                  <span>{cat.name}</span>
-                </button>;
-            })}
+        {/* 积分项目内容 */}
+        {activeTab === 'points' && (
+          <>
+            {/* Filter Bar */}
+            <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+              <div className="flex items-center gap-4">
+                <span className="text-sm font-semibold text-gray-600">筛选：</span>
+                <div className="flex items-center gap-2">
+                  {categories.map(cat => {
+                  const Icon = cat.icon;
+                  return <button key={cat.id} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all ${cat.id === 'all' ? 'bg-gray-100 text-gray-700' : ''}`}>
+                      <Icon className={`w-4 h-4 ${cat.id === 'positive' ? 'text-green-600' : cat.id === 'negative' ? 'text-red-600' : 'text-gray-500'}`} />
+                      <span>{cat.name}</span>
+                    </button>;
+                })}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        
-        {/* Items List */}
-        <div className="space-y-4">
+            
+            {/* Add Button */}
+            <div className="mb-4">
+              <button onClick={handleAdd} className="flex items-center gap-2 bg-emerald-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-emerald-600 transition-colors shadow-md">
+                <Plus className="w-5 h-5" />
+                添加积分项目
+              </button>
+            </div>
+            
+            {/* Items List */}
+            <div className="space-y-4">
           {items.map(item => {
           const category = getCategory(item.category);
           const Icon = getIcon(item.icon);
@@ -475,8 +666,77 @@ export default function PointsSettings({
                 <Plus className="w-5 h-5" />
                 添加第一个项目
               </button>
-            </div>}
-        </div>
+            </div>
+            </div>
+          </>
+        )}
+        
+        {/* 处分级别内容 */}
+        {activeTab === 'discipline' && (
+          <>
+            {/* Add Button */}
+            <div className="mb-4">
+              <button onClick={handleAddDiscipline} className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-orange-600 transition-colors shadow-md">
+                <Plus className="w-5 h-5" />
+                添加处分级别
+              </button>
+            </div>
+            
+            {/* Discipline Levels List */}
+            <div className="space-y-4">
+              {disciplineLevels.map(level => {
+                return <div key={level._id} className="bg-white rounded-xl shadow-sm p-4 transition-all duration-200 hover:shadow-md">
+                    <div className="flex items-start gap-4">
+                      {/* Icon */}
+                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center flex-shrink-0`}>
+                        <AlertTriangle className="w-6 h-6 text-white" />
+                      </div>
+                      
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="text-lg font-bold text-gray-800">{level.level_name}</h3>
+                              <span className={`px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700`}>
+                                扣{level.deduct_points}分
+                              </span>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-2">{level.description}</p>
+                            <div className="flex items-center gap-4 text-xs text-gray-500">
+                              <span className="flex items-center gap-1">
+                                <Calendar className="w-3.5 h-3.5" />
+                                有效期 {level.valid_days} 天
+                              </span>
+                            </div>
+                          </div>
+                          
+                          {/* Actions */}
+                          <div className="flex items-center gap-2">
+                            <button onClick={() => handleEditDiscipline(level)} className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors">
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => handleDeleteDiscipline(level)} className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors">
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>;
+              })}
+              
+              {disciplineLevels.length === 0 && <div className="text-center py-12">
+                  <AlertTriangle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500 mb-4">暂无处分级别</p>
+                  <button onClick={handleAddDiscipline} className="inline-flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors">
+                    <Plus className="w-5 h-5" />
+                    添加第一个级别
+                  </button>
+                </div>}
+            </div>
+          </>
+        )}
       </div>
       
       {/* Edit/Add Dialog */}

@@ -1,58 +1,12 @@
 // @ts-ignore;
 import React, { useState, useEffect } from 'react';
 // @ts-ignore;
-import { AlertTriangle, FileText, Search, Filter, Shield, ShieldAlert, Calendar, Clock, CheckCircle, XCircle, User, Plus, History, Download, Eye } from 'lucide-react';
+import { AlertTriangle, FileText, Search, Filter, Shield, ShieldAlert, Calendar, Clock, CheckCircle, XCircle, User, Plus, History, Download, Eye, Settings } from 'lucide-react';
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
-
-// 处分级别预设数据（包含扣分分值）
-const DISCIPLINE_LEVELS = [{
-  id: 1,
-  name: '口头警告',
-  points: -2,
-  severity: 'low',
-  duration: 7,
-  // 有效期（天）
-  description: '轻微违纪，口头提醒'
-}, {
-  id: 2,
-  name: '通报批评',
-  points: -5,
-  severity: 'low',
-  duration: 14,
-  description: '一般违纪，班级通报'
-}, {
-  id: 3,
-  name: '警告',
-  points: -10,
-  severity: 'medium',
-  duration: 30,
-  description: '较重违纪，书面警告'
-}, {
-  id: 4,
-  name: '严重警告',
-  points: -15,
-  severity: 'medium',
-  duration: 60,
-  description: '严重违纪，影响评优'
-}, {
-  id: 5,
-  name: '记过',
-  points: -20,
-  severity: 'high',
-  duration: 90,
-  description: '严重违纪，记入档案'
-}, {
-  id: 6,
-  name: '留校察看',
-  points: -30,
-  severity: 'high',
-  duration: 180,
-  description: '严重违纪，留校察看'
-}];
 
 // 模拟学生数据
 export default function DisciplinePage(props) {
@@ -73,6 +27,7 @@ export default function DisciplinePage(props) {
   const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState([]);
   const [students, setStudents] = useState([]);
+  const [disciplineLevels, setDisciplineLevels] = useState([]);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showDetailDialog, setShowDetailDialog] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
@@ -114,6 +69,22 @@ export default function DisciplinePage(props) {
           totalPoints: student.current_score || 0
         }));
         setStudents(transformedStudents);
+      }
+
+      // 加载处分级别数据
+      const levelResult = await db.collection('discipline_level_config').where({
+        is_active: true
+      }).orderBy('sort_order', 'asc').get();
+      if (levelResult.data && levelResult.data.length > 0) {
+        const transformedLevels = levelResult.data.map(level => ({
+          id: level._id,
+          levelName: level.level_name,
+          deductPoints: level.deduct_points,
+          validDays: level.valid_days,
+          description: level.description,
+          sortOrder: level.sort_order
+        }));
+        setDisciplineLevels(transformedLevels);
       }
 
       // 加载处分记录数据
@@ -238,7 +209,15 @@ export default function DisciplinePage(props) {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
       const student = students.find(s => s.id === newRecord.studentId);
-      const level = DISCIPLINE_LEVELS.find(l => l.id === parseInt(newRecord.levelId));
+      const level = disciplineLevels.find(l => l.id === newRecord.levelId);
+      if (!level) {
+        toast({
+          title: '错误',
+          description: '未找到处分级别配置',
+          variant: 'destructive'
+        });
+        return;
+      }
 
       // 添加处分记录到数据库
       const recordResult = await db.collection('discipline_record').add({
@@ -248,12 +227,12 @@ export default function DisciplinePage(props) {
         student_no: student.studentId || '',
         group_name: student.group || '',
         level_id: level.id,
-        level_name: level.name,
+        level_name: level.levelName,
         reason: newRecord.reason,
-        points_deducted: level.points,
+        points_deducted: level.deductPoints,
         date: newRecord.date,
         status: 'active',
-        expiry_date: new Date(Date.now() + level.duration * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        expiry_date: new Date(Date.now() + level.validDays * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         operator_name: '班主任',
         revoke_requests: []
       });
@@ -262,12 +241,12 @@ export default function DisciplinePage(props) {
         studentId: newRecord.studentId,
         studentName: student.name,
         levelId: level.id,
-        levelName: level.name,
+        levelName: level.levelName,
         reason: newRecord.reason,
-        pointsDeducted: level.points,
+        pointsDeducted: level.deductPoints,
         date: newRecord.date,
         status: 'active',
-        expiryDate: new Date(Date.now() + level.duration * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        expiryDate: new Date(Date.now() + level.validDays * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         operator: '班主任',
         revokeRequests: []
       };
@@ -281,7 +260,7 @@ export default function DisciplinePage(props) {
       });
       toast({
         title: '创建成功',
-        description: `已为 ${student.name} 创建 ${level.name}`
+        description: `已为 ${student.name} 创建 ${level.levelName}`
       });
     } catch (error) {
       console.error('创建失败:', error);
@@ -480,6 +459,12 @@ export default function DisciplinePage(props) {
               <p className="text-xs text-gray-500">学生违纪处分记录管理</p>
             </div>
             <div className="flex gap-1">
+              <Button onClick={() => $w.utils.navigateTo({
+            pageId: 'points-settings',
+            params: {}
+          })} variant="outline" size="icon" className="h-8 w-8" title="处分级别设置">
+                <Settings className="w-4 h-4" />
+              </Button>
               <Button onClick={() => setShowExportDialog(true)} variant="outline" size="icon" className="h-8 w-8">
                 <Download className="w-4 h-4" />
               </Button>
@@ -530,8 +515,17 @@ export default function DisciplinePage(props) {
                 </div> : filteredRecords.map(record => {
             const statusStyles = getStatusStyles(record.status);
             const StatusIcon = statusStyles.icon;
-            const level = DISCIPLINE_LEVELS.find(l => l.id === record.levelId);
-            const severityStyles = getSeverityStyles(level?.severity);
+            const level = disciplineLevels.find(l => l.id === record.levelId) || {
+              levelName: record.levelName,
+              deductPoints: record.pointsDeducted
+            };
+            // 根据扣分值判断严重程度样式
+            const getSeverityByPoints = points => {
+              if (points >= 20) return 'high';
+              if (points >= 10) return 'medium';
+              return 'low';
+            };
+            const severityStyles = getSeverityStyles(getSeverityByPoints(level.deductPoints));
             return <div key={record.id} className={`p-2.5 hover:bg-gray-50 transition-colors ${record.status === 'active' ? 'bg-red-50/50' : ''}`}>
                     <div className="flex items-start gap-2">
                       {/* 学生头像和基本信息 */}
@@ -605,7 +599,7 @@ export default function DisciplinePage(props) {
               levelId: e.target.value
             })}>
                     <option value="">请选择处分级别</option>
-                    {DISCIPLINE_LEVELS.map(level => <option key={level.id} value={level.id}>{level.name} ({level.points}分, {level.duration}天)</option>)}
+                    {disciplineLevels.map(level => <option key={level.id} value={level.id}>{level.levelName} (扣{level.deductPoints}分, 有效{level.validDays}天)</option>)}
                   </select>
                 </div>
                 <div>
@@ -663,8 +657,8 @@ export default function DisciplinePage(props) {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">扣分</span>
-                    <span className={`text-sm font-medium ${selectedRecord.pointsDeducted < 0 ? 'text-red-600' : 'text-gray-800'}`}>
-                      {selectedRecord.pointsDeducted}
+                    <span className={`text-sm font-medium text-red-600`}>
+                      扣{Math.abs(selectedRecord.pointsDeducted)}分
                     </span>
                   </div>
                   <div className="flex justify-between">

@@ -1,0 +1,56 @@
+[
+  {
+    "_id": "1",
+    "level_name": "口头警告",
+    "deduct_points": 2,
+    "valid_days": 7,
+    "description": "轻微违规行为，口头提醒",
+    "createdAt": 1741555200000,
+    "updatedAt": 1741555200000
+  },
+  {
+    "_id": "2",
+    "level_name": "通报批评",
+    "deduct_points": 5,
+    "valid_days": 14,
+    "description": "一般违规行为，全校通报",
+    "createdAt": 1741555200000,
+    "updatedAt": 1741555200000
+  },
+  {
+    "_id": "3",
+    "level_name": "警告",
+    "deduct_points": 10,
+    "valid_days": 30,
+    "description": "较严重违规行为，正式警告",
+    "createdAt": 1741555200000,
+    "updatedAt": 1741555200000
+  },
+  {
+    "_id": "4",
+    "level_name": "严重警告",
+    "deduct_points": 15,
+    "valid_days": 60,
+    "description": "严重违规行为，加重警告",
+    "createdAt": 1741555200000,
+    "updatedAt": 1741555200000
+  },
+  {
+    "_id": "5",
+    "level_name": "记过",
+    "deduct_points": 20,
+    "valid_days": 90,
+    "description": "重大违规行为，记入档案",
+    "createdAt": 1741555200000,
+    "updatedAt": 1741555200000
+  },
+  {
+    "_id": "6",
+    "level_name": "留校察看",
+    "deduct_points": 30,
+    "valid_days": 180,
+    "description": "严重违规行为，留校察看",
+    "createdAt": 1741555200000,
+    "updatedAt": 1741555200000
+  }
+]
