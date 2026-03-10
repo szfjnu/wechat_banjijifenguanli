@@ -207,7 +207,7 @@ export default function GradesPage(props) {
   // 过滤成绩
   const filteredGrades = grades.filter(grade => {
     const matchSearch = grade.studentName.toLowerCase().includes(searchTerm.toLowerCase()) || grade.subjectName.toLowerCase().includes(searchTerm.toLowerCase()) || grade.remark.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchStudent = filterStudent === 'all' || grade.studentId === parseInt(filterStudent);
+    const matchStudent = filterStudent === 'all' || grade.studentId === filterStudent;
     const matchSubject = filterSubject === 'all' || grade.subjectId === parseInt(filterSubject);
     const matchSemester = filterSemester === 'all' || grade.semesterId === parseInt(filterSemester);
     return matchSearch && matchStudent && matchSubject && matchSemester;
@@ -253,7 +253,7 @@ export default function GradesPage(props) {
     try {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
-      const student = students.find(s => s.id === parseInt(formData.studentId));
+      const student = students.find(s => s.studentId === formData.studentId);
       const subject = SUBJECTS.find(sub => sub.id === parseInt(formData.subjectId));
       const semester = SEMESTERS.find(sem => sem.id === parseInt(formData.semesterId));
 
@@ -276,7 +276,7 @@ export default function GradesPage(props) {
       });
       const newGrade = {
         id: result.id || result.ids?.[0] || `GRADE${Date.now()}`,
-        studentId: parseInt(formData.studentId),
+        studentId: formData.studentId,
         studentName: student.name,
         subjectId: subject.id,
         subjectName: subject.name,

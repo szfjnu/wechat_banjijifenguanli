@@ -2,7 +2,7 @@
   {
     "_id": "1",
     "record_id": "DP20250306001",
-    "student_id": 1,
+    "student_id": "2024001",
     "student_name": "张三",
     "student_id_number": "202401001",
     "dorm_room": "301",
@@ -28,7 +28,7 @@
   {
     "_id": "2",
     "record_id": "DP20250305002",
-    "student_id": 2,
+    "student_id": "2024002",
     "student_name": "李四",
     "student_id_number": "202401002",
     "dorm_room": "301",
@@ -53,7 +53,7 @@
   {
     "_id": "3",
     "record_id": "DP20250304003",
-    "student_id": 3,
+    "student_id": "2024003",
     "student_name": "王五",
     "student_id_number": "202401003",
     "dorm_room": "302",
@@ -76,7 +76,7 @@
   {
     "_id": "4",
     "record_id": "DP20250303004",
-    "student_id": 4,
+    "student_id": "2024004",
     "student_name": "赵六",
     "student_id_number": "202401004",
     "dorm_room": "303",
@@ -102,7 +102,7 @@
   {
     "_id": "5",
     "record_id": "DP20250302005",
-    "student_id": 5,
+    "student_id": "2024006",
     "student_name": "孙七",
     "student_id_number": "202401005",
     "dorm_room": "304",
@@ -127,7 +127,7 @@
   {
     "_id": "6",
     "record_id": "DP20250301006",
-    "student_id": 6,
+    "student_id": "2024007",
     "student_name": "周八",
     "student_id_number": "202401006",
     "dorm_room": "305",
@@ -150,7 +150,7 @@
   {
     "_id": "7",
     "record_id": "DP20250228007",
-    "student_id": 7,
+    "student_id": "2024008",
     "student_name": "吴九",
     "student_id_number": "202401007",
     "dorm_room": "306",
@@ -177,7 +177,7 @@
   {
     "_id": "8",
     "record_id": "DP20250227008",
-    "student_id": 8,
+    "student_id": "2024009",
     "student_name": "郑十",
     "student_id_number": "202401008",
     "dorm_room": "307",
@@ -202,7 +202,7 @@
   {
     "_id": "9",
     "record_id": "DP20250226009",
-    "student_id": 1,
+    "student_id": "2024001",
     "student_name": "张三",
     "student_id_number": "202401001",
     "dorm_room": "301",
@@ -225,7 +225,7 @@
   {
     "_id": "10",
     "record_id": "DP20250225010",
-    "student_id": 2,
+    "student_id": "2024002",
     "student_name": "李四",
     "student_id_number": "202401002",
     "dorm_room": "301",
@@ -250,7 +250,7 @@
   {
     "_id": "11",
     "record_id": "DP20240220001",
-    "student_id": 4,
+    "student_id": "2024004",
     "student_name": "赵六",
     "student_id_number": "202401004",
     "dorm_room": "303",
@@ -276,7 +276,7 @@
   {
     "_id": "12",
     "record_id": "DP20240215002",
-    "student_id": 5,
+    "student_id": "2024006",
     "student_name": "孙七",
     "student_id_number": "202401005",
     "dorm_room": "304",
