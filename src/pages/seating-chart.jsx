@@ -7,113 +7,6 @@ import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
-
-// 学生预设数据
-const MOCK_STUDENTS = [{
-  id: 1,
-  studentId: '2024001',
-  name: '张三',
-  gender: '男',
-  group: '第一组',
-  seatId: null,
-  avatar: null
-}, {
-  id: 2,
-  studentId: '2024002',
-  name: '李四',
-  gender: '女',
-  group: '第一组',
-  seatId: null,
-  avatar: null
-}, {
-  id: 3,
-  studentId: '2024003',
-  name: '王五',
-  gender: '男',
-  group: '第二组',
-  seatId: null,
-  avatar: null
-}, {
-  id: 4,
-  studentId: '2024004',
-  name: '赵六',
-  gender: '女',
-  group: '第二组',
-  seatId: null,
-  avatar: null
-}, {
-  id: 5,
-  studentId: '2024005',
-  name: '钱七',
-  gender: '男',
-  group: '第三组',
-  seatId: null,
-  avatar: null
-}, {
-  id: 6,
-  studentId: '2024006',
-  name: '孙八',
-  gender: '女',
-  group: '第三组',
-  seatId: null,
-  avatar: null
-}, {
-  id: 7,
-  studentId: '2024007',
-  name: '周九',
-  gender: '男',
-  group: '第一组',
-  seatId: null,
-  avatar: null
-}, {
-  id: 8,
-  studentId: '2024008',
-  name: '吴十',
-  gender: '女',
-  group: '第一组',
-  seatId: null,
-  avatar: null
-}, {
-  id: 9,
-  studentId: '2024009',
-  name: '郑十一',
-  gender: '男',
-  group: '第二组',
-  seatId: null,
-  avatar: null
-}, {
-  id: 10,
-  studentId: '2024010',
-  name: '冯十二',
-  gender: '女',
-  group: '第二组',
-  seatId: null,
-  avatar: null
-}, {
-  id: 11,
-  studentId: '2024011',
-  name: '陈十三',
-  gender: '男',
-  group: '第三组',
-  seatId: null,
-  avatar: null
-}, {
-  id: 12,
-  studentId: '2024012',
-  name: '褚十四',
-  gender: '女',
-  group: '第三组',
-  seatId: null,
-  avatar: null
-}];
-
-// 座位预设数据（已有座位的）
-const INITIAL_SEATS = {
-  'A1': MOCK_STUDENTS[0],
-  'B2': MOCK_STUDENTS[1],
-  'C3': MOCK_STUDENTS[2],
-  'D4': MOCK_STUDENTS[3]
-};
 export default function SeatingChart(props) {
   const {
     $w
@@ -180,6 +73,8 @@ export default function SeatingChart(props) {
       const tcb = await $w.cloud.getCloudInstance();
 
       // 1. 加载座位配置
+      let loadedRows = 6;
+      let loadedCols = 8;
       try {
         const configResult = await tcb.database().collection('seat').where({
           classroom_id: 1
@@ -187,44 +82,75 @@ export default function SeatingChart(props) {
         if (configResult.data && configResult.data.length > 0) {
           const config = configResult.data[0];
           // 使用数据库中的配置
-          setRows(config.total_rows || 6);
-          setCols(config.total_cols || 8);
-          setTempRows(config.total_rows || 6);
-          setTempCols(config.total_cols || 8);
-        } else {
-          // 如果没有配置记录，使用默认值
-          setRows(6);
-          setCols(8);
-          setTempRows(6);
-          setTempCols(8);
+          loadedRows = config.total_rows || 6;
+          loadedCols = config.total_cols || 8;
         }
       } catch (error) {
         console.error('加载座位配置失败:', error);
-        // 使用默认值
-        setRows(6);
-        setCols(8);
-        setTempRows(6);
-        setTempCols(8);
+      }
+      setRows(loadedRows);
+      setCols(loadedCols);
+      setTempRows(loadedRows);
+      setTempCols(loadedCols);
+
+      // 2. 加载学生数据
+      let studentsData = [];
+      try {
+        const studentsResult = await tcb.database().collection('student').get();
+        if (studentsResult.data && studentsResult.data.length > 0) {
+          // 转换为前端需要的格式
+          studentsData = studentsResult.data.map(s => ({
+            id: s.student_id,
+            name: s.name,
+            studentId: s.student_id,
+            gender: s.gender,
+            group: s.group || '未分组',
+            avatar: s.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + s.student_id,
+            seatId: null,
+            position: s.position || ''
+          }));
+        }
+      } catch (error) {
+        console.error('加载学生数据失败:', error);
+        toast({
+          title: '加载失败',
+          description: '无法加载学生数据',
+          variant: 'destructive'
+        });
       }
 
-      // 2. 模拟学生数据加载
-      await new Promise(resolve => setTimeout(resolve, 500));
-      const studentsData = MOCK_STUDENTS.map(student => ({
-        ...student
-      }));
-
-      // 3. 设置已有座位的学生ID
-      Object.keys(INITIAL_SEATS).forEach(seatId => {
-        const student = INITIAL_SEATS[seatId];
-        const foundStudent = studentsData.find(s => s.id === student.id);
-        if (foundStudent) {
-          foundStudent.seatId = seatId;
+      // 3. 加载座位安排
+      const loadedSeats = {};
+      try {
+        const seatsResult = await tcb.database().collection('seat').where({
+          classroom_id: 1,
+          student_id: tcb.database().command.neq(null)
+        }).get();
+        if (seatsResult.data && seatsResult.data.length > 0) {
+          seatsResult.data.forEach(seatRecord => {
+            if (seatRecord.student_id) {
+              const student = studentsData.find(s => s.id === seatRecord.student_id);
+              if (student) {
+                student.seatId = seatRecord.seat_id;
+                loadedSeats[seatRecord.seat_id] = student;
+              }
+            }
+          });
         }
-      });
+      } catch (error) {
+        console.error('加载座位安排失败:', error);
+      }
       setStudents(studentsData);
-      setSeats({
-        ...INITIAL_SEATS
-      });
+      setSeats(loadedSeats);
+
+      // 如果没有学生数据，显示提示
+      if (studentsData.length === 0) {
+        toast({
+          title: '提示',
+          description: '暂无学生数据，请先在学生管理页面添加学生',
+          variant: 'default'
+        });
+      }
     } catch (error) {
       console.error('加载数据失败:', error);
       toast({
