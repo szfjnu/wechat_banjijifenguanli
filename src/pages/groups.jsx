@@ -69,11 +69,32 @@ export default function GroupsPage(props) {
 
       // 加载分组数据
       const groupResult = await db.collection('group').get();
-      setGroups(groupResult.data);
+      const transformedGroups = groupResult.data.map(g => ({
+        _id: g._id,
+        id: g._id,
+        name: g.name,
+        semesterId: g.semester_id,
+        semesterName: g.semester_name,
+        leaderId: g.leader_id,
+        leaderName: g.leader_name,
+        memberCount: g.member_count || g.members.length,
+        createdAt: new Date(g.created_at).toLocaleDateString('zh-CN'),
+        members: g.members || []
+      }));
+      setGroups(transformedGroups);
 
       // 加载学生数据
       const studentResult = await db.collection('students').get();
-      setStudents(studentResult.data);
+      const transformedStudents = studentResult.data.map(s => ({
+        _id: s._id,
+        id: s.student_id,
+        studentId: s.student_id,
+        name: s.name,
+        gender: s.gender,
+        group: s.group || '未分组',
+        avatar: s.avatar_url || null
+      }));
+      setStudents(transformedStudents);
     } catch (error) {
       console.error('加载数据失败:', error);
       toast({
@@ -89,7 +110,7 @@ export default function GroupsPage(props) {
   // 过滤分组
   const filteredGroups = groups.filter(group => {
     const matchSearch = group.name.toLowerCase().includes(searchTerm.toLowerCase()) || group.leaderName.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchSemester = selectedSemester === 'all' || group.semesterId === parseInt(selectedSemester);
+    const matchSemester = selectedSemester === 'all' || group.semesterId === parseInt(selectedSemester) || group.semesterId === selectedSemester;
     return matchSearch && matchSemester;
   });
 
@@ -119,7 +140,7 @@ export default function GroupsPage(props) {
       const tcb = await props.$w.cloud.getCloudInstance();
       const db = tcb.database();
       const semester = semesters.find(s => s.id === parseInt(formData.semesterId));
-      const leader = students.find(s => s.student_id === formData.leaderId);
+      const leader = students.find(s => s.studentId === formData.leaderId);
       const result = await db.collection('group').add({
         name: formData.name,
         semester_id: parseInt(formData.semesterId),
@@ -129,7 +150,7 @@ export default function GroupsPage(props) {
         member_count: formData.memberIds.length + 1,
         members: [formData.leaderId, ...formData.memberIds],
         change_history: `${new Date().toISOString().split('T')[0]}: 创建分组，组长：${leader.name}，成员：${leader.name}、${formData.memberIds.map(id => {
-          const student = students.find(s => s.student_id === id);
+          const student = students.find(s => s.studentId === id);
           return student ? student.name : id;
         }).join('、')}`,
         created_at: new Date().getTime(),
@@ -186,7 +207,7 @@ export default function GroupsPage(props) {
       const tcb = await props.$w.cloud.getCloudInstance();
       const db = tcb.database();
       const semester = semesters.find(s => s.id === parseInt(formData.semesterId));
-      const leader = students.find(s => s.student_id === formData.leaderId);
+      const leader = students.find(s => s.studentId === formData.leaderId);
       await db.collection('group').doc(selectedGroup._id).update({
         name: formData.name,
         semester_id: parseInt(formData.semesterId),
@@ -442,10 +463,10 @@ export default function GroupsPage(props) {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">组员</label>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {MOCK_STUDENTS.filter(s => s.id !== formData.leaderId).map(student => <label key={student.id} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
-                        <input type="checkbox" checked={formData.memberIds.includes(student.id)} onChange={() => toggleMember(student.id)} className="w-4 h-4 text-rose-600 rounded border-gray-300 focus:ring-rose-500" />
+                    {students.filter(s => s.student_id !== formData.leaderId).map(student => <label key={student._id} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
+                        <input type="checkbox" checked={formData.memberIds.includes(student.student_id)} onChange={() => toggleMember(student.student_id)} className="w-4 h-4 text-rose-600 rounded border-gray-300 focus:ring-rose-500" />
                         <span className="text-sm text-gray-700">{student.name}</span>
-                        <span className="text-xs text-gray-500">({student.studentId})</span>
+                        <span className="text-xs text-gray-500">({student.student_id})</span>
                       </label>)}
                   </div>
                 </div>
@@ -511,15 +532,15 @@ export default function GroupsPage(props) {
                   <h4 className="text-sm font-medium text-gray-700 mb-2">成员列表</h4>
                   <div className="space-y-2">
                     {selectedGroup.members.map(memberId => {
-                const member = MOCK_STUDENTS.find(s => s.id === memberId);
+                const member = students.find(s => s.studentId === memberId);
                 if (!member) return null;
-                return <div key={member.id} className={`flex items-center gap-2 p-2 rounded-lg ${memberId === selectedGroup.leaderId ? 'bg-amber-50' : 'bg-gray-50'}`}>
+                return <div key={member._id} className={`flex items-center gap-2 p-2 rounded-lg ${memberId === selectedGroup.leaderId ? 'bg-amber-50' : 'bg-gray-50'}`}>
                           {memberId === selectedGroup.leaderId && <Crown className="w-3.5 h-3.5 text-amber-600" />}
                           <div className="w-6 h-6 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-xs">
                             {member.name[0]}
                           </div>
                           <span className="text-sm text-gray-800">{member.name}</span>
-                          <span className="text-xs text-gray-500">{member.studentId}</span>
+                          <span className="text-xs text-gray-500">{member.student_id}</span>
                         </div>;
               })}
                   </div>
