@@ -108,40 +108,7 @@ export default function DutyRoster(props) {
     points: 4,
     description: '打扫教室外的走廊'
   }];
-  // 模拟学生数据
-  const students = [{
-    id: 's001',
-    name: '张三',
-    studentId: '2024001'
-  }, {
-    id: 's002',
-    name: '李四',
-    studentId: '2024002'
-  }, {
-    id: 's003',
-    name: '王五',
-    studentId: '2024003'
-  }, {
-    id: 's004',
-    name: '赵六',
-    studentId: '2024004'
-  }, {
-    id: 's005',
-    name: '钱七',
-    studentId: '2024005'
-  }, {
-    id: 's006',
-    name: '孙八',
-    studentId: '2024006'
-  }, {
-    id: 's007',
-    name: '周九',
-    studentId: '2024007'
-  }, {
-    id: 's008',
-    name: '吴十',
-    studentId: '2024008'
-  }];
+  const [students, setStudents] = useState([]);
   useEffect(() => {
     loadDutyData();
   }, []);
@@ -151,37 +118,96 @@ export default function DutyRoster(props) {
   const loadDutyData = async () => {
     try {
       setLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 500));
-      // 模拟值日任务数据（基于个人分配）
+      const tcb = await $w.cloud.getCloudInstance();
+
+      // 1. 加载学生数据
+      let loadedStudents = [];
+      try {
+        const studentsResult = await tcb.database().collection('student').get();
+        if (studentsResult.data && studentsResult.data.length > 0) {
+          loadedStudents = studentsResult.data.map(s => ({
+            _id: s._id,
+            id: s._id,
+            name: s.name,
+            studentId: s.student_id,
+            studentNo: s.student_id,
+            gender: s.gender,
+            group: s.group || '未分组',
+            avatar: s.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + s.student_id
+          }));
+          console.log('加载的学生数据:', loadedStudents);
+        }
+      } catch (error) {
+        console.error('加载学生数据失败:', error);
+      }
+      setStudents(loadedStudents);
+
+      // 2. 加载值日任务数据
+      let loadedTasks = [];
+      let loadedNotifications = [];
+      try {
+        const tasksResult = await tcb.database().collection('duty_task').orderBy('date', 'desc').limit(100).get();
+        if (tasksResult.data && tasksResult.data.length > 0) {
+          loadedTasks = tasksResult.data.map(task => ({
+            id: task._id,
+            _id: task._id,
+            studentId: task.student_id,
+            studentName: task.student_name,
+            studentNo: task.student_no,
+            taskName: task.task_name,
+            taskIcon: task.task_icon || '🧹',
+            points: task.points || 5,
+            date: task.date,
+            semesterId: task.semester_id,
+            semesterName: task.semester_name,
+            weekNumber: task.week_number,
+            status: task.status || 'pending',
+            score: task.score || 0,
+            comment: task.comment || '',
+            images: task.images || [],
+            isCustom: task.is_custom || false,
+            reminderSent: task.reminder_sent || false,
+            createdAt: task.created_at || new Date().toISOString()
+          }));
+          console.log('加载的值日任务数据:', loadedTasks);
+
+          // 生成未完成任务的通知
+          const pendingTasks = loadedTasks.filter(t => t.status === 'pending');
+          loadedNotifications = pendingTasks.map(task => ({
+            id: task.id,
+            type: 'pending',
+            message: `${task.studentName} ${task.date}的${task.taskName}任务尚未完成`,
+            time: '待完成',
+            studentId: task.studentId,
+            taskId: task.id
+          })).slice(0, 5);
+        }
+      } catch (error) {
+        console.error('加载值日任务数据失败:', error);
+      }
+      setTasks(loadedTasks);
+      setNotifications(loadedNotifications);
+
+      // 3. 设置当前周的开始日期（本周一）
       const today = new Date();
-      const thisWeekTasks = generateWeeklyTasks(today, 10);
-      setTasks(thisWeekTasks);
-      // 模拟通知数据
-      setNotifications([{
-        id: 1,
-        type: 'pending',
-        message: '张三 今天（3月3日）的清扫地面任务尚未完成',
-        time: '10分钟前',
-        studentId: 's001',
-        taskId: 1
-      }, {
-        id: 2,
-        type: 'pending',
-        message: '王五 3月4日的清理垃圾桶任务待完成',
-        time: '2小时前',
-        studentId: 's003',
-        taskId: 5
-      }]);
-      // 设置当前周的开始日期（本周一）
       const day = today.getDay() || 7;
       const monday = new Date(today);
       monday.setDate(today.getDate() - day + 1);
       setCurrentWeekStart(monday);
+
+      // 如果没有值日任务数据，显示提示
+      if (loadedStudents.length === 0) {
+        toast({
+          title: '提示',
+          description: '暂无学生数据，请先在学生管理页面添加学生',
+          variant: 'default'
+        });
+      }
     } catch (error) {
       console.error('加载值日数据失败:', error);
       toast({
         title: '加载失败',
-        description: error.message,
+        description: error.message || '无法加载值日数据',
         variant: 'destructive'
       });
     } finally {
@@ -269,16 +295,52 @@ export default function DutyRoster(props) {
     return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
   };
   // 自动分配本周值日任务
-  const autoAssignWeekly = () => {
+  const autoAssignWeekly = async () => {
     try {
       if (!confirm('确定要重新生成本周的值日安排吗？这将覆盖现有任务。')) {
         return;
       }
+      const tcb = await $w.cloud.getCloudInstance();
       const weekNumber = getWeekNumber(new Date());
+
+      // 删除本周的旧任务
+      await tcb.database().collection('duty_task').where({
+        week_number: weekNumber
+      }).remove();
+
+      // 生成新任务并保存到数据库
       const newTasks = generateWeeklyTasks(new Date(), weekNumber);
+      const promises = newTasks.map(async task => {
+        const result = await tcb.database().collection('duty_task').add({
+          student_id: task.studentId,
+          student_name: task.studentName,
+          student_no: task.studentNo,
+          task_name: task.taskName,
+          task_icon: task.taskIcon,
+          points: task.points,
+          date: task.date,
+          semester_id: 1,
+          semester_name: '当前学期',
+          week_number: task.weekNumber,
+          status: task.status,
+          score: task.score || 0,
+          comment: task.comment || '',
+          images: task.images || [],
+          is_custom: task.isCustom || false,
+          reminder_sent: task.reminderSent || false,
+          created_at: task.createdAt
+        });
+        return {
+          ...task,
+          id: result.id,
+          _id: result.id
+        };
+      });
+      const savedTasks = await Promise.all(promises);
+
       // 只保留本周之前的任务，替换本周的任务
       const oldTasks = tasks.filter(t => t.weekNumber !== weekNumber);
-      setTasks([...oldTasks, ...newTasks]);
+      setTasks([...oldTasks, ...savedTasks]);
       toast({
         title: '自动分配成功',
         description: `已为本周（第${weekNumber}周）自动生成${newTasks.length}个值日任务`
@@ -292,7 +354,7 @@ export default function DutyRoster(props) {
       });
     }
   };
-  const handleAddTask = () => {
+  const handleAddTask = async () => {
     if (!newTask.studentId || !newTask.taskName || !newTask.date) {
       toast({
         title: '请填写完整信息',
@@ -304,49 +366,96 @@ export default function DutyRoster(props) {
     const weekNumber = getWeekNumber(new Date(newTask.date));
     const student = students.find(s => s.id === newTask.studentId);
     const presetTask = PRESET_TASKS.find(t => t.name === newTask.taskName);
-    const task = {
-      id: Date.now(),
-      studentId: newTask.studentId,
-      studentName: student.name,
-      studentNo: student.studentId,
-      taskName: newTask.taskName,
-      taskIcon: presetTask ? presetTask.icon : '📌',
-      points: newTask.points,
-      date: newTask.date,
-      status: 'pending',
-      score: null,
-      comment: '',
-      images: [],
-      createdAt: new Date().toISOString(),
-      weekNumber: weekNumber,
-      isCustom: isCustomTask,
-      reminderSent: false
-    };
-    setTasks([...tasks, task]);
-    setShowAddDialog(false);
-    setNewTask({
-      studentId: '',
-      taskName: '',
-      date: '',
-      points: 5
-    });
-    setCustomTaskName('');
-    setIsCustomTask(false);
-    toast({
-      title: '添加成功',
-      description: `已为${student.name}添加值日任务：${task.taskName}`
-    });
+    try {
+      const tcb = await $w.cloud.getCloudInstance();
+
+      // 保存到数据库
+      const result = await tcb.database().collection('duty_task').add({
+        student_id: newTask.studentId,
+        student_name: student.name,
+        student_no: student.studentId,
+        task_name: newTask.taskName,
+        task_icon: presetTask ? presetTask.icon : '📌',
+        points: newTask.points,
+        date: newTask.date,
+        semester_id: 1,
+        semester_name: '当前学期',
+        week_number: weekNumber,
+        status: 'pending',
+        score: 0,
+        comment: '',
+        images: [],
+        is_custom: isCustomTask,
+        reminder_sent: false,
+        created_at: new Date().toISOString()
+      });
+      const task = {
+        id: result.id,
+        _id: result.id,
+        studentId: newTask.studentId,
+        studentName: student.name,
+        studentNo: student.studentId,
+        taskName: newTask.taskName,
+        taskIcon: presetTask ? presetTask.icon : '📌',
+        points: newTask.points,
+        date: newTask.date,
+        semesterId: 1,
+        semesterName: '当前学期',
+        weekNumber: weekNumber,
+        status: 'pending',
+        score: 0,
+        comment: '',
+        images: [],
+        isCustom: isCustomTask,
+        reminderSent: false,
+        createdAt: new Date().toISOString()
+      };
+      setTasks([...tasks, task]);
+      setShowAddDialog(false);
+      setNewTask({
+        studentId: '',
+        taskName: '',
+        date: '',
+        points: 5
+      });
+      setCustomTaskName('');
+      setIsCustomTask(false);
+      toast({
+        title: '添加成功',
+        description: `已为${student.name}添加值日任务：${task.taskName}`
+      });
+    } catch (error) {
+      console.error('添加任务失败:', error);
+      toast({
+        title: '添加失败',
+        description: error.message || '无法添加值日任务',
+        variant: 'destructive'
+      });
+    }
   };
-  const handleDeleteTask = taskId => {
-    setTasks(tasks.filter(t => t.id !== taskId));
-    setShowDeleteConfirm(false);
-    setSelectedTask(null);
-    toast({
-      title: '删除成功',
-      description: '值日任务已删除'
-    });
+  const handleDeleteTask = async taskId => {
+    try {
+      const tcb = await $w.cloud.getCloudInstance();
+
+      // 从数据库删除
+      await tcb.database().collection('duty_task').doc(taskId).remove();
+      setTasks(tasks.filter(t => t.id !== taskId));
+      setShowDeleteConfirm(false);
+      setSelectedTask(null);
+      toast({
+        title: '删除成功',
+        description: '值日任务已删除'
+      });
+    } catch (error) {
+      console.error('删除任务失败:', error);
+      toast({
+        title: '删除失败',
+        description: error.message || '无法删除值日任务',
+        variant: 'destructive'
+      });
+    }
   };
-  const handleCheckTask = () => {
+  const handleCheckTask = async () => {
     if (checkForm.score === 0) {
       toast({
         title: '请选择评分',
@@ -355,52 +464,85 @@ export default function DutyRoster(props) {
       });
       return;
     }
-    const updatedTasks = tasks.map(t => t.id === selectedTask.id ? {
-      ...t,
-      status: 'completed',
-      score: checkForm.score,
-      comment: checkForm.comment,
-      images: checkForm.images
-    } : t);
-    setTasks(updatedTasks);
-    setShowCheckDialog(false);
-    setCheckForm({
-      score: 0,
-      comment: '',
-      images: []
-    });
-    setSelectedTask(null);
-    toast({
-      title: '评分成功',
-      description: `已完成${selectedTask.studentName}的${selectedTask.taskName}任务评分`
-    });
+    try {
+      const tcb = await $w.cloud.getCloudInstance();
+
+      // 更新数据库中的任务状态
+      await tcb.database().collection('duty_task').doc(selectedTask.id).update({
+        status: 'completed',
+        score: checkForm.score,
+        comment: checkForm.comment,
+        images: checkForm.images
+      });
+      const updatedTasks = tasks.map(t => t.id === selectedTask.id ? {
+        ...t,
+        status: 'completed',
+        score: checkForm.score,
+        comment: checkForm.comment,
+        images: checkForm.images
+      } : t);
+      setTasks(updatedTasks);
+      setShowCheckDialog(false);
+      setCheckForm({
+        score: 0,
+        comment: '',
+        images: []
+      });
+      setSelectedTask(null);
+      toast({
+        title: '评分成功',
+        description: `已完成${selectedTask.studentName}的${selectedTask.taskName}任务评分`
+      });
+    } catch (error) {
+      console.error('评分失败:', error);
+      toast({
+        title: '评分失败',
+        description: error.message || '无法保存评分',
+        variant: 'destructive'
+      });
+    }
   };
-  const handleSendReminder = () => {
-    const updatedTasks = tasks.map(t => t.id === reminderForm.taskId ? {
-      ...t,
-      reminderSent: true
-    } : t);
-    setTasks(updatedTasks);
-    const notification = {
-      id: Date.now(),
-      type: 'reminder',
-      message: `已提醒${reminderForm.studentName}完成${reminderForm.taskName}任务`,
-      time: '刚刚',
-      studentId: reminderForm.studentId,
-      taskId: reminderForm.taskId
-    };
-    setNotifications([notification, ...notifications]);
-    setShowReminderDialog(false);
-    setReminderForm({
-      taskId: null,
-      studentName: '',
-      taskName: '',
-      message: ''
-    });
-    toast({
-      title: '提醒已发送',
-      description: `${reminderForm.studentName}将收到值日提醒通知`
-    });
+  const handleSendReminder = async () => {
+    try {
+      const tcb = await $w.cloud.getCloudInstance();
+
+      // 更新数据库中的提醒状态
+      await tcb.database().collection('duty_task').doc(reminderForm.taskId).update({
+        reminder_sent: true
+      });
+      const updatedTasks = tasks.map(t => t.id === reminderForm.taskId ? {
+        ...t,
+        reminderSent: true
+      } : t);
+      setTasks(updatedTasks);
+      const notification = {
+        id: Date.now(),
+        type: 'reminder',
+        message: `已提醒${reminderForm.studentName}完成${reminderForm.taskName}任务`,
+        time: '刚刚',
+        studentId: reminderForm.studentId,
+        taskId: reminderForm.taskId
+      };
+      setNotifications([notification, ...notifications]);
+      setShowReminderDialog(false);
+      setReminderForm({
+        taskId: null,
+        studentName: '',
+        taskName: '',
+        message: ''
+      });
+      toast({
+        title: '提醒已发送',
+        description: `${reminderForm.studentName}将收到值日提醒通知`
+      });
+    } catch (error) {
+      console.error('发送提醒失败:', error);
+      toast({
+        title: '发送失败',
+        description: error.message || '无法发送提醒',
+        variant: 'destructive'
+      });
+    }
   };
   const openReminderDialog = task => {
     setReminderForm({

@@ -134,11 +134,7 @@ export default function SeatingChart(props) {
         if (seatsResult.data && seatsResult.data.length > 0) {
           seatsResult.data.forEach(seatRecord => {
             if (seatRecord.student_id) {
-              // 先尝试用 _id 匹配，如果失败再用 student_id（学号）匹配
-              let student = studentsData.find(s => s.id === seatRecord.student_id);
-              if (!student) {
-                student = studentsData.find(s => s.studentId === seatRecord.student_id);
-              }
+              const student = studentsData.find(s => s.id === seatRecord.student_id);
               console.log('匹配学生:', seatRecord.student_id, student);
               if (student) {
                 student.seatId = seatRecord.seat_id;
@@ -282,8 +278,7 @@ export default function SeatingChart(props) {
           // 行号（A, B, C...）
           col: parseInt(seatId.substring(1)),
           // 列号（1, 2, 3...）
-          student_id: student._id,
-          // 使用学生记录的 _id
+          student_id: student.id,
           student_name: student.name,
           is_available: false,
           total_rows: rows,
