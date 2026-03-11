@@ -457,16 +457,16 @@ export default function GroupsPage(props) {
               leaderId: e.target.value
             })}>
                     <option value="">请选择组长</option>
-                    {students.map(student => <option key={student._id} value={student.student_id}>{student.name} ({student.student_id})</option>)}
+                    {students.map(student => <option key={student._id} value={student.studentId}>{student.name} ({student.studentId})</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">组员</label>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {students.filter(s => s.student_id !== formData.leaderId).map(student => <label key={student._id} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
-                        <input type="checkbox" checked={formData.memberIds.includes(student.student_id)} onChange={() => toggleMember(student.student_id)} className="w-4 h-4 text-rose-600 rounded border-gray-300 focus:ring-rose-500" />
+                    {students.filter(s => s.studentId !== formData.leaderId).map(student => <label key={student._id} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
+                        <input type="checkbox" checked={formData.memberIds.includes(student.studentId)} onChange={() => toggleMember(student.studentId)} className="w-4 h-4 text-rose-600 rounded border-gray-300 focus:ring-rose-500" />
                         <span className="text-sm text-gray-700">{student.name}</span>
-                        <span className="text-xs text-gray-500">({student.student_id})</span>
+                        <span className="text-xs text-gray-500">({student.studentId})</span>
                       </label>)}
                   </div>
                 </div>
@@ -540,7 +540,7 @@ export default function GroupsPage(props) {
                             {member.name[0]}
                           </div>
                           <span className="text-sm text-gray-800">{member.name}</span>
-                          <span className="text-xs text-gray-500">{member.student_id}</span>
+                          <span className="text-xs text-gray-500">{member.studentId}</span>
                         </div>;
               })}
                   </div>
