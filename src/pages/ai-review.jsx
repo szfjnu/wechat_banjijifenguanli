@@ -54,9 +54,9 @@ export default function AIReviewPage(props) {
       setLoadingStudents(true);
       const tcb = await props.$w.cloud.getCloudInstance();
       const db = tcb.database();
-      const result = await db.collection('student').get();
+      const result = await db.collection('students').get();
       const studentsData = result.data.map(student => ({
-        id: student._id,
+        id: student.student_id,
         name: student.name || '未命名',
         studentId: student.student_id || '',
         group: student.group || '未分组',

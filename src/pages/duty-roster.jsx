@@ -170,6 +170,14 @@ export default function DutyRoster(props) {
             createdAt: task.created_at || new Date().toISOString()
           }));
           console.log('加载的值日任务数据:', loadedTasks);
+          console.log('加载的学生数据:', loadedStudents);
+
+          // 验证学生匹配情况
+          loadedTasks.forEach(task => {
+            const student = loadedStudents.find(s => s.id === task.studentId);
+            console.log('任务学生匹配:', task.studentId, student ? '✅匹配' : '❌未匹配', task.studentName);
+          });
+          console.log('加载的值日任务数据:', loadedTasks);
 
           // 生成未完成任务的通知
           const pendingTasks = loadedTasks.filter(t => t.status === 'pending');

@@ -166,7 +166,7 @@ export default function GroupsPage(props) {
       setGroups(groupResult.data);
 
       // 加载学生数据
-      const studentResult = await db.collection('student').get();
+      const studentResult = await db.collection('students').get();
       setStudents(studentResult.data);
     } catch (error) {
       console.error('加载数据失败:', error);
