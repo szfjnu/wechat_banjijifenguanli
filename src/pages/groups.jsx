@@ -191,11 +191,11 @@ export default function GroupsPage(props) {
   const stats = {
     totalGroups: filteredGroups.length,
     currentGroups: filteredGroups.filter(g => {
-      const semester = SEMESTERS.find(s => s.id === g.semesterId);
+      const semester = semesters.find(s => s.id === g.semesterId);
       return semester?.isCurrent;
     }).length,
     totalMembers: filteredGroups.reduce((sum, g) => sum + g.memberCount, 0),
-    currentSemester: SEMESTERS.find(s => s.isCurrent)?.name || ''
+    currentSemester: semesters.find(s => s.isCurrent)?.name || ''
   };
 
   // 创建分组
@@ -210,7 +210,7 @@ export default function GroupsPage(props) {
     }
     try {
       setLoadingAction(true);
-      const semester = SEMESTERS.find(s => s.id === parseInt(formData.semesterId));
+      const semester = semesters.find(s => s.id === parseInt(formData.semesterId));
       const leader = MOCK_STUDENTS.find(s => s.id === formData.leaderId);
       const newGroup = {
         id: Math.max(...groups.map(g => g.id), 0) + 1,
@@ -259,7 +259,7 @@ export default function GroupsPage(props) {
     }
     try {
       setLoadingAction(true);
-      const semester = SEMESTERS.find(s => s.id === parseInt(formData.semesterId));
+      const semester = semesters.find(s => s.id === parseInt(formData.semesterId));
       const leader = MOCK_STUDENTS.find(s => s.id === formData.leaderId);
       const updatedGroups = groups.map(g => g.id === selectedGroup.id ? {
         ...g,
@@ -392,7 +392,7 @@ export default function GroupsPage(props) {
               </div>
               <select className="px-2 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 text-xs" value={selectedSemester} onChange={e => setSelectedSemester(e.target.value)}>
                 <option value="all">全部学期</option>
-                {SEMESTERS.map(semester => <option key={semester.id} value={semester.id}>{semester.name}{semester.isCurrent ? '（当前）' : ''}</option>)}
+                {semesters.map(semester => <option key={semester.id} value={semester.id}>{semester.name}{semester.isCurrent ? '（当前）' : ''}</option>)}
               </select>
             </div>
           </div>
@@ -409,7 +409,7 @@ export default function GroupsPage(props) {
               {filteredGroups.length === 0 ? <div className="p-6 text-center text-gray-500 text-sm">
                   暂无分组记录
                 </div> : filteredGroups.map(group => {
-            const semester = SEMESTERS.find(s => s.id === group.semesterId);
+            const semester = semesters.find(s => s.id === group.semesterId);
             return <div key={group.id} className={`p-2.5 hover:bg-gray-50 transition-colors ${semester?.isCurrent ? 'bg-rose-50/50' : ''}`}>
                     <div className="flex items-start gap-2">
                       {/* 组头像 */}
@@ -487,7 +487,7 @@ export default function GroupsPage(props) {
               semesterId: e.target.value
             })}>
                     <option value="">请选择学期</option>
-                    {SEMESTERS.map(semester => <option key={semester.id} value={semester.id}>{semester.name}</option>)}
+                    {semesters.map(semester => <option key={semester.id} value={semester.id}>{semester.name}</option>)}
                   </select>
                 </div>
                 <div>
