@@ -12,6 +12,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": false,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -28,6 +34,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -44,6 +56,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -60,6 +78,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -76,6 +100,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -92,6 +122,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -108,6 +144,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -124,6 +166,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -140,6 +188,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -156,6 +210,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": false,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -172,6 +232,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -188,6 +254,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -204,6 +276,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -220,6 +298,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -236,6 +320,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -252,6 +342,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -268,6 +364,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -284,6 +386,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -300,6 +408,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": false,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -316,6 +430,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": false,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -332,6 +452,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -348,6 +474,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -364,6 +496,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -380,6 +518,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -396,6 +540,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -412,6 +562,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -428,6 +584,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -444,6 +606,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -460,6 +628,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -476,6 +650,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -492,6 +672,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -508,6 +694,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -524,6 +716,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -540,6 +738,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -556,6 +760,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -572,6 +782,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -588,6 +804,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -604,6 +826,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -620,6 +848,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -636,6 +870,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -652,6 +892,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -668,6 +914,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -684,6 +936,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -700,6 +958,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -716,6 +980,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -732,6 +1002,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -748,6 +1024,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -764,6 +1046,12 @@
     "semester_name": "2024-2025第二学期",
     "is_available": true,
     "note": "",
+    "layout_config": {
+      "rows": 6,
+      "cols": 8,
+      "row_labels": ["A", "B", "C", "D", "E", "F"],
+      "col_labels": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   }

@@ -56,6 +56,16 @@
       "name": "note",
       "title": "备注",
       "type": "MultiLineString"
+    },
+    {
+      "name": "total_rows",
+      "title": "总行数",
+      "type": "Number"
+    },
+    {
+      "name": "total_cols",
+      "title": "总列数",
+      "type": "Number"
     }
   ]
 }

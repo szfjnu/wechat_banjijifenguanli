@@ -1,16 +1,12 @@
 // @ts-ignore;
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 // @ts-ignore;
-import { Maximize2, RefreshCw, Save, UserPlus, UserMinus, Search, Filter, Download, Upload, Grid3X3, Info, Users } from 'lucide-react';
+import { Maximize2, RefreshCw, Save, UserPlus, UserMinus, Search, Filter, Download, Upload, Grid3X3, Info, Users, Settings, Plus, Minus } from 'lucide-react';
 // @ts-ignore;
-import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, useToast } from '@/components/ui';
+import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, useToast, Input, Label } from '@/components/ui';
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
-
-// 座位行和列定义
-const ROWS = ['A', 'B', 'C', 'D', 'E', 'F'];
-const COLS = [1, 2, 3, 4, 5, 6, 7, 8];
 
 // 学生预设数据
 const MOCK_STUDENTS = [{
@@ -143,22 +139,81 @@ export default function SeatingChart(props) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGroup, setSelectedGroup] = useState('all');
   const [showPreview, setShowPreview] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+
+  // 动态行数和列数
+  const [rows, setRows] = useState(6);
+  const [cols, setCols] = useState(8);
+  const [tempRows, setTempRows] = useState(6);
+  const [tempCols, setTempCols] = useState(8);
+
+  // 动态生成行标签和列号
+  const ROWS = useMemo(() => {
+    return Array.from({
+      length: rows
+    }, (_, i) => String.fromCharCode(65 + i));
+  }, [rows]);
+  const COLS = useMemo(() => {
+    return Array.from({
+      length: cols
+    }, (_, i) => i + 1);
+  }, [cols]);
   useEffect(() => {
     loadData();
   }, []);
-  useEffect(() => {
-    filterStudents();
-  }, [students, searchQuery, selectedGroup, seats]);
+
+  // 计算统计数据
+  const totalSeats = useMemo(() => rows * cols, [rows, cols]);
+  const assignedCount = useMemo(() => Object.keys(seats).length, [seats]);
+  const unassignedStudents = useMemo(() => {
+    return students.filter(student => {
+      const hasSeat = !!student.seatId;
+      if (hasSeat) return false;
+      const matchesSearch = searchQuery === '' || student.name.includes(searchQuery) || student.studentId.includes(searchQuery);
+      const matchesGroup = selectedGroup === 'all' || student.group === selectedGroup;
+      return matchesSearch && matchesGroup;
+    });
+  }, [students, searchQuery, selectedGroup]);
   const loadData = async () => {
     try {
       setLoading(true);
-      // 模拟数据加载
+      const tcb = await $w.cloud.getCloudInstance();
+
+      // 1. 加载座位配置
+      try {
+        const configResult = await tcb.database().collection('seat').where({
+          classroom_id: 1
+        }).orderBy('total_rows', 'asc').limit(1).get();
+        if (configResult.data && configResult.data.length > 0) {
+          const config = configResult.data[0];
+          // 使用数据库中的配置
+          setRows(config.total_rows || 6);
+          setCols(config.total_cols || 8);
+          setTempRows(config.total_rows || 6);
+          setTempCols(config.total_cols || 8);
+        } else {
+          // 如果没有配置记录，使用默认值
+          setRows(6);
+          setCols(8);
+          setTempRows(6);
+          setTempCols(8);
+        }
+      } catch (error) {
+        console.error('加载座位配置失败:', error);
+        // 使用默认值
+        setRows(6);
+        setCols(8);
+        setTempRows(6);
+        setTempCols(8);
+      }
+
+      // 2. 模拟学生数据加载
       await new Promise(resolve => setTimeout(resolve, 500));
-      // 复制学生数据
       const studentsData = MOCK_STUDENTS.map(student => ({
         ...student
       }));
-      // 设置已有座位的学生ID
+
+      // 3. 设置已有座位的学生ID
       Object.keys(INITIAL_SEATS).forEach(seatId => {
         const student = INITIAL_SEATS[seatId];
         const foundStudent = studentsData.find(s => s.id === student.id);
@@ -180,16 +235,6 @@ export default function SeatingChart(props) {
     } finally {
       setLoading(false);
     }
-  };
-  const filterStudents = () => {
-    // 未分配座位的学生
-    return students.filter(student => {
-      const hasSeat = !!student.seatId;
-      if (hasSeat) return false;
-      const matchesSearch = searchQuery === '' || student.name.includes(searchQuery) || student.studentId.includes(searchQuery);
-      const matchesGroup = selectedGroup === 'all' || student.group === selectedGroup;
-      return matchesSearch && matchesGroup;
-    });
   };
   const handleDragStart = student => {
     setDraggedStudent(student);
@@ -267,14 +312,138 @@ export default function SeatingChart(props) {
     setSelectedSeat(student.seatId);
     setShowStudentInfo(true);
   };
-  const handleSaveLayout = () => {
-    // 模拟保存座位布局
-    console.log('保存座位布局:', seats);
-    toast({
-      title: '座位布局已保存',
-      description: '当前座位布局已成功保存',
-      variant: 'default'
-    });
+  const handleSaveLayout = async () => {
+    try {
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+
+      // 1. 删除该教室的所有现有座位记录
+      try {
+        const existingSeats = await db.collection('seat').where({
+          classroom_id: 1
+        }).get();
+        if (existingSeats.data && existingSeats.data.length > 0) {
+          // 逐条删除座位记录
+          for (const seat of existingSeats.data) {
+            await db.collection('seat').doc(seat._id).remove();
+          }
+        }
+      } catch (error) {
+        console.error('删除旧座位记录失败:', error);
+      }
+
+      // 2. 保存当前座位布局
+      const seatPromises = [];
+      Object.keys(seats).forEach(seatId => {
+        const student = seats[seatId];
+        const seatRecord = {
+          seat_id: seatId,
+          classroom_id: 1,
+          classroom_name: '主教室',
+          row: seatId.charAt(0),
+          // 行号（A, B, C...）
+          col: parseInt(seatId.substring(1)),
+          // 列号（1, 2, 3...）
+          student_id: student.id,
+          student_name: student.name,
+          is_available: false,
+          total_rows: rows,
+          total_cols: cols
+        };
+        seatPromises.push(db.collection('seat').add(seatRecord));
+      });
+
+      // 3. 并发保存所有座位
+      await Promise.all(seatPromises);
+      toast({
+        title: '座位布局已保存',
+        description: `已保存 ${Object.keys(seats).length} 个座位信息`,
+        variant: 'default'
+      });
+    } catch (error) {
+      console.error('保存座位布局失败:', error);
+      toast({
+        title: '保存失败',
+        description: error.message || '无法保存座位布局',
+        variant: 'destructive'
+      });
+    }
+  };
+  const handleApplySettings = async () => {
+    // 检查是否有改变
+    if (tempRows === rows && tempCols === cols) {
+      setShowSettings(false);
+      return;
+    }
+
+    // 检查是否有学生需要重新分配
+    const hasAssignedStudents = Object.keys(seats).length > 0;
+    if (hasAssignedStudents && !window.confirm('调整布局会清空当前座位安排，是否继续？')) {
+      return;
+    }
+    try {
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+
+      // 1. 保存座位配置到数据库
+      try {
+        // 查询现有配置
+        const existingConfig = await db.collection('seat').where({
+          classroom_id: 1
+        }).get();
+        if (existingConfig.data && existingConfig.data.length > 0) {
+          // 更新现有配置
+          const configId = existingConfig.data[0]._id;
+          await db.collection('seat').doc(configId).update({
+            total_rows: tempRows,
+            total_cols: tempCols
+          });
+        } else {
+          // 创建新配置
+          await db.collection('seat').add({
+            classroom_id: 1,
+            classroom_name: '主教室',
+            total_rows: tempRows,
+            total_cols: tempCols
+          });
+        }
+      } catch (error) {
+        console.error('保存座位配置失败:', error);
+        toast({
+          title: '保存失败',
+          description: '无法保存座位配置',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      // 2. 应用新设置
+      setRows(tempRows);
+      setCols(tempCols);
+
+      // 3. 清空座位
+      setSeats({});
+
+      // 4. 更新所有学生的座位ID为空
+      const updatedStudents = students.map(s => ({
+        ...s,
+        seatId: null
+      }));
+      setStudents(updatedStudents);
+      setShowSettings(false);
+      toast({
+        title: '布局已更新',
+        description: `座位布局已调整为 ${tempRows} × ${tempCols}，${hasAssignedStudents ? '座位已重置' : ''}`,
+        variant: 'default'
+      });
+    } catch (error) {
+      console.error('应用设置失败:', error);
+      toast({
+        title: '操作失败',
+        description: error.message || '请重试',
+        variant: 'destructive'
+      });
+    }
   };
   const handleResetLayout = () => {
     // 清空所有座位
@@ -292,13 +461,13 @@ export default function SeatingChart(props) {
   };
   const handleAutoAssign = () => {
     // 自动分配未分配座位的学生
-    const unassignedStudents = students.filter(s => !s.seatId);
+    const studentsToAssign = students.filter(s => !s.seatId);
     const availableSeats = ROWS.flatMap(row => COLS.map(col => `${row}${col}`)).filter(seatId => !seats[seatId]);
     const newSeats = {
       ...seats
     };
     const updatedStudents = [...students];
-    unassignedStudents.forEach((student, index) => {
+    studentsToAssign.forEach((student, index) => {
       if (index < availableSeats.length) {
         const seatId = availableSeats[index];
         newSeats[seatId] = student;
@@ -315,13 +484,10 @@ export default function SeatingChart(props) {
     setSeats(newSeats);
     toast({
       title: '自动分配完成',
-      description: `已为 ${Math.min(unassignedStudents.length, availableSeats.length)} 名学生分配座位`,
+      description: `已为 ${Math.min(studentsToAssign.length, availableSeats.length)} 名学生分配座位`,
       variant: 'default'
     });
   };
-  const assignedCount = Object.keys(seats).length;
-  const totalSeats = ROWS.length * COLS.length;
-  const unassignedStudents = filterStudents();
   return <div className="min-h-screen bg-gray-50 pb-16">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-40">
@@ -412,10 +578,16 @@ export default function SeatingChart(props) {
                   <h3 className="text-lg font-semibold text-slate-800">座位图</h3>
                   <span className="text-sm text-slate-600">（可拖拽学生到座位）</span>
                 </div>
-                <Button size="sm" variant="outline" onClick={handleAutoAssign}>
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  自动分配
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button size="sm" variant="outline" onClick={() => setShowSettings(true)}>
+                    <Settings className="w-4 h-4 mr-2" />
+                    设置行列
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={handleAutoAssign}>
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    自动分配
+                  </Button>
+                </div>
               </div>
               
               {/* 讲台指示 */}
@@ -570,6 +742,83 @@ export default function SeatingChart(props) {
                 })}
                   </div>
                 </div>)}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* 设置对话框 - 调整行列 */}
+      <Dialog open={showSettings} onOpenChange={setShowSettings}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>座位布局设置</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6">
+            {/* 行数设置 */}
+            <div className="space-y-3">
+              <Label className="text-base font-semibold">行数</Label>
+              <div className="flex items-center gap-3">
+                <Button variant="outline" size="icon" onClick={() => setTempRows(Math.max(2, tempRows - 1))} disabled={tempRows <= 2}>
+                  <Minus className="w-4 h-4" />
+                </Button>
+                <div className="flex-1 flex items-center justify-center">
+                  <Input type="number" value={tempRows} onChange={e => setTempRows(Math.max(2, Math.min(10, parseInt(e.target.value) || 6)))} min="2" max="10" className="w-20 text-center text-2xl font-bold h-12" />
+                </div>
+                <Button variant="outline" size="icon" onClick={() => setTempRows(Math.min(10, tempRows + 1))} disabled={tempRows >= 10}>
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+              <p className="text-xs text-slate-500">座位行数（2-10行）</p>
+            </div>
+            
+            {/* 列数设置 */}
+            <div className="space-y-3">
+              <Label className="text-base font-semibold">列数</Label>
+              <div className="flex items-center gap-3">
+                <Button variant="outline" size="icon" onClick={() => setTempCols(Math.max(2, tempCols - 1))} disabled={tempCols <= 2}>
+                  <Minus className="w-4 h-4" />
+                </Button>
+                <div className="flex-1 flex items-center justify-center">
+                  <Input type="number" value={tempCols} onChange={e => setTempCols(Math.max(2, Math.min(12, parseInt(e.target.value) || 8)))} min="2" max="12" className="w-20 text-center text-2xl font-bold h-12" />
+                </div>
+                <Button variant="outline" size="icon" onClick={() => setTempCols(Math.min(12, tempCols + 1))} disabled={tempCols >= 12}>
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+              <p className="text-xs text-slate-500">座位列数（2-12列）</p>
+            </div>
+            
+            {/* 预览信息 */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4">
+              <div className="grid grid-cols-2 gap-4 text-center">
+                <div>
+                  <p className="text-sm text-slate-600">当前座位</p>
+                  <p className="text-2xl font-bold text-slate-800">{rows} × {cols}</p>
+                  <p className="text-xs text-slate-500">共 {rows * cols} 个座位</p>
+                </div>
+                <div>
+                  <p className="text-sm text-slate-600">调整后座位</p>
+                  <p className="text-2xl font-bold text-blue-600">{tempRows} × {tempCols}</p>
+                  <p className="text-xs text-slate-500">共 {tempRows * tempCols} 个座位</p>
+                </div>
+              </div>
+              {(tempRows !== rows || tempCols !== cols) && <div className="mt-3 text-center text-xs text-orange-600 font-medium">
+                  ⚠️ 调整布局可能会清空当前座位安排
+                </div>}
+            </div>
+            
+            {/* 操作按钮 */}
+            <div className="flex items-center gap-3">
+              <Button variant="outline" onClick={() => {
+              setTempRows(rows);
+              setTempCols(cols);
+              setShowSettings(false);
+            }} className="flex-1">
+                取消
+              </Button>
+              <Button onClick={handleApplySettings} className="flex-1">
+                确认应用
+              </Button>
             </div>
           </div>
         </DialogContent>
