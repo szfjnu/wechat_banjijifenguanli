@@ -123,11 +123,11 @@ export default function DutyRoster(props) {
       // 1. 加载学生数据
       let loadedStudents = [];
       try {
-        const studentsResult = await tcb.database().collection('student').get();
+        const studentsResult = await tcb.database().collection('students').get();
         if (studentsResult.data && studentsResult.data.length > 0) {
           loadedStudents = studentsResult.data.map(s => ({
             _id: s._id,
-            id: s._id,
+            id: s.student_id,
             name: s.name,
             studentId: s.student_id,
             studentNo: s.student_id,

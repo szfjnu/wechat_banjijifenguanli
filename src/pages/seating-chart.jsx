@@ -96,12 +96,12 @@ export default function SeatingChart(props) {
       // 2. 加载学生数据
       let studentsData = [];
       try {
-        const studentsResult = await tcb.database().collection('student').get();
+        const studentsResult = await tcb.database().collection('students').get();
         if (studentsResult.data && studentsResult.data.length > 0) {
           // 转换为前端需要的格式
           studentsData = studentsResult.data.map(s => ({
             _id: s._id,
-            id: s._id,
+            id: s.student_id,
             name: s.name,
             studentId: s.student_id,
             gender: s.gender,
