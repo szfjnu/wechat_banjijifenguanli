@@ -12,101 +12,7 @@ import { TabBar } from '@/components/TabBar';
 // 初始化学期列表为空，后续从数据库加载
 const INITIAL_SEMESTERS = [];
 
-// 学生预设数据
-const MOCK_STUDENTS = [{
-  id: 1,
-  studentId: '2024001',
-  name: '张三',
-  group: '第一组',
-  avatar: null
-}, {
-  id: 2,
-  studentId: '2024002',
-  name: '李四',
-  group: '第二组',
-  avatar: null
-}, {
-  id: 3,
-  studentId: '2024003',
-  name: '王五',
-  group: '第三组',
-  avatar: null
-}, {
-  id: 4,
-  studentId: '2024004',
-  name: '赵六',
-  group: '第一组',
-  avatar: null
-}, {
-  id: 5,
-  studentId: '2024005',
-  name: '钱七',
-  group: '第二组',
-  avatar: null
-}, {
-  id: 6,
-  studentId: '2024006',
-  name: '孙八',
-  group: '第三组',
-  avatar: null
-}, {
-  id: 7,
-  studentId: '2024007',
-  name: '周九',
-  group: '第一组',
-  avatar: null
-}, {
-  id: 8,
-  studentId: '2024008',
-  name: '吴十',
-  group: '第二组',
-  avatar: null
-}, {
-  id: 9,
-  studentId: '2024009',
-  name: '郑十一',
-  group: '第三组',
-  avatar: null
-}, {
-  id: 10,
-  studentId: '2024010',
-  name: '王十二',
-  group: '第一组',
-  avatar: null
-}];
-
-// 分组预设数据
-const MOCK_GROUPS = [{
-  id: 1,
-  name: '第一组',
-  semesterId: 2,
-  semesterName: '2024-2025第二学期',
-  leaderId: 1,
-  leaderName: '张三',
-  memberCount: 4,
-  createdAt: '2025-02-20',
-  members: [1, 4, 7, 10]
-}, {
-  id: 2,
-  name: '第二组',
-  semesterId: 2,
-  semesterName: '2024-2025第二学期',
-  leaderId: 2,
-  leaderName: '李四',
-  memberCount: 3,
-  createdAt: '2025-02-20',
-  members: [2, 5, 8]
-}, {
-  id: 3,
-  name: '第三组',
-  semesterId: 2,
-  semesterName: '2024-2025第二学期',
-  leaderId: 3,
-  leaderName: '王五',
-  memberCount: 3,
-  createdAt: '2025-02-20',
-  members: [3, 6, 9]
-}];
+// 删除模拟数据，使用数据库真实数据
 export default function GroupsPage(props) {
   const {
     $w
@@ -210,18 +116,36 @@ export default function GroupsPage(props) {
     }
     try {
       setLoadingAction(true);
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
       const semester = semesters.find(s => s.id === parseInt(formData.semesterId));
-      const leader = MOCK_STUDENTS.find(s => s.id === formData.leaderId);
+      const leader = students.find(s => s.student_id === formData.leaderId);
+      const result = await db.collection('group').add({
+        name: formData.name,
+        semester_id: parseInt(formData.semesterId),
+        semester_name: semester.name,
+        leader_id: formData.leaderId,
+        leader_name: leader.name,
+        member_count: formData.memberIds.length + 1,
+        members: [formData.leaderId, ...formData.memberIds],
+        change_history: `${new Date().toISOString().split('T')[0]}: 创建分组，组长：${leader.name}，成员：${leader.name}、${formData.memberIds.map(id => {
+          const student = students.find(s => s.student_id === id);
+          return student ? student.name : id;
+        }).join('、')}`,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime()
+      });
       const newGroup = {
-        id: Math.max(...groups.map(g => g.id), 0) + 1,
+        _id: result.id,
+        id: result.id,
         name: formData.name,
         semesterId: parseInt(formData.semesterId),
         semesterName: semester.name,
         leaderId: formData.leaderId,
         leaderName: leader.name,
         memberCount: formData.memberIds.length + 1,
-        createdAt: new Date().toISOString().split('T')[0],
-        members: [parseInt(formData.leaderId), ...formData.memberIds.map(id => parseInt(id))]
+        members: [formData.leaderId, ...formData.memberIds],
+        createdAt: new Date().toISOString().split('T')[0]
       };
       setGroups([...groups, newGroup]);
       setShowCreateDialog(false);
@@ -236,7 +160,7 @@ export default function GroupsPage(props) {
         description: '分组已创建'
       });
     } catch (error) {
-      console.error('创建失败:', error);
+      console.error('创建分组失败:', error);
       toast({
         title: '创建失败',
         description: error.message,
@@ -259,9 +183,21 @@ export default function GroupsPage(props) {
     }
     try {
       setLoadingAction(true);
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
       const semester = semesters.find(s => s.id === parseInt(formData.semesterId));
-      const leader = MOCK_STUDENTS.find(s => s.id === formData.leaderId);
-      const updatedGroups = groups.map(g => g.id === selectedGroup.id ? {
+      const leader = students.find(s => s.student_id === formData.leaderId);
+      await db.collection('group').doc(selectedGroup._id).update({
+        name: formData.name,
+        semester_id: parseInt(formData.semesterId),
+        semester_name: semester.name,
+        leader_id: formData.leaderId,
+        leader_name: leader.name,
+        member_count: formData.memberIds.length + 1,
+        members: [formData.leaderId, ...formData.memberIds],
+        updated_at: new Date().getTime()
+      });
+      const updatedGroups = groups.map(g => g._id === selectedGroup._id ? {
         ...g,
         name: formData.name,
         semesterId: parseInt(formData.semesterId),
@@ -269,7 +205,7 @@ export default function GroupsPage(props) {
         leaderId: formData.leaderId,
         leaderName: leader.name,
         memberCount: formData.memberIds.length + 1,
-        members: [parseInt(formData.leaderId), ...formData.memberIds.map(id => parseInt(id))]
+        members: [formData.leaderId, ...formData.memberIds]
       } : g);
       setGroups(updatedGroups);
       setShowEditDialog(false);
@@ -285,7 +221,7 @@ export default function GroupsPage(props) {
         description: '分组已更新'
       });
     } catch (error) {
-      console.error('更新失败:', error);
+      console.error('更新分组失败:', error);
       toast({
         title: '更新失败',
         description: error.message,
@@ -302,7 +238,10 @@ export default function GroupsPage(props) {
       return;
     }
     try {
-      const updatedGroups = groups.filter(g => g.id !== groupId);
+      const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+      await db.collection('group').doc(groupId).remove();
+      const updatedGroups = groups.filter(g => g._id !== groupId);
       setGroups(updatedGroups);
       toast({
         title: '删除成功',
@@ -497,7 +436,7 @@ export default function GroupsPage(props) {
               leaderId: e.target.value
             })}>
                     <option value="">请选择组长</option>
-                    {MOCK_STUDENTS.map(student => <option key={student.id} value={student.id}>{student.name} ({student.studentId})</option>)}
+                    {students.map(student => <option key={student._id} value={student.student_id}>{student.name} ({student.student_id})</option>)}
                   </select>
                 </div>
                 <div>
