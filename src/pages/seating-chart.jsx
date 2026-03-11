@@ -100,7 +100,8 @@ export default function SeatingChart(props) {
         if (studentsResult.data && studentsResult.data.length > 0) {
           // 转换为前端需要的格式
           studentsData = studentsResult.data.map(s => ({
-            id: s.student_id,
+            _id: s._id,
+            id: s._id,
             name: s.name,
             studentId: s.student_id,
             gender: s.gender,
@@ -109,6 +110,9 @@ export default function SeatingChart(props) {
             seatId: null,
             position: s.position || ''
           }));
+          console.log('加载的学生数据:', studentsData);
+        } else {
+          console.log('没有查询到学生数据');
         }
       } catch (error) {
         console.error('加载学生数据失败:', error);
@@ -126,13 +130,17 @@ export default function SeatingChart(props) {
           classroom_id: 1,
           student_id: tcb.database().command.neq(null)
         }).get();
+        console.log('加载的座位记录:', seatsResult.data);
         if (seatsResult.data && seatsResult.data.length > 0) {
           seatsResult.data.forEach(seatRecord => {
             if (seatRecord.student_id) {
               const student = studentsData.find(s => s.id === seatRecord.student_id);
+              console.log('匹配学生:', seatRecord.student_id, student);
               if (student) {
                 student.seatId = seatRecord.seat_id;
                 loadedSeats[seatRecord.seat_id] = student;
+              } else {
+                console.log('未找到匹配的学生:', seatRecord.student_id);
               }
             }
           });
