@@ -167,7 +167,7 @@ export default function DutyRoster(props) {
             images: task.images || [],
             isCustom: task.is_custom || false,
             reminderSent: task.reminder_sent || false,
-            createdAt: task.created_at || new Date().toISOString()
+            createdAt: task.createdAt ? new Date(task.createdAt).toLocaleDateString('zh-CN') : new Date().toLocaleDateString('zh-CN')
           }));
           console.log('加载的值日任务数据:', loadedTasks);
           console.log('加载的学生数据:', loadedStudents);

@@ -142,7 +142,7 @@ export default function PointsSettings({
           category: item.item_type === '加分' ? item.score_value > 0 ? 'positive' : 'negative' : 'negative',
           icon: item.icon_name || 'Star',
           enabled: item.is_enabled !== false,
-          createdAt: item.created_at ? item.created_at.split('T')[0] : '',
+          createdAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-CN') : '',
           usageCount: 0 // 需要从 score_records 计算后续添加
         }));
         setItems(transformedItems);

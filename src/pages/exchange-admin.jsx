@@ -97,7 +97,7 @@ export default function ExchangeAdmin({
           image: item.image_url,
           bidStartTime: item.bid_start_time ? item.bid_start_time.split('T')[0] : '',
           bidEndTime: item.bid_end_time ? item.bid_end_time.split('T')[0] : '',
-          createdAt: item.created_at ? item.created_at.split('T')[0] : '',
+          createdAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-CN') : '',
           usageCount: 0 // 需要从兑换记录计算
         }));
         setItems(transformedItems);

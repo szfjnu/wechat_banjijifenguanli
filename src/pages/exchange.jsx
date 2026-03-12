@@ -69,7 +69,7 @@ export default function ExchangePage({
           mode: item.redemption_mode === '投标竞拍' ? 'bidding' : 'direct',
           status: item.status === '可兑换' ? 'available' : item.status === '竞拍中' ? 'bidding' : item.status === '投标中' ? 'bidding' : 'unavailable',
           category: '其他',
-          createdAt: item.created_at?.substring(0, 10) || '',
+          createdAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-CN') : '',
           quantity: item.quantity,
           biddingStartTime: item.bid_start_time,
           biddingEndTime: item.bid_end_time,

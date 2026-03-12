@@ -168,7 +168,7 @@ export default function AIReviewPage(props) {
         studentName: record.student_name,
         timeRange: record.time_range,
         content: record.content,
-        createdAt: record.created_date || new Date().toISOString()
+        createdAt: record.createdAt ? new Date(record.createdAt).toLocaleDateString('zh-CN') : record.created_date || new Date().toLocaleDateString('zh-CN')
       }));
       setSavedReviews(reviews);
     } catch (error) {
