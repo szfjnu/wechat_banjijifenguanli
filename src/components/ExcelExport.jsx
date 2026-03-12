@@ -4,6 +4,8 @@ import React from 'react';
 import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Checkbox, toast } from '@/components/ui';
 // @ts-ignore;
 import { FileSpreadsheet, Download, CheckCircle2, AlertCircle, X } from 'lucide-react';
+// @ts-ignore;
+import { getBeijingDateString } from '@/lib/utils';
 
 const ExcelExport = ({
   open,
@@ -130,7 +132,7 @@ const ExcelExport = ({
       });
       const link = document.createElement('a');
       const url = URL.createObjectURL(blob);
-      const timestamp = new Date().toISOString().slice(0, 10);
+      const timestamp = getBeijingDateString();
       link.setAttribute('href', url);
       link.setAttribute('download', `${fileName}_${timestamp}.csv`);
       link.style.visibility = 'hidden';

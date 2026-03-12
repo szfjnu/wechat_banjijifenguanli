@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Button, Checkbox, Badge, Card, CardContent, toast } from '@/components/ui';
 // @ts-ignore;
 import { FileText, Download, CheckCircle2, Loader2, Calendar, TrendingUp, Target, Award, AlertCircle } from 'lucide-react';
+// @ts-ignore;
+import { getBeijingTime } from '@/lib/utils';
 
 const ReportGenerator = ({
   open,
@@ -249,7 +251,7 @@ const ReportGenerator = ({
           ${reportContent}
           
           <div class="footer no-print">
-            <p>报告生成时间：${new Date().toLocaleString('zh-CN')}</p>
+            <p>报告生成时间：${getBeijingTime().toLocaleString('zh-CN')}</p>
           </div>
         </body>
         </html>

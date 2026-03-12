@@ -158,7 +158,7 @@ export default function NoticePublish(props) {
         title: data.title,
         content: data.content,
         publisher: props.$w.auth.currentUser?.name || '管理员',
-        publish_time: new Date(data.publishTime).toISOString(),
+        publish_time: data.publishTime + 'T00:00:00+08:00',
         target_type: targetType,
         target_ids: targetIds,
         target_names: targetNames,

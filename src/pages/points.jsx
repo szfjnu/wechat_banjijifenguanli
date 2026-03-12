@@ -309,7 +309,7 @@ export default function PointsPage(props) {
         item_id: item.name,
         score_change: item.points,
         reason_detail: formData.note || item.name,
-        date: new Date(formData.time + 'T00:00:00+08:00').toISOString(),
+        date: formData.time + 'T00:00:00+08:00',
         source_type: '日常记录',
         approval_status: '待审核',
         recorder_name: '教师',

@@ -241,7 +241,7 @@ export default function DocumentsPage({
         permission: uploadForm.permission === 'public' ? '公开' : uploadForm.permission === 'student' ? '仅学生可见' : uploadForm.permission === 'parent' ? '仅家长可见' : '公开',
         upload_date: getBeijingTimeISO(),
         update_date: getBeijingTimeISO(),
-        expiry_date: uploadForm.expiryDate ? new Date(uploadForm.expiryDate + 'T00:00:00+08:00').toISOString() : null,
+        expiry_date: uploadForm.expiryDate ? uploadForm.expiryDate + 'T00:00:00+08:00' : null,
         uploader: $w.auth.currentUser?.name || '管理员',
         status: '正常',
         view_count: 0,

@@ -193,8 +193,8 @@ export default function ExchangeAdmin({
         redemption_mode: newItem.mode === 'direct' ? '直接兑换' : '投标竞拍',
         quantity: Number(newItem.stock) || 1,
         status: '可兑换',
-        bid_start_time: newItem.mode === 'bid' ? new Date(newItem.bidStartTime + 'T00:00:00+08:00').toISOString() : null,
-        bid_end_time: newItem.mode === 'bid' ? new Date(newItem.bidEndTime + 'T00:00:00+08:00').toISOString() : null,
+        bid_start_time: newItem.mode === 'bid' ? newItem.bidStartTime + 'T00:00:00+08:00' : null,
+        bid_end_time: newItem.mode === 'bid' ? newItem.bidEndTime + 'T00:00:00+08:00' : null,
         winner_bid_score: 0,
         winner_id: '',
         created_by: $w?.auth?.currentUser?.name || '管理员',
@@ -252,8 +252,8 @@ export default function ExchangeAdmin({
         image_url: newItem.image || editedItem.image,
         required_score: Number(newItem.points),
         quantity: Number(newItem.stock) || 1,
-        bid_start_time: newItem.mode === 'bid' ? new Date(newItem.bidStartTime + 'T00:00:00+08:00').toISOString() : null,
-        bid_end_time: newItem.mode === 'bid' ? new Date(newItem.bidEndTime + 'T00:00:00+08:00').toISOString() : null,
+        bid_start_time: newItem.mode === 'bid' ? newItem.bidStartTime + 'T00:00:00+08:00' : null,
+        bid_end_time: newItem.mode === 'bid' ? newItem.bidEndTime + 'T00:00:00+08:00' : null,
         updated_at: getBeijingTimeISO()
       });
       setItems(items.map(item => item.id === editedItem.id ? {

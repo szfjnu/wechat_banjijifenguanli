@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { Clock, MapPin, Calendar, AlertCircle, ChevronRight, Bell, BookOpen } from 'lucide-react';
 // @ts-ignore;
 import { Card } from '@/components/ui';
+// @ts-ignore;
+import { getBeijingTime, getBeijingDateString } from '@/lib/utils';
 
 export function TeacherScheduleReminder(props) {
   const {
@@ -15,7 +17,7 @@ export function TeacherScheduleReminder(props) {
   const [currentSection, setCurrentSection] = useState(null);
   const [nextClass, setNextClass] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentTime, setCurrentTime] = useState(getBeijingTime());
   useEffect(() => {
     loadTodaySchedule();
     loadReminders();
@@ -24,11 +26,11 @@ export function TeacherScheduleReminder(props) {
     return () => clearInterval(timer);
   }, []);
   const updateTime = () => {
-    setCurrentTime(new Date());
+    setCurrentTime(getBeijingTime());
     determineCurrentSection();
   };
   const determineCurrentSection = () => {
-    const now = new Date();
+    const now = getBeijingTime();
     const hours = now.getHours();
     const minutes = now.getMinutes();
     const timeValue = hours * 60 + minutes;
@@ -137,7 +139,7 @@ export function TeacherScheduleReminder(props) {
       const db = tcb.database();
 
       // 获取今天是星期几（0=周日，1=周一，...，6=周六）
-      const today = new Date();
+      const today = getBeijingTime();
       const weekDay = today.getDay(); // 0-6
 
       // 查询今天星期对应的课程
@@ -148,7 +150,7 @@ export function TeacherScheduleReminder(props) {
         // 转换数据格式
         const schedule = result.data.map((item, index) => {
           // 根据当前时间确定课程状态
-          const now = new Date();
+          const now = getBeijingTime();
           const currentTime = now.getHours() * 60 + now.getMinutes();
           const [startH, startM] = (item.start_time || '08:00').split(':').map(Number);
           const [endH, endM] = (item.end_time || '09:00').split(':').map(Number);
@@ -218,7 +220,7 @@ export function TeacherScheduleReminder(props) {
           <h3 className="text-white font-bold text-base flex items-center space-x-2">
             <span>今日课程</span>
             <span className="text-amber-200 text-xs font-normal">
-              {new Date().toLocaleDateString('zh-CN', {
+              {getBeijingTime().toLocaleDateString('zh-CN', {
               month: 'short',
               day: 'numeric',
               weekday: 'short'
