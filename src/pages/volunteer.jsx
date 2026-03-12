@@ -137,7 +137,7 @@ export default function VolunteerPage({
     studentId: '',
     activityName: '',
     duration: '',
-    date: new Date().toISOString().split('T')[0],
+    date: getBeijingDateString(),
     note: ''
   });
 
@@ -181,7 +181,7 @@ export default function VolunteerPage({
 
       // 添加到数据库
       const result = await db.collection('volunteer_records').add({
-        record_id: `VOL${Date.now()}`,
+        record_id: `VOL${getBeijingTime().getTime()}`,
         student_id: newRecord.studentId,
         student_name: student?.name || '',
         activity_name: newRecord.activityName,
@@ -195,7 +195,7 @@ export default function VolunteerPage({
         is_verified: true,
         verifier_name: '管理员',
         recorder_name: $w?.auth?.currentUser?.name || '管理员',
-        created_at: new Date().toISOString()
+        created_at: getBeijingTimeISO()
       });
 
       // 更新前端状态
@@ -218,7 +218,7 @@ export default function VolunteerPage({
         studentId: '',
         activityName: '',
         duration: '',
-        date: new Date().toISOString().split('T')[0],
+        date: getBeijingDateString(),
         note: ''
       });
       toast({
@@ -246,7 +246,7 @@ export default function VolunteerPage({
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `志愿服务记录_${new Date().toLocaleDateString()}.csv`;
+    link.download = `志愿服务记录_${getBeijingTime().toLocaleDateString()}.csv`;
     link.click();
     URL.revokeObjectURL(url);
     toast({

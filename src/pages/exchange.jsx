@@ -4,9 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { Gift, Search, Filter, TrendingUp, Clock, AlertCircle, Trophy, CheckCircle, XCircle, Users, Calendar, Eye, Tag, Download } from 'lucide-react';
 // @ts-ignore;
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, useToast, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, StatCard } from '@/components/ui';
+// @ts-ignore;
+import { getBeijingTimeISO, getBeijingTime } from '@/lib/utils';
 
 import { TabBar } from '@/components/TabBar';
-
 // 格式化积分：整数显示整数，小数最多显示两位
 const formatPoints = points => {
   if (points === undefined || points === null || isNaN(points)) return '0';
@@ -241,7 +242,7 @@ export default function ExchangePage({
 
       // 创建投标兑换申请记录
       const result = await db.collection('redemption_requests').add({
-        request_id: `RR${Date.now()}`,
+        request_id: `RR${getBeijingTime().getTime()}`,
         student_id: student.studentId,
         student_name: student.name,
         item_id: item.id,
@@ -249,7 +250,7 @@ export default function ExchangePage({
         points_required: points,
         redemption_mode: '投标竞拍',
         status: '待审核',
-        redemption_time: new Date().toISOString(),
+        redemption_time: getBeijingTimeISO(),
         semester_id: currentSemesterId,
         semester_name: currentSemesterName,
         is_winner: false
@@ -269,7 +270,7 @@ export default function ExchangePage({
         studentId: student.studentId,
         studentName: student.name,
         points: points,
-        biddingTime: new Date().toLocaleString('zh-CN')
+        biddingTime: getBeijingTime().toLocaleString('zh-CN')
       };
       setBiddings([...biddings, newBidding]);
 
@@ -348,7 +349,7 @@ export default function ExchangePage({
 
       // 添加兑换记录到数据库
       const result = await db.collection('redemption_requests').add({
-        request_id: `RR${Date.now()}`,
+        request_id: `RR${getBeijingTime().getTime()}`,
         student_id: student.studentId,
         student_name: student.name,
         item_id: item.id,
@@ -356,9 +357,9 @@ export default function ExchangePage({
         points_required: item.pointsRequired,
         redemption_mode: '直接兑换',
         status: '已兑换',
-        redemption_time: new Date().toISOString(),
+        redemption_time: getBeijingTimeISO(),
         approver_name: '系统',
-        approval_time: new Date().toISOString(),
+        approval_time: getBeijingTimeISO(),
         approval_comment: '直接兑换自动审核通过',
         semester_id: currentSemesterId,
         semester_name: currentSemesterName,
@@ -378,7 +379,7 @@ export default function ExchangePage({
         studentId: student.studentId,
         studentName: student.name,
         pointsUsed: item.pointsRequired,
-        exchangeDate: new Date().toLocaleDateString('zh-CN'),
+        exchangeDate: getBeijingTime().toLocaleDateString('zh-CN'),
         status: 'completed'
       };
       setExchanges([...exchanges, newExchange]);
@@ -455,7 +456,7 @@ export default function ExchangePage({
   // 获取剩余时间
   const getRemainingTime = endTime => {
     const end = new Date(endTime);
-    const now = new Date();
+    const now = getBeijingTime();
     const diff = end - now;
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor(diff % (1000 * 60 * 60 * 24) / (1000 * 60 * 60));
