@@ -38,6 +38,7 @@ export default function GroupsPage(props) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSemester, setSelectedSemester] = useState('all');
   const [loadingAction, setLoadingAction] = useState(false);
+  const [assignedStudentIds, setAssignedStudentIds] = useState([]);
 
   // 表单状态
   const [formData, setFormData] = useState({
@@ -95,6 +96,16 @@ export default function GroupsPage(props) {
         avatar: s.avatar_url || null
       }));
       setStudents(transformedStudents);
+
+      // 收集所有分组中的学生 ID（包括组长和组员）
+      const assignedIds = new Set();
+      transformedGroups.forEach(group => {
+        // 添加组长 ID
+        if (group.leaderId) assignedIds.add(group.leaderId);
+        // 添加组员 ID
+        if (group.members) group.members.forEach(memberId => assignedIds.add(memberId));
+      });
+      setAssignedStudentIds(Array.from(assignedIds));
     } catch (error) {
       console.error('加载数据失败:', error);
       toast({
@@ -541,13 +552,21 @@ export default function GroupsPage(props) {
               leaderId: e.target.value
             })}>
                     <option value="">请选择组长</option>
-                    {students.map(student => <option key={student._id} value={student.studentId}>{student.name} ({student.studentId})</option>)}
+                    {students.filter(s => showEditDialog ?
+              // 编辑模式：排除其他分组的组长，保留当前分组的组长
+              !assignedStudentIds.includes(s.studentId) || s.studentId === selectedGroup.leaderId :
+              // 创建模式：排除所有已分组的学生
+              !assignedStudentIds.includes(s.studentId)).map(student => <option key={student._id} value={student.studentId}>{student.name} ({student.studentId})</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">组员</label>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {students.filter(s => s.studentId !== formData.leaderId).map(student => <label key={student._id} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
+                    {students.filter(s => showEditDialog ?
+              // 编辑模式：排除其他分组的成员，保留当前分组的成员，也排除当前选择的组长
+              (!assignedStudentIds.includes(s.studentId) || selectedGroup.members && selectedGroup.members.includes(s.studentId)) && s.studentId !== formData.leaderId :
+              // 创建模式：排除所有已分组的学生，也排除当前选择的组长
+              !assignedStudentIds.includes(s.studentId) && s.studentId !== formData.leaderId).map(student => <label key={student._id} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
                         <input type="checkbox" checked={formData.memberIds.includes(student.studentId)} onChange={() => toggleMember(student.studentId)} className="w-4 h-4 text-rose-600 rounded border-gray-300 focus:ring-rose-500" />
                         <span className="text-sm text-gray-700">{student.name}</span>
                         <span className="text-xs text-gray-500">({student.studentId})</span>
