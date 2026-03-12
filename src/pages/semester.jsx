@@ -38,7 +38,7 @@ export default function SemesterPage(props) {
           isAutomated: sem.is_automated || false,
           resetConfig: sem.reset_config || {},
           note: sem.note || '',
-          createdAt: sem.createdAt ? new Date(sem.createdAt).toLocaleDateString('zh-CN') : '未知',
+          createdAt: sem.created_at ? new Date(sem.created_at).toLocaleDateString('zh-CN') : '未知',
           // 宿舍积分配置
           dormConversionRatio: sem.dorm_conversion_ratio !== undefined ? sem.dorm_conversion_ratio : 0.3,
           dormCriticalThreshold: sem.dorm_critical_threshold !== undefined ? sem.dorm_critical_threshold : 40,
