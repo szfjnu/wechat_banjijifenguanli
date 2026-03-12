@@ -338,7 +338,7 @@ export default function ScheduleManage(props) {
           subject_name: formData.courseName,
           schedule_type: '课程',
           status: 'normal',
-          created_at: new Date().toISOString()
+          created_at: getBeijingTimeISO()
         });
         const newItem = {
           ...formData,

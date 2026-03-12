@@ -122,8 +122,8 @@ export default function StudentsManage(props) {
       const studentData = {
         ...formData,
         _openid: $w.auth.currentUser.userId,
-        created_at: new Date().toISOString().split('T')[0],
-        updated_at: new Date().toISOString().split('T')[0],
+        created_at: getBeijingDateString(),
+        updated_at: getBeijingDateString(),
         current_score: formData.current_score || 100,
         initial_score: formData.initial_score || 100,
         dorm_score: formData.is_boarding ? formData.dorm_score || 100 : 0,
@@ -131,7 +131,7 @@ export default function StudentsManage(props) {
         operation_history: [{
           operation: '创建学生档案',
           operator: $w.auth.currentUser.name || '系统',
-          timestamp: new Date().toISOString(),
+          timestamp: getBeijingTimeISO(),
           details: '新建学生基础信息'
         }]
       };
@@ -157,7 +157,7 @@ export default function StudentsManage(props) {
       const db = tcb.database();
       const updateData = {
         ...formData,
-        updated_at: new Date().toISOString().split('T')[0],
+        updated_at: getBeijingDateString(),
         updated_by: $w.auth.currentUser.userId,
         dorm_score: formData.is_boarding ? formData.dorm_score || 100 : 0
       };
@@ -245,7 +245,7 @@ export default function StudentsManage(props) {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `students_${new Date().toISOString().split('T')[0]}.json`;
+      link.download = `students_${getBeijingDateString()}.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

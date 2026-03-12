@@ -167,7 +167,7 @@ export default function StudentGrowth(props) {
     const exportData = {
       student: selectedStudent,
       records: filteredRecords,
-      exportDate: new Date().toISOString(),
+      exportDate: getBeijingTimeISO(),
       statistics: {
         totalRecords: filteredRecords.length,
         totalScoreChange: filteredRecords.reduce((sum, r) => sum + r.score_change, 0),
@@ -181,7 +181,7 @@ export default function StudentGrowth(props) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${selectedStudent.name}_成长轨迹_${new Date().toLocaleDateString('zh-CN')}.json`;
+    a.download = `${selectedStudent.name}_成长轨迹_${getBeijingTime().toLocaleDateString('zh-CN')}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

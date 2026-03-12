@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, Users, TrendingUp, AlertCircle, Sun, CloudRain, CloudSnow, Wind, Clock, Star, ChevronRight, Trophy, Plus, Bell, Cloud, CloudLightning, Snowflake, CalendarDays, Calculator } from 'lucide-react';
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
+// @ts-ignore;
+import { getBeijingTime } from '@/lib/utils';
 
 import { TabBar } from '@/components/TabBar';
 import { StatCard } from '@/components/StatCard';
@@ -91,7 +93,7 @@ export default function Home(props) {
       }
 
       // 加载今日生日学生（使用 date_of_birth 字段）
-      const today = new Date();
+      const today = getBeijingTime();
       const todayMonth = String(today.getMonth() + 1).padStart(2, '0');
       const todayDay = String(today.getDate()).padStart(2, '0');
       const todayDateStr = `-${todayMonth}-${todayDay}`;
@@ -165,7 +167,7 @@ export default function Home(props) {
   const loadWeatherData = async () => {
     try {
       // 根据当前日期生成合适的天气数据
-      const today = new Date();
+      const today = getBeijingTime();
       const month = today.getMonth() + 1;
       let temperature = 20;
       let condition = 'sunny';

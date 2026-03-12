@@ -120,7 +120,7 @@ export default function GradesPage(props) {
     studentId: '',
     subjectId: '',
     score: '',
-    examDate: new Date().toISOString().split('T')[0],
+    examDate: getBeijingDateString(),
     semesterId: '',
     remark: ''
   });
@@ -331,13 +331,13 @@ export default function GradesPage(props) {
     try {
       let exportData = filteredGrades;
       if (exportRange === 'current_month') {
-        const now = new Date();
+        const now = getBeijingTime();
         exportData = filteredGrades.filter(g => {
           const gradeDate = new Date(g.examDate);
           return gradeDate.getMonth() === now.getMonth() && gradeDate.getFullYear() === now.getFullYear();
         });
       } else if (exportRange === 'last_month') {
-        const now = new Date();
+        const now = getBeijingTime();
         const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1);
         exportData = filteredGrades.filter(g => {
           const gradeDate = new Date(g.examDate);

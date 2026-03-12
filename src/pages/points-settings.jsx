@@ -262,14 +262,14 @@ export default function PointsSettings({
           score_value: formData.points,
           icon_name: formData.icon,
           is_enabled: formData.enabled,
-          updated_at: new Date().toISOString()
+          updated_at: getBeijingTimeISO()
         });
 
         // 更新前端
         setItems(items.map(item => item.id === editingItem.id ? {
           ...item,
           ...formData,
-          updatedAt: new Date().toISOString()
+          updatedAt: getBeijingTimeISO()
         } : item));
         toast({
           title: '更新成功',
@@ -286,7 +286,7 @@ export default function PointsSettings({
           icon_name: formData.icon,
           is_enabled: formData.enabled,
           created_at: getBeijingTimeISO(),
-          updated_at: new Date().toISOString()
+          updated_at: getBeijingTimeISO()
         });
 
         // 更新前端
@@ -324,7 +324,7 @@ export default function PointsSettings({
       // 更新数据库中的启用状态
       await db.collection('score_items').doc(item.id).update({
         is_enabled: !item.enabled,
-        updated_at: new Date().toISOString()
+        updated_at: getBeijingTimeISO()
       });
 
       // 更新前端

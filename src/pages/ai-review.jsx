@@ -5,7 +5,7 @@ import { Brain, Sparkles, User, Users, Calendar, TrendingUp, Award, ShieldAlert,
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
 // @ts-ignore;
-import { getBeijingDateString, getBeijingTimeISO } from '@/lib/utils';
+import { getBeijingDateString, getBeijingTimeISO, getBeijingTime } from '@/lib/utils';
 
 import { TabBar } from '@/components/TabBar';
 // 格式化积分：整数显示整数，小数最多显示两位
@@ -178,7 +178,7 @@ export default function AIReviewPage(props) {
         studentName: record.student_name,
         timeRange: record.time_range,
         content: record.content,
-        createdAt: record.createdAt ? new Date(record.createdAt).toLocaleDateString('zh-CN') : record.created_date || new Date().toLocaleDateString('zh-CN')
+        createdAt: record.createdAt ? new Date(record.createdAt).toLocaleDateString('zh-CN') : record.created_date || getBeijingTime().toLocaleDateString('zh-CN')
       }));
       setSavedReviews(reviews);
     } catch (error) {
@@ -304,7 +304,7 @@ export default function AIReviewPage(props) {
 
 ---
 
-**点评时间**：${new Date().toLocaleDateString('zh-CN')}  
+**点评时间**：${getBeijingTime().toLocaleDateString('zh-CN')}  
 **AI助手**：班级管理智能系统`;
     }
     return `## ${name}${rangeText}个人成长点评
@@ -342,7 +342,7 @@ ${name}同学在本学期表现优异，总积分达到${formatPoints(data.total
 
 ---
 
-**点评时间**：${new Date().toLocaleDateString('zh-CN')}  
+**点评时间**：${getBeijingTime().toLocaleDateString('zh-CN')}  
 **积分情况**：${formatPoints(data.totalPoints)}分  
 **学业成绩**：GPA ${data.gpa}  
 **技能证书**：${data.certificates}项  
@@ -357,7 +357,7 @@ ${name}同学在本学期表现优异，总积分达到${formatPoints(data.total
       const tcb = await props.$w.cloud.getCloudInstance();
       const db = tcb.database();
       const newReview = {
-        record_id: `AR${Date.now()}`,
+        record_id: `AR${getBeijingTime().getTime()}`,
         student_id: isClassReview ? 'class' : selectedStudent.studentId,
         student_name: isClassReview ? '全班' : selectedStudent.name,
         group: isClassReview ? '全部' : selectedStudent.group,

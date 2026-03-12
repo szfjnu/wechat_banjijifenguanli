@@ -5,7 +5,7 @@ import { Award, Upload, Search, Filter, Plus, FileText, Calendar, TrendingUp, Do
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
 // @ts-ignore;
-import { getBeijingDateString, getBeijingTimeISO } from '@/lib/utils';
+import { getBeijingDateString, getBeijingTimeISO, getBeijingTime } from '@/lib/utils';
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
@@ -110,7 +110,7 @@ export default function CertificatesPage(props) {
     studentId: '',
     certificateName: '',
     levelId: '',
-    date: new Date().toISOString().split('T')[0],
+    date: getBeijingDateString(),
     note: '',
     file: null
   });
@@ -198,7 +198,7 @@ export default function CertificatesPage(props) {
     setFilteredCertificates(result);
   };
   const calculateStats = () => {
-    const now = new Date();
+    const now = getBeijingTime();
     const thisMonthCerts = certificates.filter(cert => {
       const certDate = new Date(cert.date);
       return certDate.getMonth() === now.getMonth() && certDate.getFullYear() === now.getFullYear();
@@ -316,7 +316,7 @@ export default function CertificatesPage(props) {
         note: formData.note
       });
       const newCertificate = {
-        id: result.id || result.ids?.[0] || `CERT${Date.now()}`,
+        id: result.id || result.ids?.[0] || `CERT${getBeijingTime().getTime()}`,
         studentId: formData.studentId,
         studentName: student.name,
         certificateName: formData.certificateName,
@@ -362,13 +362,13 @@ export default function CertificatesPage(props) {
     try {
       let exportData = filteredCertificates;
       if (exportRange === 'current_month') {
-        const now = new Date();
+        const now = getBeijingTime();
         exportData = filteredCertificates.filter(cert => {
           const certDate = new Date(cert.date);
           return certDate.getMonth() === now.getMonth() && certDate.getFullYear() === now.getFullYear();
         });
       } else if (exportRange === 'last_month') {
-        const now = new Date();
+        const now = getBeijingTime();
         const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1);
         exportData = filteredCertificates.filter(cert => {
           const certDate = new Date(cert.date);
@@ -386,7 +386,7 @@ export default function CertificatesPage(props) {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `证书记录_${new Date().toISOString().split('T')[0]}.csv`;
+      link.download = `证书记录_${getBeijingDateString()}.csv`;
       link.click();
       URL.revokeObjectURL(url);
       setShowExportDialog(false);

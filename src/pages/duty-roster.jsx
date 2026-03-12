@@ -255,7 +255,7 @@ export default function DutyRoster(props) {
         score: day === 2 ? 4 : null,
         comment: day === 2 ? '完成质量较好' : '',
         images: [],
-        createdAt: new Date().toISOString(),
+        createdAt: getBeijingTimeISO(),
         weekNumber: weekNumber,
         isCustom: false,
         reminderSent: false
@@ -274,7 +274,7 @@ export default function DutyRoster(props) {
         score: day === 2 ? 5 : null,
         comment: day === 2 ? '优秀' : '',
         images: [],
-        createdAt: new Date().toISOString(),
+        createdAt: getBeijingTimeISO(),
         weekNumber: weekNumber,
         isCustom: false,
         reminderSent: false
@@ -288,7 +288,7 @@ export default function DutyRoster(props) {
       filtered = filtered.filter(task => task.status === selectedStatus);
     }
     if (selectedWeek === 'this-week') {
-      const weekNumber = getWeekNumber(new Date());
+      const weekNumber = getWeekNumber(getBeijingTime());
       filtered = filtered.filter(task => task.weekNumber === weekNumber);
     } else if (selectedWeek === 'last-week') {
       const weekNumber = getWeekNumber(getBeijingTime()) - 1;
@@ -311,7 +311,7 @@ export default function DutyRoster(props) {
         return;
       }
       const tcb = await $w.cloud.getCloudInstance();
-      const weekNumber = getWeekNumber(new Date());
+      const weekNumber = getWeekNumber(getBeijingTime());
 
       // 删除本周的旧任务
       await tcb.database().collection('duty_task').where({
@@ -418,7 +418,7 @@ export default function DutyRoster(props) {
         images: [],
         isCustom: isCustomTask,
         reminderSent: false,
-        createdAt: new Date().toISOString()
+        createdAt: getBeijingTimeISO()
       };
       setTasks([...tasks, task]);
       setShowAddDialog(false);

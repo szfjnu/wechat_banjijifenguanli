@@ -231,7 +231,7 @@ export default function DisciplinePage(props) {
 
       // 添加处分记录到数据库
       const recordResult = await db.collection('discipline_record').add({
-        record_id: `DR${Date.now()}`,
+        record_id: `DR${getBeijingTime().getTime()}`,
         student_id: newRecord.studentId || '',
         student_name: student.name,
         student_no: student.studentId || '',
@@ -247,7 +247,7 @@ export default function DisciplinePage(props) {
         revoke_requests: []
       });
       const createdRecord = {
-        id: recordResult.id || recordResult.ids?.[0] || `DR${Date.now()}`,
+        id: recordResult.id || recordResult.ids?.[0] || `DR${getBeijingTime().getTime()}`,
         studentId: newRecord.studentId,
         studentName: student.name,
         levelId: level.id,
@@ -400,13 +400,13 @@ export default function DisciplinePage(props) {
     try {
       let exportRecords = records;
       if (exportRange === 'current_month') {
-        const now = new Date();
+        const now = getBeijingTime();
         exportRecords = records.filter(r => {
           const recordDate = new Date(r.date);
           return recordDate.getMonth() === now.getMonth() && recordDate.getFullYear() === now.getFullYear();
         });
       } else if (exportRange === 'last_month') {
-        const now = new Date();
+        const now = getBeijingTime();
         const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1);
         exportRecords = records.filter(r => {
           const recordDate = new Date(r.date);
@@ -421,7 +421,7 @@ export default function DisciplinePage(props) {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `处分记录_${new Date().toISOString().split('T')[0]}.csv`;
+      link.download = `处分记录_${getBeijingDateString()}.csv`;
       link.click();
       URL.revokeObjectURL(url);
       setShowExportDialog(false);

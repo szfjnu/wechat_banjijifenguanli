@@ -181,7 +181,7 @@ export default function DormPointsPage(props) {
       } else {
         // 新增
         const newItem = {
-          item_id: `DDI${Date.now()}`,
+          item_id: `DDI${getBeijingTime().getTime()}`,
           item_code: `D${String(deductionItems.length + 1).padStart(3, '0')}`,
           item_name: itemFormData.name,
           item_category: itemFormData.category,
@@ -192,7 +192,7 @@ export default function DormPointsPage(props) {
           icon_name: 'AlertTriangle',
           creator: '系统管理员',
           created_date: getBeijingDateString(),
-          update_date: new Date().toISOString().split('T')[0]
+          update_date: getBeijingDateString()
         };
         await db.collection('dorm_deduction_items').add(newItem);
         toast({
@@ -322,7 +322,7 @@ export default function DormPointsPage(props) {
 
       // 1. 添加扣分记录到宿舍扣分记录表
       const recordResult = await db.collection('dorm_deduction_record').add({
-        record_id: `DP${Date.now()}`,
+        record_id: `DP${getBeijingTime().getTime()}`,
         student_id: student.studentId || '',
         student_name: student.name,
         student_id_number: student.studentId,
@@ -366,7 +366,7 @@ export default function DormPointsPage(props) {
         points: deductionItem.points,
         originalDormPoints: student.dormPoints,
         convertedPoints: convertedPoints,
-        date: new Date().toLocaleString('zh-CN'),
+        date: getBeijingTime().toLocaleString('zh-CN'),
         operator: $w?.auth?.currentUser?.name || '宿管员',
         remark: remark || '',
         images: uploadedImages.map(img => ({
@@ -507,7 +507,7 @@ export default function DormPointsPage(props) {
       const reader = new FileReader();
       reader.onload = event => {
         setUploadedImages(prev => [...prev, {
-          id: Date.now() + Math.random(),
+          id: getBeijingTime().getTime() + Math.random(),
           name: file.name,
           url: event.target.result
         }]);

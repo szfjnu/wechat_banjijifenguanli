@@ -238,7 +238,7 @@ export default function VolunteerPage({
   // 导出CSV
   const exportCSV = () => {
     const headers = ['学号', '姓名', '小组', '活动名称', '活动类别', '服务时长(小时)', '获得积分', '服务日期', '备注', '记录人', '记录时间'];
-    const rows = filteredHistory.map(record => [record.studentId, record.studentName, record.group, record.activityName, record.activityCategory, record.duration, record.points, record.date, record.note || '', record.operator, record.createdAt || new Date().toLocaleString()]);
+    const rows = filteredHistory.map(record => [record.studentId, record.studentName, record.group, record.activityName, record.activityCategory, record.duration, record.points, record.date, record.note || '', record.operator, record.createdAt || getBeijingTime().toLocaleString()]);
     const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n');
     const blob = new Blob([csvContent], {
       type: 'text/csv;charset=utf-8;'

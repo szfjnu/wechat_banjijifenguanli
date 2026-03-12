@@ -233,7 +233,7 @@ export default function PointsPage(props) {
     studentId: '',
     itemId: '',
     points: 0,
-    time: new Date().toISOString().slice(0, 16),
+    time: getBeijingTime().toISOString().slice(0, 16),
     note: ''
   });
   useEffect(() => {
@@ -303,13 +303,13 @@ export default function PointsPage(props) {
 
       // 添加积分记录到数据库
       const result = await db.collection('score_records').add({
-        record_id: `SR${Date.now()}`,
+        record_id: `SR${getBeijingTime().getTime()}`,
         student_id: student.studentId,
         student_name: student.name,
         item_id: item.name,
         score_change: item.points,
         reason_detail: formData.note || item.name,
-        date: new Date(formData.time).toISOString(),
+        date: new Date(formData.time + 'T00:00:00+08:00').toISOString(),
         source_type: '日常记录',
         approval_status: '待审核',
         recorder_name: '教师',
@@ -388,7 +388,7 @@ export default function PointsPage(props) {
       // 更新数据库记录
       await db.collection('score_records').doc(recordId).update({
         approval_status: '已拒绝',
-        approval_time: new Date().toISOString(),
+        approval_time: getBeijingTimeISO(),
         approver_name: '班主任'
       });
 
@@ -415,7 +415,7 @@ export default function PointsPage(props) {
       studentId: '',
       itemId: '',
       points: 0,
-      time: new Date().toISOString().slice(0, 16),
+      time: getBeijingTime().toISOString().slice(0, 16),
       note: ''
     });
   };

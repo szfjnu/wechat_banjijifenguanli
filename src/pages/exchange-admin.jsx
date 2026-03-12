@@ -193,13 +193,13 @@ export default function ExchangeAdmin({
         redemption_mode: newItem.mode === 'direct' ? '直接兑换' : '投标竞拍',
         quantity: Number(newItem.stock) || 1,
         status: '可兑换',
-        bid_start_time: newItem.mode === 'bid' ? new Date(newItem.bidStartTime).toISOString() : null,
-        bid_end_time: newItem.mode === 'bid' ? new Date(newItem.bidEndTime).toISOString() : null,
+        bid_start_time: newItem.mode === 'bid' ? new Date(newItem.bidStartTime + 'T00:00:00+08:00').toISOString() : null,
+        bid_end_time: newItem.mode === 'bid' ? new Date(newItem.bidEndTime + 'T00:00:00+08:00').toISOString() : null,
         winner_bid_score: 0,
         winner_id: '',
         created_by: $w?.auth?.currentUser?.name || '管理员',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        created_at: getBeijingTimeISO(),
+        updated_at: getBeijingTimeISO()
       });
       const item = {
         ...newItem,
@@ -208,7 +208,7 @@ export default function ExchangeAdmin({
         points: Number(newItem.points),
         stock: Number(newItem.stock) || 1,
         status: newItem.mode === 'bid' ? 'bidding' : 'available',
-        createdAt: new Date().toISOString().split('T')[0],
+        createdAt: getBeijingDateString(),
         usageCount: 0
       };
       setItems([...items, item]);
@@ -252,9 +252,9 @@ export default function ExchangeAdmin({
         image_url: newItem.image || editedItem.image,
         required_score: Number(newItem.points),
         quantity: Number(newItem.stock) || 1,
-        bid_start_time: newItem.mode === 'bid' ? new Date(newItem.bidStartTime).toISOString() : null,
-        bid_end_time: newItem.mode === 'bid' ? new Date(newItem.bidEndTime).toISOString() : null,
-        updated_at: new Date().toISOString()
+        bid_start_time: newItem.mode === 'bid' ? new Date(newItem.bidStartTime + 'T00:00:00+08:00').toISOString() : null,
+        bid_end_time: newItem.mode === 'bid' ? new Date(newItem.bidEndTime + 'T00:00:00+08:00').toISOString() : null,
+        updated_at: getBeijingTimeISO()
       });
       setItems(items.map(item => item.id === editedItem.id ? {
         ...newItem,
@@ -320,7 +320,7 @@ export default function ExchangeAdmin({
         item_id: item.item_id
       }).update({
         status: dbStatus,
-        updated_at: new Date().toISOString()
+        updated_at: getBeijingTimeISO()
       });
       setItems(items.map(item => item.id === itemId ? {
         ...item,

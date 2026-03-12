@@ -178,12 +178,12 @@ export default function GroupsPage(props) {
         leader_name: leader.name,
         member_count: formData.memberIds.length + 1,
         members: [formData.leaderId, ...formData.memberIds],
-        change_history: `${new Date().toISOString().split('T')[0]}: 创建分组，组长：${leader.name}，成员：${leader.name}、${formData.memberIds.map(id => {
+        change_history: `${getBeijingDateString()}: 创建分组，组长：${leader.name}，成员：${leader.name}、${formData.memberIds.map(id => {
           const student = students.find(s => s.studentId === id);
           return student ? student.name : id;
         }).join('、')}`,
-        created_at: new Date().getTime(),
-        updated_at: new Date().getTime()
+        created_at: getBeijingTime().getTime(),
+        updated_at: getBeijingTime().getTime()
       });
 
       // 同步更新 students 数据模型中所有成员的 group 字段
@@ -208,7 +208,7 @@ export default function GroupsPage(props) {
         leaderName: leader.name,
         memberCount: formData.memberIds.length + 1,
         members: [formData.leaderId, ...formData.memberIds],
-        createdAt: new Date().toISOString().split('T')[0]
+        createdAt: getBeijingDateString()
       };
       setGroups([...groups, newGroup]);
       setShowCreateDialog(false);
@@ -276,7 +276,7 @@ export default function GroupsPage(props) {
         leader_name: leader.name,
         member_count: formData.memberIds.length + 1,
         members: [formData.leaderId, ...formData.memberIds],
-        updated_at: new Date().getTime()
+        updated_at: getBeijingTime().getTime()
       });
 
       // 同步更新 students 数据模型中所有成员的 group 字段

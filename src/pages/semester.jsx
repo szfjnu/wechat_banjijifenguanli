@@ -204,7 +204,7 @@ export default function SemesterPage(props) {
         status: 'pending',
         description: newSemester.name,
         created_at: getBeijingTimeISO(),
-        updated_at: new Date().toISOString()
+        updated_at: getBeijingTimeISO()
       });
       const createdSemester = {
         id: result.id || result.ids?.[0] || `SEM${getBeijingTime().getTime()}`,
@@ -318,7 +318,7 @@ export default function SemesterPage(props) {
         is_initialized: editingSemester.isInitialized,
         status: 'active',
         description: editingSemester.name,
-        updated_at: new Date().toISOString()
+        updated_at: getBeijingTimeISO()
       });
       const updatedSemesters = semesters.map(sem => sem.id === editingSemester.id ? editingSemester : sem);
       setSemesters(updatedSemesters);

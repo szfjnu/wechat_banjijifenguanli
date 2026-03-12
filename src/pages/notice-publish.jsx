@@ -37,7 +37,7 @@ export default function NoticePublish(props) {
     defaultValues: {
       title: '',
       content: '',
-      publishTime: new Date().toISOString().slice(0, 16)
+      publishTime: getBeijingTime().toISOString().slice(0, 16)
     }
   });
 
@@ -163,8 +163,8 @@ export default function NoticePublish(props) {
         target_ids: targetIds,
         target_names: targetNames,
         status: 'published',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        created_at: getBeijingTimeISO(),
+        updated_at: getBeijingTimeISO()
       };
       const result = await db.collection('notice').add(noticeData);
       toast({
@@ -176,7 +176,7 @@ export default function NoticePublish(props) {
       form.reset({
         title: '',
         content: '',
-        publishTime: new Date().toISOString().slice(0, 16)
+        publishTime: getBeijingTime().toISOString().slice(0, 16)
       });
       setSelectedStudents([]);
       setGroupsSelected([]);
@@ -220,7 +220,7 @@ export default function NoticePublish(props) {
           <h1 className="text-lg font-bold">通知发布</h1>
           <div className="flex items-center space-x-2">
             <Clock className="w-4 h-4" />
-            <span className="text-sm font-mono">{new Date().toLocaleTimeString('zh-CN', {
+            <span className="text-sm font-mono">{getBeijingTime().toLocaleTimeString('zh-CN', {
               hour: '2-digit',
               minute: '2-digit'
             })}</span>
