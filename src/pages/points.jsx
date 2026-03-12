@@ -72,9 +72,14 @@ export default function PointsPage(props) {
       // 加载积分记录（从 point_record 数据模型）
       const recordsResult = await tcb.database().collection('point_record').orderBy('record_date', 'desc').limit(50).get();
       if (recordsResult.data && recordsResult.data.length > 0) {
+        // 获取所有学生的 student_id_number 到 _id 的映射
+        const studentMap = {};
+        studentsResult.data.forEach(s => {
+          studentMap[s.student_id] = s._id;
+        });
         const transformedRecords = recordsResult.data.map(record => ({
           id: record._id,
-          studentId: record.student_id,
+          studentId: record.student_id_number || record.student_id,
           studentName: record.student_name || '未知',
           itemName: record.item_name || '未知项目',
           points: record.point_change,
@@ -135,9 +140,9 @@ export default function PointsPage(props) {
         item_category: rule.category,
         point_type: rule.points > 0 ? '加分' : '扣分',
         point_change: formData.points,
-        student_id: student.studentId,
+        student_id: student.id,
         student_name: student.name,
-        student_id_number: '',
+        student_id_number: student.studentId,
         score_before: student.totalPoints,
         score_after: student.totalPoints + formData.points,
         reason: formData.note || rule.name,
@@ -152,7 +157,7 @@ export default function PointsPage(props) {
       // 更新前端状态
       const newRecord = {
         id: result.id || result._id,
-        studentId: student.studentId,
+        studentId: student.id,
         studentName: student.name,
         itemName: rule.name,
         points: formData.points,

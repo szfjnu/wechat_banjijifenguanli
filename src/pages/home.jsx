@@ -48,8 +48,8 @@ export default function Home(props) {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
 
-      // 加载学生数据
-      const studentResult = await db.collection('student').limit(10).orderBy('current_score', 'desc').get();
+      // 加载学生数据（移除限制以获取全部数据用于统计）
+      const studentResult = await db.collection('student').orderBy('current_score', 'desc').get();
       if (studentResult.data && studentResult.data.length > 0) {
         const transformedStudents = studentResult.data.map(student => ({
           id: student._id,
@@ -83,6 +83,10 @@ export default function Home(props) {
           avgScore: Math.round(avgScore),
           pendingTasks
         });
+
+        // 只取前5名学生用于排行榜展示
+        const top5Students = transformedStudents.slice(0, 5);
+        setStudents(top5Students);
       } else {
         setPointsData([]);
         setStatsData({
