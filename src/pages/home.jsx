@@ -5,7 +5,7 @@ import { Calendar, Users, TrendingUp, AlertCircle, Sun, CloudRain, CloudSnow, Wi
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
 // @ts-ignore;
-import { getBeijingTime } from '@/lib/utils';
+import { getBeijingTime, formatPoints } from '@/lib/utils';
 
 import { TabBar } from '@/components/TabBar';
 import { StatCard } from '@/components/StatCard';
@@ -49,7 +49,7 @@ export default function Home(props) {
       const db = tcb.database();
 
       // 加载学生数据
-      const studentResult = await db.collection('students').limit(10).orderBy('current_score', 'desc').get();
+      const studentResult = await db.collection('student').limit(10).orderBy('current_score', 'desc').get();
       if (studentResult.data && studentResult.data.length > 0) {
         const transformedStudents = studentResult.data.map(student => ({
           id: student._id,
@@ -76,7 +76,7 @@ export default function Home(props) {
 
         // 计算数据概览统计
         const totalStudents = studentResult.data.length;
-        const avgScoreRaw = studentResult.data.reduce((sum, s) => sum + (s.current_score || 0), 0) / totalStudents;
+        const avgScore = studentResult.data.reduce((sum, s) => sum + (s.current_score || 0), 0) / totalStudents;
         const pendingTasks = 3; // 可以从实际任务表查询
         setStatsData({
           totalStudents,
@@ -97,8 +97,8 @@ export default function Home(props) {
       const todayMonth = String(today.getMonth() + 1).padStart(2, '0');
       const todayDay = String(today.getDate()).padStart(2, '0');
       const todayDateStr = `-${todayMonth}-${todayDay}`;
-      const birthdayResult = await db.collection('students').where({
-        date_of_birth: db.RegExp({
+      const birthdayResult = await db.collection('student').where({
+        birthday: db.RegExp({
           regexp: todayDateStr,
           options: 'i'
         })
