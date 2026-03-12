@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Clock, Calendar, BookOpen, MapPin, Save, ChevronRight, PlusCircle, Settings, Users, Bell, X } from 'lucide-react';
 // @ts-ignore;
 import { Button, useToast, Input, Card } from '@/components/ui';
+// @ts-ignore;
+import { getBeijingTimeISO, getBeijingDateString, getBeijingTime } from '@/lib/utils';
 
 import { TabBar } from '@/components/TabBar';
 import { TeacherScheduleReminder } from '@/components/TeacherScheduleReminder';
@@ -385,8 +387,8 @@ export default function ScheduleManage(props) {
           item_name: item.name,
           time_range: item.time,
           note: item.note || '',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          created_at: getBeijingTimeISO(),
+          updated_at: getBeijingTimeISO()
         }));
       });
       await Promise.all(addPromises);

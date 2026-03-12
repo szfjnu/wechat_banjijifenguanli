@@ -4,10 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { GraduationCap, BookOpen, Award, TrendingUp, AlertCircle, CheckCircle, Clock, Search, Download, FileText, Plus, Flag, Info, Target } from 'lucide-react';
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
+// @ts-ignore;
+import { getBeijingTimeISO, getBeijingDateString, getBeijingTime } from '@/lib/utils';
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
-
 // 模拟转段考科目配置（可标记为转段考科目）
 const EXAM_SUBJECTS = [{
   id: 1,
@@ -357,7 +358,7 @@ export default function ExamMonitorPage(props) {
     });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `转段考监控报表_${new Date().toLocaleDateString('zh-CN')}.csv`;
+    link.download = `转段考监控报表_${getBeijingTime().toLocaleDateString('zh-CN')}.csv`;
     link.click();
     toast({
       title: '导出成功',

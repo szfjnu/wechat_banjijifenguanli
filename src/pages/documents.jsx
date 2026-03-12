@@ -5,7 +5,7 @@ import { FileText, Upload, Search, Filter, Pin, Eye, Download, Calendar, Trash2,
 // @ts-ignore;
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, useToast, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui';
 // @ts-ignore;
-import { getBeijingDateString, getBeijingTimeISO } from '@/lib/utils';
+import { getBeijingDateString, getBeijingTimeISO, getBeijingTime } from '@/lib/utils';
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
@@ -229,7 +229,7 @@ export default function DocumentsPage({
 
       // 添加文件到数据库
       const result = await db.collection('policy_document').add({
-        document_id: `PD${Date.now()}`,
+        document_id: `PD${getBeijingTime().getTime()}`,
         title: uploadForm.title,
         category: uploadForm.category,
         description: uploadForm.description,
@@ -451,7 +451,7 @@ export default function DocumentsPage({
   // 检查文件是否已过期
   const isExpired = file => {
     if (!file.expiryDate) return false;
-    return new Date(file.expiryDate) < new Date();
+    return new Date(file.expiryDate) < getBeijingTime();
   };
 
   // 统计数据

@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Calendar, Clock, CheckCircle, Edit3, Trash2, Flag, CalendarDays, Info } from 'lucide-react';
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
+// @ts-ignore;
+import { getBeijingTimeISO, getBeijingDateString, getBeijingTime } from '@/lib/utils';
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
@@ -117,7 +119,7 @@ export default function SemesterPage(props) {
 
   // 获取学期状态
   const getSemesterStatus = (startDate, endDate) => {
-    const now = new Date();
+    const now = getBeijingTime();
     const start = new Date(startDate);
     const end = new Date(endDate);
     if (now < start) {
@@ -201,11 +203,11 @@ export default function SemesterPage(props) {
         // 其他必要字段
         status: 'pending',
         description: newSemester.name,
-        created_at: new Date().toISOString(),
+        created_at: getBeijingTimeISO(),
         updated_at: new Date().toISOString()
       });
       const createdSemester = {
-        id: result.id || result.ids?.[0] || `SEM${Date.now()}`,
+        id: result.id || result.ids?.[0] || `SEM${getBeijingTime().getTime()}`,
         name: newSemester.name,
         startDate: newSemester.startDate,
         endDate: newSemester.endDate,
@@ -218,7 +220,7 @@ export default function SemesterPage(props) {
           reset_date: newSemester.endDate
         },
         note: '',
-        createdAt: new Date().toISOString(),
+        createdAt: getBeijingTimeISO(),
         // 宿舍积分配置 - 使用默认值
         ...DEFAULT_DORM_CONFIG
       };

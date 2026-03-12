@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui';
 // @ts-ignore;
 import { Settings2, Target, Plus, Edit2, Trash2, Save, X, TrendingUp, Star, Shield, BookOpen, Heart, Award, Zap, ChevronUp, ChevronDown, CheckCircle, Database, AlertTriangle, Calendar } from 'lucide-react';
+// @ts-ignore;
+import { getBeijingTimeISO, getBeijingDateString, getBeijingTime } from '@/lib/utils';
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
@@ -283,7 +285,7 @@ export default function PointsSettings({
           item_type: formData.points > 0 ? '加分' : '扣分',
           icon_name: formData.icon,
           is_enabled: formData.enabled,
-          created_at: new Date().toISOString(),
+          created_at: getBeijingTimeISO(),
           updated_at: new Date().toISOString()
         });
 
@@ -291,7 +293,7 @@ export default function PointsSettings({
         const newItem = {
           id: result.id || result._id,
           ...formData,
-          createdAt: new Date().toISOString().split('T')[0],
+          createdAt: getBeijingDateString(),
           usageCount: 0
         };
         setItems([...items, newItem]);
@@ -466,7 +468,7 @@ export default function PointsSettings({
         const newLevel = {
           _id: result.id || result._id,
           ...disciplineFormData,
-          createdAt: new Date().toISOString().split('T')[0]
+          createdAt: getBeijingDateString()
         };
         console.log('新增级别数据:', newLevel);
         // 按扣分值排序后添加

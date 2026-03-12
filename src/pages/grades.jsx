@@ -4,10 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Calendar, Search, Filter, BookOpen, TrendingUp, TrendingDown, AlertCircle, Award, Calculator, FileText, Download, CheckCircle, Users, BarChart3 } from 'lucide-react';
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
+// @ts-ignore;
+import { getBeijingDateString, getBeijingTimeISO, getBeijingTime } from '@/lib/utils';
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
-
 // 学科预设数据（包含标准学分）
 const SUBJECTS = [{
   id: 1,
@@ -281,7 +282,7 @@ export default function GradesPage(props) {
         remark: formData.remark
       });
       const newGrade = {
-        id: result.id || result.ids?.[0] || `GRADE${Date.now()}`,
+        id: result.id || result.ids?.[0] || `GRADE${getBeijingTime().getTime()}`,
         studentId: formData.studentId,
         studentName: student.name,
         subjectId: subject.id,
@@ -301,7 +302,7 @@ export default function GradesPage(props) {
         studentId: '',
         subjectId: '',
         score: '',
-        examDate: new Date().toISOString().split('T')[0],
+        examDate: getBeijingDateString(),
         semesterId: '',
         remark: ''
       });
@@ -353,7 +354,7 @@ export default function GradesPage(props) {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `成绩报表_${new Date().toISOString().split('T')[0]}.csv`;
+      link.download = `成绩报表_${getBeijingDateString()}.csv`;
       link.click();
       URL.revokeObjectURL(url);
       setShowExportDialog(false);

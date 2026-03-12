@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { Search, Plus, BookOpen, Edit, Trash2, AlertTriangle, CheckCircle2, ArrowLeft, Home, Sliders, Download, Star, GraduationCap, Calculator } from 'lucide-react';
 // @ts-ignore;
 import { Button, Input, useToast } from '@/components/ui';
+// @ts-ignore;
+import { getBeijingTimeISO, getBeijingDateString, getBeijingTime } from '@/lib/utils';
 
 import { TabBar } from '@/components/TabBar';
 import { StatCard } from '@/components/StatCard';
@@ -172,11 +174,11 @@ export default function Subjects(props) {
       return;
     }
     const newSubject = {
-      id: Date.now(),
+      id: getBeijingTime().getTime(),
       name: formData.name,
       credits: Number(formData.credits),
       isExamSubject: formData.isExamSubject,
-      createdAt: new Date().toISOString().split('T')[0]
+      createdAt: getBeijingDateString()
     };
     setSubjects([...subjects, newSubject]);
     setShowAddDialog(false);
@@ -276,7 +278,7 @@ export default function Subjects(props) {
     });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `科目列表_${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `科目列表_${getBeijingDateString()}.csv`;
     link.click();
     toast({
       title: '导出成功',

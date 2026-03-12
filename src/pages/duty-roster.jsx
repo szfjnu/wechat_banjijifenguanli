@@ -5,7 +5,7 @@ import { Calendar, User, Star, CheckCircle, Clock, AlertCircle, Plus, Bell, Came
 // @ts-ignore;
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea, useToast, Badge } from '@/components/ui';
 // @ts-ignore;
-import { getBeijingTimeISO, getBeijingDateString } from '@/lib/utils';
+import { getBeijingTimeISO, getBeijingDateString, getBeijingTime } from '@/lib/utils';
 
 import { TabBar } from '@/components/TabBar';
 import { StatCard } from '@/components/StatCard';
@@ -35,7 +35,7 @@ export default function DutyRoster(props) {
   const [showImagePreview, setShowImagePreview] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
-  const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
+  const [currentWeekStart, setCurrentWeekStart] = useState(getBeijingTime());
   const [notifications, setNotifications] = useState([]);
   const [customTaskName, setCustomTaskName] = useState('');
   const [isCustomTask, setIsCustomTask] = useState(false);
@@ -169,7 +169,7 @@ export default function DutyRoster(props) {
             images: task.images || [],
             isCustom: task.is_custom || false,
             reminderSent: task.reminder_sent || false,
-            createdAt: task.createdAt ? new Date(task.createdAt).toLocaleDateString('zh-CN') : new Date().toLocaleDateString('zh-CN')
+            createdAt: task.createdAt ? new Date(task.createdAt).toLocaleDateString('zh-CN') : getBeijingTime().toLocaleDateString('zh-CN')
           }));
           console.log('加载的值日任务数据:', loadedTasks);
           console.log('加载的学生数据:', loadedStudents);
@@ -199,7 +199,7 @@ export default function DutyRoster(props) {
       setNotifications(loadedNotifications);
 
       // 3. 设置当前周的开始日期（本周一）
-      const today = new Date();
+      const today = getBeijingTime();
       const day = today.getDay() || 7;
       const monday = new Date(today);
       monday.setDate(today.getDate() - day + 1);
@@ -233,7 +233,7 @@ export default function DutyRoster(props) {
     for (let day = 0; day < 7; day++) {
       const currentDate = new Date(monday);
       currentDate.setDate(monday.getDate() + day);
-      const dateStr = currentDate.toISOString().split('T')[0];
+      const dateStr = getBeijingDateString();
       // 每天分配2个值日任务（按学生轮值）
       const studentIndex1 = day * 2 % students.length;
       const studentIndex2 = (day * 2 + 1) % students.length;
@@ -243,7 +243,7 @@ export default function DutyRoster(props) {
       const task2 = PRESET_TASKS[taskIndex2];
       // 第一个任务
       weekTasks.push({
-        id: Date.now() + day * 1000,
+        id: getBeijingTime().getTime() + day * 1000,
         studentId: students[studentIndex1].id,
         studentName: students[studentIndex1].name,
         studentNo: students[studentIndex1].studentId,
@@ -262,7 +262,7 @@ export default function DutyRoster(props) {
       });
       // 第二个任务
       weekTasks.push({
-        id: Date.now() + day * 1000 + 1,
+        id: getBeijingTime().getTime() + day * 1000 + 1,
         studentId: students[studentIndex2].id,
         studentName: students[studentIndex2].name,
         studentNo: students[studentIndex2].studentId,
@@ -291,7 +291,7 @@ export default function DutyRoster(props) {
       const weekNumber = getWeekNumber(new Date());
       filtered = filtered.filter(task => task.weekNumber === weekNumber);
     } else if (selectedWeek === 'last-week') {
-      const weekNumber = getWeekNumber(new Date()) - 1;
+      const weekNumber = getWeekNumber(getBeijingTime()) - 1;
       filtered = filtered.filter(task => task.weekNumber === weekNumber);
     }
     filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -319,7 +319,7 @@ export default function DutyRoster(props) {
       }).remove();
 
       // 生成新任务并保存到数据库
-      const newTasks = generateWeeklyTasks(new Date(), weekNumber);
+      const newTasks = generateWeeklyTasks(getBeijingTime(), weekNumber);
       const promises = newTasks.map(async task => {
         const result = await tcb.database().collection('duty_task').add({
           student_id: task.studentId,
@@ -526,7 +526,7 @@ export default function DutyRoster(props) {
       } : t);
       setTasks(updatedTasks);
       const notification = {
-        id: Date.now(),
+        id: getBeijingTime().getTime(),
         type: 'reminder',
         message: `已提醒${reminderForm.studentName}完成${reminderForm.taskName}任务`,
         time: '刚刚',
@@ -583,7 +583,7 @@ export default function DutyRoster(props) {
       return;
     }
     const images = files.map(file => ({
-      id: Date.now() + Math.random(),
+      id: getBeijingTime().getTime() + Math.random(),
       file: file,
       url: URL.createObjectURL(file),
       name: file.name
@@ -614,8 +614,8 @@ export default function DutyRoster(props) {
     end.setDate(start.getDate() + 6);
     return `${start.getMonth() + 1}月${start.getDate()}日 - ${end.getMonth() + 1}月${end.getDate()}日`;
   };
-  const pendingTasks = tasks.filter(t => t.status === 'pending' && t.weekNumber === getWeekNumber(new Date()));
-  const completedTasks = tasks.filter(t => t.status === 'completed' && t.weekNumber === getWeekNumber(new Date()));
+  const pendingTasks = tasks.filter(t => t.status === 'pending' && t.weekNumber === getWeekNumber(getBeijingTime()));
+  const completedTasks = tasks.filter(t => t.status === 'completed' && t.weekNumber === getWeekNumber(getBeijingTime()));
   const avgScore = completedTasks.length > 0 ? (completedTasks.reduce((sum, t) => sum + (t.score || 0), 0) / completedTasks.length).toFixed(1) : 0;
   const totalPoints = completedTasks.reduce((sum, t) => sum + (t.points || 0), 0);
   if (loading) {
@@ -710,7 +710,7 @@ export default function DutyRoster(props) {
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <div className="p-2 bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
             <h2 className="text-lg font-semibold text-gray-800">值日任务清单</h2>
-            <p className="text-xs text-gray-600 mt-0.5">{getWeekRange()} · 第{getWeekNumber(new Date())}周</p>
+            <p className="text-xs text-gray-600 mt-0.5">{getWeekRange()} · 第{getWeekNumber(getBeijingTime())}周</p>
           </div>
           <div className="divide-y">
             {filteredTasks.map(task => <div key={task.id} className={`p-2 hover:bg-gray-50 transition-colors ${task.status === 'completed' ? 'bg-green-50/30' : ''}`}>

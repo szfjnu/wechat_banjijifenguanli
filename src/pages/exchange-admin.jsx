@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui';
 // @ts-ignore;
 import { Package, ShoppingBag, Clock, CheckCircle2, XCircle, AlertTriangle, Plus, Edit2, Trash2, TrendingUp, Users, DollarSign, Eye, MoreHorizontal, Filter, Search, Calendar, Camera, X, Settings2, Award, Trophy } from 'lucide-react';
+// @ts-ignore;
+import { getBeijingTimeISO, getBeijingDateString, getBeijingTime } from '@/lib/utils';
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
@@ -181,7 +183,7 @@ export default function ExchangeAdmin({
       const db = tcb.database();
 
       // 添加物品到数据库
-      const item_id = `item_${Date.now()}`;
+      const item_id = `item_${getBeijingTime().getTime()}`;
       await db.collection('redemption_items').add({
         item_id: item_id,
         name: newItem.name,
