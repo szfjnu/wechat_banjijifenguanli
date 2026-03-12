@@ -134,18 +134,18 @@ export default function PointsSettings({
     try {
       setLoading(true);
       const tcb = await $w.cloud.getCloudInstance();
-      const result = await tcb.database().collection('score_items').get();
+      const result = await tcb.database().collection('point_rule').get();
       if (result.data && result.data.length > 0) {
         const transformedItems = result.data.map(item => ({
           id: item._id,
-          name: item.item_name,
+          name: item.rule_name,
           description: item.description || '',
           points: item.score_value,
-          category: item.item_type === '加分' ? item.score_value > 0 ? 'positive' : 'negative' : 'negative',
+          category: item.rule_type === '加分' ? item.score_value > 0 ? 'positive' : 'negative' : 'negative',
           icon: item.icon_name || 'Star',
           enabled: item.is_enabled !== false,
-          createdAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-CN') : '',
-          usageCount: 0 // 需要从 score_records 计算后续添加
+          createdAt: item.created_date ? new Date(item.created_date).toLocaleDateString('zh-CN') : '',
+          usageCount: 0 // 需要从 point_record 计算后续添加
         }));
         setItems(transformedItems);
       } else {
@@ -256,13 +256,13 @@ export default function PointsSettings({
       const db = tcb.database();
       if (editingItem) {
         // 更新数据库
-        await db.collection('score_items').doc(editingItem.id).update({
-          item_name: formData.name,
+        await db.collection('point_rule').doc(editingItem.id).update({
+          rule_name: formData.name,
           description: formData.description,
           score_value: formData.points,
           icon_name: formData.icon,
           is_enabled: formData.enabled,
-          updated_at: getBeijingTimeISO()
+          updated_date: getBeijingTimeISO()
         });
 
         // 更新前端
@@ -278,15 +278,15 @@ export default function PointsSettings({
         });
       } else {
         // 新增到数据库
-        const result = await db.collection('score_items').add({
-          item_name: formData.name,
+        const result = await db.collection('point_rule').add({
+          rule_name: formData.name,
           description: formData.description,
           score_value: formData.points,
-          item_type: formData.points > 0 ? '加分' : '扣分',
+          rule_type: formData.points > 0 ? '加分' : '扣分',
           icon_name: formData.icon,
           is_enabled: formData.enabled,
-          created_at: getBeijingTimeISO(),
-          updated_at: getBeijingTimeISO()
+          created_date: getBeijingTimeISO(),
+          updated_date: getBeijingTimeISO()
         });
 
         // 更新前端
@@ -322,9 +322,9 @@ export default function PointsSettings({
       const db = tcb.database();
 
       // 更新数据库中的启用状态
-      await db.collection('score_items').doc(item.id).update({
+      await db.collection('point_rule').doc(item.id).update({
         is_enabled: !item.enabled,
-        updated_at: getBeijingTimeISO()
+        updated_date: getBeijingTimeISO()
       });
 
       // 更新前端
