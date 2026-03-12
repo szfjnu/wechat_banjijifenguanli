@@ -174,6 +174,19 @@ export default function GroupsPage(props) {
         created_at: new Date().getTime(),
         updated_at: new Date().getTime()
       });
+
+      // 同步更新 students 数据模型中所有成员的 group 字段
+      const allMemberIds = [formData.leaderId, ...formData.memberIds];
+      for (const studentId of allMemberIds) {
+        const student = students.find(s => s.studentId === studentId);
+        if (student) {
+          await db.collection('students').where({
+            student_id: studentId
+          }).update({
+            group: formData.name
+          });
+        }
+      }
       const newGroup = {
         _id: result.id,
         id: result.id,
@@ -254,6 +267,30 @@ export default function GroupsPage(props) {
         members: [formData.leaderId, ...formData.memberIds],
         updated_at: new Date().getTime()
       });
+
+      // 同步更新 students 数据模型中所有成员的 group 字段
+      const newMemberIds = [formData.leaderId, ...formData.memberIds];
+      const oldMemberIds = selectedGroup.members || [];
+
+      // 更新旧成员中被移出的学生，将其 group 字段清空
+      for (const oldStudentId of oldMemberIds) {
+        if (!newMemberIds.includes(oldStudentId)) {
+          await db.collection('students').where({
+            student_id: oldStudentId
+          }).update({
+            group: ''
+          });
+        }
+      }
+
+      // 更新旧成员中保留的学生，将其 group 字段更新为新分组名（如果组名有变化）
+      for (const newStudentId of newMemberIds) {
+        await db.collection('students').where({
+          student_id: newStudentId
+        }).update({
+          group: formData.name
+        });
+      }
       const updatedGroups = groups.map(g => g._id === selectedGroup._id ? {
         ...g,
         name: formData.name,
@@ -297,6 +334,17 @@ export default function GroupsPage(props) {
     try {
       const tcb = await props.$w.cloud.getCloudInstance();
       const db = tcb.database();
+      const groupToDelete = groups.find(g => g._id === groupId);
+      if (groupToDelete && groupToDelete.members) {
+        // 清空所有成员的 group 字段
+        for (const studentId of groupToDelete.members) {
+          await db.collection('students').where({
+            student_id: studentId
+          }).update({
+            group: ''
+          });
+        }
+      }
       await db.collection('group').doc(groupId).remove();
       const updatedGroups = groups.filter(g => g._id !== groupId);
       setGroups(updatedGroups);
