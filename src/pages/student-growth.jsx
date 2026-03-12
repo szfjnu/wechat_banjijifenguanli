@@ -264,7 +264,7 @@ export default function StudentGrowth(props) {
                   <div className="mt-2 flex items-center justify-between text-sm">
                     <span className="text-gray-500">当前积分:</span>
                     <span className={`font-semibold ${student.current_score >= 90 ? 'text-green-600' : student.current_score >= 80 ? 'text-blue-600' : student.current_score >= 70 ? 'text-yellow-600' : 'text-red-600'}`}>
-                      {student.current_score || 0}
+                      {formatPoints(student.current_score || 0)}
                     </span>
                   </div>
                 </div>)}
@@ -297,12 +297,12 @@ export default function StudentGrowth(props) {
               
               {stats && <div className="flex items-center space-x-6 text-sm">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-orange-600">{stats.total}</div>
+                    <div className="text-2xl font-bold text-orange-600">{formatPoints(stats.total)}</div>
                     <div className="text-gray-500">总记录</div>
                   </div>
                   <div className="text-center">
                     <div className={`text-2xl font-bold ${stats.totalChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {stats.totalChange >= 0 ? '+' : ''}{stats.totalChange}
+                      {stats.totalChange >= 0 ? '+' : ''}{formatPoints(stats.totalChange)}
                     </div>
                     <div className="text-gray-500">总分变化</div>
                   </div>

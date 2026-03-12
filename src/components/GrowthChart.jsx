@@ -4,6 +4,15 @@ import React from 'react';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+
+// 格式化积分：整数显示整数，小数最多显示两位
+const formatPoints = points => {
+  if (points === undefined || points === null || isNaN(points)) return '0';
+  const num = Number(points);
+  const rounded = Math.round(num * 100) / 100;
+  // 如果小数部分为0，显示整数；否则最多显示两位小数
+  return rounded === Math.floor(rounded) ? String(Math.floor(rounded)) : rounded.toFixed(2);
+};
 export function GrowthChart({
   data
 }) {
@@ -51,7 +60,7 @@ export function GrowthChart({
   const typeChartData = Object.entries(typeStats).map(([type, stats]) => ({
     type,
     count: stats.count,
-    avgScore: stats.count > 0 ? (stats.totalScore / stats.count).toFixed(2) : 0
+    avgScore: stats.count > 0 ? formatPoints(stats.totalScore / stats.count) : '0'
   }));
   return <div className="space-y-6">
       {/* 统计卡片 */}
@@ -93,7 +102,7 @@ export function GrowthChart({
             <div>
               <p className="text-sm text-purple-600 mb-1">平均变化</p>
               <p className={`text-2xl font-bold ${avgScore >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {avgScore >= 0 ? '+' : ''}{avgScore.toFixed(2)}
+                {avgScore >= 0 ? '+' : ''}{formatPoints(avgScore)}
               </p>
             </div>
             <Minus className="w-8 h-8 text-purple-500" />
@@ -178,7 +187,7 @@ export function GrowthChart({
             border: '1px solid #e5e7eb',
             borderRadius: '8px',
             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-          }} formatter={value => [`${value} 分`, '累计积分']} />
+          }} formatter={value => [`${formatPoints(value)} 分`, '累计积分']} />
             <Area type="monotone" dataKey="cumulativeScore" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorScore)" />
           </AreaChart>
         </ResponsiveContainer>

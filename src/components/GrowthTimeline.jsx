@@ -5,6 +5,14 @@ import { Calendar, TrendingUp, TrendingDown, Award, AlertTriangle, Activity } fr
 // @ts-ignore;
 import { Badge } from '@/components/ui';
 
+// 格式化积分：整数显示整数，小数最多显示两位
+const formatPoints = points => {
+  if (points === undefined || points === null || isNaN(points)) return '0';
+  const num = Number(points);
+  const rounded = Math.round(num * 100) / 100;
+  // 如果小数部分为0，显示整数；否则最多显示两位小数
+  return rounded === Math.floor(rounded) ? String(Math.floor(rounded)) : rounded.toFixed(2);
+};
 export function GrowthTimeline({
   records
 }) {
@@ -132,7 +140,7 @@ export function GrowthTimeline({
                   {/* 右侧：积分变化 */}
                   <div className="ml-4 flex flex-col items-end">
                     <div className={`text-2xl font-bold ${getScoreColor(record.score_change)}`}>
-                      {record.score_change >= 0 ? '+' : ''}{record.score_change}
+                      {record.score_change >= 0 ? '+' : ''}{formatPoints(record.score_change)}
                     </div>
                     <div className="text-sm text-gray-500">积分</div>
                   </div>
