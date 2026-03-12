@@ -43,7 +43,14 @@ export default function Students(props) {
       setLoading(true);
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
-      const result = await db.collection('student').get();
+      const result = await db.collection('students').get();
+
+      // 添加调试日志
+      console.log('students.jsx 加载学生数据:', {
+        数据总数: result.data ? result.data.length : 0,
+        数据库集合名: 'students',
+        查询结果: result
+      });
       if (result.data && result.data.length > 0) {
         // 转换数据格式，适配前端显示
         const transformedStudents = result.data.map(student => ({

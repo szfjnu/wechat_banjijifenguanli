@@ -49,11 +49,11 @@ export default function Home(props) {
       const db = tcb.database();
 
       // 1. 先查询所有学生总数（用于统计）
-      const totalStudentsResult = await db.collection('student').count();
+      const totalStudentsResult = await db.collection('students').count();
       const totalStudents = totalStudentsResult.total || 0;
 
       // 2. 查询所有学生的积分数据（用于计算平均积分）
-      const allStudentsResult = await db.collection('student').field({
+      const allStudentsResult = await db.collection('students').field({
         _id: true,
         name: true,
         current_score: true
@@ -65,7 +65,7 @@ export default function Home(props) {
       const avgScore = totalStudents > 0 ? Math.round(totalScore / totalStudents) : 0;
 
       // 3. 查询积分排行榜前10名学生
-      const topStudentsResult = await db.collection('student').orderBy('current_score', 'desc').limit(10).get();
+      const topStudentsResult = await db.collection('students').orderBy('current_score', 'desc').limit(10).get();
       if (topStudentsResult.data && topStudentsResult.data.length > 0) {
         const transformedStudents = topStudentsResult.data.map(student => ({
           id: student._id,
@@ -110,7 +110,7 @@ export default function Home(props) {
       const todayMonth = String(today.getMonth() + 1).padStart(2, '0');
       const todayDay = String(today.getDate()).padStart(2, '0');
       const todayDateStr = `-${todayMonth}-${todayDay}`;
-      const birthdayResult = await db.collection('student').where({
+      const birthdayResult = await db.collection('students').where({
         birthday: db.RegExp({
           regexp: todayDateStr,
           options: 'i'

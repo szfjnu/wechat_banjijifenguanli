@@ -57,12 +57,29 @@ export default function StudentsManage(props) {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
       const result = await db.collection('students').get();
+
+      // 添加调试日志
+      console.log('students-manage.jsx 加载学生数据:', {
+        数据总数: result.data ? result.data.length : 0,
+        数据库集合名: 'students',
+        查询结果: result
+      });
       if (result.data && result.data.length > 0) {
         setStudents(result.data);
         setFilteredStudents(result.data);
+        toast({
+          title: '加载成功',
+          description: `成功加载 ${result.data.length} 名学生数据`,
+          variant: 'default'
+        });
       } else {
         setStudents([]);
         setFilteredStudents([]);
+        toast({
+          title: '无数据',
+          description: 'students 数据集暂无学生记录',
+          variant: 'default'
+        });
       }
     } catch (error) {
       console.error('加载学生数据失败:', error);
