@@ -141,6 +141,24 @@ export default function GroupsPage(props) {
       const db = tcb.database();
       const semester = semesters.find(s => s.id === parseInt(formData.semesterId));
       const leader = students.find(s => s.studentId === formData.leaderId);
+      if (!semester) {
+        toast({
+          title: '学期错误',
+          description: '选择的学期不存在',
+          variant: 'destructive'
+        });
+        setLoadingAction(false);
+        return;
+      }
+      if (!leader) {
+        toast({
+          title: '组长错误',
+          description: '选择的组长不存在',
+          variant: 'destructive'
+        });
+        setLoadingAction(false);
+        return;
+      }
       const result = await db.collection('group').add({
         name: formData.name,
         semester_id: parseInt(formData.semesterId),
@@ -208,6 +226,24 @@ export default function GroupsPage(props) {
       const db = tcb.database();
       const semester = semesters.find(s => s.id === parseInt(formData.semesterId));
       const leader = students.find(s => s.studentId === formData.leaderId);
+      if (!semester) {
+        toast({
+          title: '学期错误',
+          description: '选择的学期不存在',
+          variant: 'destructive'
+        });
+        setLoadingAction(false);
+        return;
+      }
+      if (!leader) {
+        toast({
+          title: '组长错误',
+          description: '选择的组长不存在',
+          variant: 'destructive'
+        });
+        setLoadingAction(false);
+        return;
+      }
       await db.collection('group').doc(selectedGroup._id).update({
         name: formData.name,
         semester_id: parseInt(formData.semesterId),
