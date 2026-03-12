@@ -4,10 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { Bed, AlertTriangle, Search, Filter, TrendingDown, Shield, ShieldAlert, FileText, Upload, Users, Camera, RefreshCw, Settings, Calendar, Image as ImageIcon, X, Eye, Trash2, Plus, Edit2, Save } from 'lucide-react';
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
+// @ts-ignore;
+import { getBeijingTimeISO, getBeijingDateString } from '@/lib/utils';
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
-
 // 格式化积分：整数显示整数，小数最多显示两位
 const formatPoints = points => {
   if (points === undefined || points === null || isNaN(points)) return '0';
@@ -171,7 +172,7 @@ export default function DormPointsPage(props) {
           item_category: itemFormData.category,
           description: itemFormData.description,
           priority: itemFormData.priority,
-          update_date: new Date().toISOString().split('T')[0]
+          update_date: getBeijingDateString()
         });
         toast({
           title: '保存成功',
@@ -190,7 +191,7 @@ export default function DormPointsPage(props) {
           priority: itemFormData.priority || 5,
           icon_name: 'AlertTriangle',
           creator: '系统管理员',
-          created_date: new Date().toISOString().split('T')[0],
+          created_date: getBeijingDateString(),
           update_date: new Date().toISOString().split('T')[0]
         };
         await db.collection('dorm_deduction_items').add(newItem);
@@ -333,7 +334,7 @@ export default function DormPointsPage(props) {
         original_score: student.dormPoints,
         reason: remark || deductionItem.name,
         evidence_images: uploadedImages.map(img => img.url),
-        deduction_date: new Date().toISOString(),
+        deduction_date: getBeijingTimeISO(),
         recorder_name: $w?.auth?.currentUser?.name || '宿管员',
         semester_id: currentSemester?.id || 2,
         semester_name: currentSemester?.name || '未设置学期',
@@ -603,7 +604,7 @@ export default function DormPointsPage(props) {
         const semester = result.data[0];
         await db.collection('semesters').doc(semester._id).update({
           dorm_conversion_ratio: newConversionRate,
-          updated_at: new Date().toISOString()
+          updated_at: getBeijingTimeISO()
         });
       }
       setConversionRate(newConversionRate);

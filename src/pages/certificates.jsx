@@ -4,10 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { Award, Upload, Search, Filter, Plus, FileText, Calendar, TrendingUp, Download, Eye, CheckCircle, Star, Trophy, Medal } from 'lucide-react';
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
+// @ts-ignore;
+import { getBeijingDateString, getBeijingTimeISO } from '@/lib/utils';
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
-
 // 格式化积分：整数显示整数，小数最多显示两位
 const formatPoints = points => {
   if (points === undefined || points === null || isNaN(points)) return '0';
@@ -332,7 +333,7 @@ export default function CertificatesPage(props) {
         studentId: '',
         certificateName: '',
         levelId: '',
-        date: new Date().toISOString().split('T')[0],
+        date: getBeijingDateString(),
         note: '',
         file: null
       });

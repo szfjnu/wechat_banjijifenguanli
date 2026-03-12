@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, User, Star, CheckCircle, Clock, AlertCircle, Plus, Bell, Camera, FileImage, MessageSquare, TrendingUp, CalendarDays, ChevronRight, ChevronLeft, Trash2, Edit3, Home } from 'lucide-react';
 // @ts-ignore;
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea, useToast, Badge } from '@/components/ui';
+// @ts-ignore;
+import { getBeijingTimeISO, getBeijingDateString } from '@/lib/utils';
 
 import { TabBar } from '@/components/TabBar';
 import { StatCard } from '@/components/StatCard';
@@ -395,7 +397,7 @@ export default function DutyRoster(props) {
         images: [],
         is_custom: isCustomTask,
         reminder_sent: false,
-        created_at: new Date().toISOString()
+        created_at: getBeijingTimeISO()
       });
       const task = {
         id: result.id,

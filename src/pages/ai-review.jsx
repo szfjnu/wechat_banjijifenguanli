@@ -4,9 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { Brain, Sparkles, User, Users, Calendar, TrendingUp, Award, ShieldAlert, Heart, BookOpen, Download, Share2, Edit3, Save, CheckCircle, AlertCircle, FileText } from 'lucide-react';
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
+// @ts-ignore;
+import { getBeijingDateString, getBeijingTimeISO } from '@/lib/utils';
 
 import { TabBar } from '@/components/TabBar';
-
 // 格式化积分：整数显示整数，小数最多显示两位
 const formatPoints = points => {
   if (points === undefined || points === null || isNaN(points)) return '0';
@@ -367,7 +368,7 @@ ${name}同学在本学期表现优异，总积分达到${formatPoints(data.total
         gpa: 0,
         certificates_count: 0,
         volunteer_hours: 0,
-        created_date: new Date().toISOString().split('T')[0],
+        created_date: getBeijingDateString(),
         created_by: props.$w?.auth?.currentUser?.name || '系统管理员',
         remark: ''
       };

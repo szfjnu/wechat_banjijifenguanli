@@ -4,9 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Calendar, Clock, Search, Filter, ChevronDown, CheckCircle, XCircle, TrendingUp, TrendingDown, FileText } from 'lucide-react';
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
+// @ts-ignore;
+import { getBeijingTime, getBeijingTimeISO, getBeijingDateString } from '@/lib/utils';
 
 import { TabBar } from '@/components/TabBar';
-
 // 格式化积分：整数显示整数，小数最多显示两位
 const formatPoints = points => {
   if (points === undefined || points === null || isNaN(points)) return '0';
@@ -357,7 +358,7 @@ export default function PointsPage(props) {
       // 更新数据库记录
       await db.collection('score_records').doc(recordId).update({
         approval_status: '已通过',
-        approval_time: new Date().toISOString(),
+        approval_time: getBeijingTimeISO(),
         approver_name: '班主任'
       });
 

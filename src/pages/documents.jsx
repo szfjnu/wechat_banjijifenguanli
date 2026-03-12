@@ -4,10 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { FileText, Upload, Search, Filter, Pin, Eye, Download, Calendar, Trash2, Edit2, Share2, Shield, Clock, AlertCircle, CheckCircle, XCircle, Plus, Folder, ShieldCheck, AlertTriangle } from 'lucide-react';
 // @ts-ignore;
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, useToast, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui';
+// @ts-ignore;
+import { getBeijingDateString, getBeijingTimeISO } from '@/lib/utils';
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
-
 // 文件分类
 const CATEGORIES = [{
   value: 'all',
@@ -238,9 +239,9 @@ export default function DocumentsPage({
         file_url: 'https://example.com/files/' + uploadForm.file.name,
         is_pinned: false,
         permission: uploadForm.permission === 'public' ? '公开' : uploadForm.permission === 'student' ? '仅学生可见' : uploadForm.permission === 'parent' ? '仅家长可见' : '公开',
-        upload_date: new Date().toISOString(),
-        update_date: new Date().toISOString(),
-        expiry_date: uploadForm.expiryDate ? new Date(uploadForm.expiryDate).toISOString() : null,
+        upload_date: getBeijingTimeISO(),
+        update_date: getBeijingTimeISO(),
+        expiry_date: uploadForm.expiryDate ? new Date(uploadForm.expiryDate + 'T00:00:00+08:00').toISOString() : null,
         uploader: $w.auth.currentUser?.name || '管理员',
         status: '正常',
         view_count: 0,
@@ -259,7 +260,7 @@ export default function DocumentsPage({
         fileUrl: 'https://example.com/files/' + uploadForm.file.name,
         isPinned: false,
         permission: uploadForm.permission,
-        uploadDate: new Date().toISOString().split('T')[0],
+        uploadDate: getBeijingDateString(),
         expiryDate: uploadForm.expiryDate || null,
         uploader: $w.auth.currentUser?.name || '管理员',
         viewCount: 0,
@@ -304,7 +305,7 @@ export default function DocumentsPage({
       // 更新数据库中的置顶状态
       await db.collection('policy_document').doc(fileId).update({
         is_pinned: newPinnedStatus,
-        update_date: new Date().toISOString()
+        update_date: getBeijingTimeISO()
       });
       setFiles(files.map(f => f.id === fileId ? {
         ...f,
@@ -363,7 +364,7 @@ export default function DocumentsPage({
       // 更新数据库中的查看次数
       await db.collection('policy_document').doc(file.id).update({
         view_count: (file.viewCount || 0) + 1,
-        update_date: new Date().toISOString()
+        update_date: getBeijingTimeISO()
       });
 
       // 增加前端查看次数
@@ -387,7 +388,7 @@ export default function DocumentsPage({
       // 更新数据库中的下载次数
       await db.collection('policy_document').doc(file.id).update({
         download_count: (file.downloadCount || 0) + 1,
-        update_date: new Date().toISOString()
+        update_date: getBeijingTimeISO()
       });
 
       // 增加前端下载次数

@@ -4,10 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { AlertTriangle, FileText, Search, Filter, Shield, ShieldAlert, Calendar, Clock, CheckCircle, XCircle, User, Plus, History, Download, Eye, Settings } from 'lucide-react';
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
+// @ts-ignore;
+import { getBeijingTimeISO, getBeijingDateString } from '@/lib/utils';
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
-
 // 格式化积分：整数显示整数，小数最多显示两位
 const formatPoints = points => {
   if (points === undefined || points === null || isNaN(points)) return '0';
@@ -54,7 +55,7 @@ export default function DisciplinePage(props) {
     studentId: '',
     levelId: '',
     reason: '',
-    date: new Date().toISOString().split('T')[0]
+    date: getBeijingDateString()
   });
 
   // 加载数据
@@ -241,7 +242,7 @@ export default function DisciplinePage(props) {
         points_deducted: level.deductPoints,
         date: newRecord.date,
         status: 'active',
-        expiry_date: new Date(Date.now() + level.validDays * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        expiry_date: getBeijingDateString(),
         operator_name: '班主任',
         revoke_requests: []
       });
@@ -255,7 +256,7 @@ export default function DisciplinePage(props) {
         pointsDeducted: level.deductPoints,
         date: newRecord.date,
         status: 'active',
-        expiryDate: new Date(Date.now() + level.validDays * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        expiryDate: getBeijingDateString(),
         operator: '班主任',
         revokeRequests: []
       };
@@ -265,7 +266,7 @@ export default function DisciplinePage(props) {
         studentId: '',
         levelId: '',
         reason: '',
-        date: new Date().toISOString().split('T')[0]
+        date: getBeijingDateString()
       });
       toast({
         title: '创建成功',
@@ -305,7 +306,7 @@ export default function DisciplinePage(props) {
       await db.collection('discipline_record').doc(selectedRecord.id).update({
         status: 'revoked',
         revoke_reason: revokeReason,
-        revoked_date: new Date().toISOString()
+        revoked_date: getBeijingTimeISO()
       });
 
       // 更新本地状态
@@ -313,7 +314,7 @@ export default function DisciplinePage(props) {
         ...r,
         status: 'revoked',
         revokeReason,
-        revokedDate: new Date().toISOString()
+        revokedDate: getBeijingTimeISO()
       } : r);
       setRecords(updatedRecords);
       setShowRevokeDialog(false);
@@ -351,7 +352,7 @@ export default function DisciplinePage(props) {
       const existingRequests = selectedRecord.revokeRequests || [];
       const newRequest = {
         reason: revokeRequestReason,
-        requestDate: new Date().toISOString(),
+        requestDate: getBeijingTimeISO(),
         status: 'pending'
       };
 
