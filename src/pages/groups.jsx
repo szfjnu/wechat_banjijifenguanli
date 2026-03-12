@@ -139,7 +139,7 @@ export default function GroupsPage(props) {
       setLoadingAction(true);
       const tcb = await props.$w.cloud.getCloudInstance();
       const db = tcb.database();
-      const semester = semesters.find(s => s.id === parseInt(formData.semesterId));
+      const semester = semesters.find(s => s.id === formData.semesterId || s.id === parseInt(formData.semesterId));
       const leader = students.find(s => s.studentId === formData.leaderId);
       if (!semester) {
         toast({
@@ -224,7 +224,7 @@ export default function GroupsPage(props) {
       setLoadingAction(true);
       const tcb = await props.$w.cloud.getCloudInstance();
       const db = tcb.database();
-      const semester = semesters.find(s => s.id === parseInt(formData.semesterId));
+      const semester = semesters.find(s => s.id === formData.semesterId || s.id === parseInt(formData.semesterId));
       const leader = students.find(s => s.studentId === formData.leaderId);
       if (!semester) {
         toast({

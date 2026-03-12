@@ -38,7 +38,7 @@ export default function SemesterPage(props) {
           isAutomated: sem.is_automated || false,
           resetConfig: sem.reset_config || {},
           note: sem.note || '',
-          createdAt: sem.createdAt,
+          createdAt: sem.createdAt ? new Date(sem.createdAt).toLocaleDateString('zh-CN') : '未知',
           // 宿舍积分配置
           dormConversionRatio: sem.dorm_conversion_ratio !== undefined ? sem.dorm_conversion_ratio : 0.3,
           dormCriticalThreshold: sem.dorm_critical_threshold !== undefined ? sem.dorm_critical_threshold : 40,
@@ -409,11 +409,7 @@ export default function SemesterPage(props) {
           {semesters.map(semester => {
           const status = getSemesterStatus(semester.startDate, semester.endDate);
           const days = calculateDays(semester.startDate, semester.endDate);
-          const createdAt = new Date(semester.createdAt).toLocaleDateString('zh-CN', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit'
-          });
+          const createdAt = semester.createdAt && semester.createdAt !== '未知' ? semester.createdAt : '未知';
           return <div key={semester.id} className={`bg-white rounded-lg shadow-sm border-2 p-3 transition-all ${semester.isCurrent ? 'border-indigo-400 bg-indigo-50/30' : 'border-slate-200 hover:border-slate-300'}`}>
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
