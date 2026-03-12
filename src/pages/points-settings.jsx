@@ -219,15 +219,30 @@ export default function PointsSettings({
   };
 
   // 删除项目
-  // 删除项目
-  const handleDelete = item => {
+  const handleDelete = async item => {
     if (window.confirm(`确定要删除「${item.name}」这个积分项目吗？`)) {
-      setItems(items.filter(i => i.id !== item.id));
-      toast({
-        title: '删除成功',
-        description: '积分项目已删除',
-        variant: 'default'
-      });
+      try {
+        const tcb = await $w.cloud.getCloudInstance();
+        const db = tcb.database();
+
+        // 从数据库删除
+        await db.collection('point_rule').doc(item.id).remove();
+
+        // 更新前端状态
+        setItems(items.filter(i => i.id !== item.id));
+        toast({
+          title: '删除成功',
+          description: '积分项目已删除',
+          variant: 'default'
+        });
+      } catch (error) {
+        console.error('删除积分项目失败:', error);
+        toast({
+          title: '删除失败',
+          description: error.message || '无法删除积分项目',
+          variant: 'destructive'
+        });
+      }
     }
   };
 

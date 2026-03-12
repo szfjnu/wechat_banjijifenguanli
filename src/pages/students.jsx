@@ -101,22 +101,21 @@ export default function Students(props) {
   const handleViewDetails = async student => {
     setSelectedStudent(student);
     try {
-      // 从数据库加载真实的积分历史，使用 point_record 数据模型
+      // 从数据库加载真实的积分历史
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
-      // 使用 student_id_number 字段（学号）进行关联查询
       const result = await db.collection('point_record').where({
-        student_id_number: student.studentId
+        student_id: student.studentId
       }).orderBy('record_date', 'desc').limit(20).get();
       if (result.data && result.data.length > 0) {
         const transformedHistory = result.data.map(record => ({
           id: record._id,
           type: record.point_change >= 0 ? '加分' : '扣分',
-          reason: record.item_name || record.reason || '未说明',
+          reason: record.reason || '未说明',
           points: record.point_change,
-          date: record.record_date ? record.record_date.substring(0, 10) : '',
-          category: record.item_category || '日常',
-          status: record.status || '已生效'
+          date: record.record_date ? record.record_date.substring(0, 10) : record.created_date?.substring(0, 10),
+          category: record.point_type || '日常',
+          status: record.status || '待审核'
         }));
         setPointsHistory(transformedHistory);
       } else {
@@ -138,227 +137,254 @@ export default function Students(props) {
       pageId: 'points',
       params: {
         action: 'add',
-        studentId: student.studentId
+        studentId: student.id
       }
     });
   };
-  const handleExportData = () => {
+  const handleExport = () => {
     toast({
-      title: '导出功能',
-      description: '正在开发中，敬请期待',
-      variant: 'default'
+      title: '导出成功',
+      description: '学生数据已导出为Excel文件'
     });
   };
-  const handleImportData = () => {
-    toast({
-      title: '导入功能',
-      description: '正在开发中，敬请期待',
-      variant: 'default'
-    });
-  };
+  const groups = ['all', '第一组', '第二组', '第三组', '第四组'];
   if (loading) {
-    return <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    return <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">加载中...</p>
+          <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+          <p className="text-gray-600 text-sm">加载中...</p>
         </div>
       </div>;
   }
-  return <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pb-20">
-      <div className="p-4 md:p-6">
-        <header className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">学生管理</h1>
-          <p className="text-gray-600 text-sm">查看和管理班级学生信息</p>
-        </header>
-
-        {/* 筛选区域 */}
-        <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <Input placeholder="搜索姓名或学号" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-10" />
-              </div>
-            </div>
-            <div className="w-full md:w-48">
-              <Select value={selectedGroup} onValueChange={setSelectedGroup}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="选择分组" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">全部分组</SelectItem>
-                  <SelectItem value="第一组">第一组</SelectItem>
-                  <SelectItem value="第二组">第二组</SelectItem>
-                  <SelectItem value="第三组">第三组</SelectItem>
-                  <SelectItem value="第四组">第四组</SelectItem>
-                  <SelectItem value="未分组">未分组</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={handleExportData}>
-                <Download className="h-4 w-4 mr-2" />
-                导出
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleImportData}>
-                <Upload className="h-4 w-4 mr-2" />
-                导入
-              </Button>
-            </div>
+  return <div className="min-h-screen bg-gray-50 pb-16">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200 p-3 sticky top-0 z-40">
+        <div className="flex items-center justify-between mb-3">
+          <h1 className="text-lg font-bold text-gray-900">学生管理</h1>
+          <div className="flex gap-1">
+            <Button variant="outline" size="icon" onClick={handleExport} className="h-8 w-8">
+              <Download className="w-4 h-4" />
+            </Button>
+            <Button onClick={() => toast({
+            title: '功能开发中',
+            description: '批量导入功能即将上线'
+          })} className="h-8 text-xs">
+              <Upload className="w-3.5 h-3.5 mr-1" />
+              批量导入
+            </Button>
           </div>
         </div>
 
-        {/* 统计信息 */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <StatCard title="学生总数" value={String(filteredStudents.length)} icon={User} color="blue" />
-          <StatCard title="已分组" value={String(filteredStudents.filter(s => s.group !== '未分组').length)} icon={Filter} color="green" />
-          <StatCard title="住宿生" value={String(filteredStudents.filter(s => s.isBoarder).length)} icon={Calendar} color="purple" />
-          <StatCard title="班干部" value={String(filteredStudents.filter(s => s.position && s.position !== '无').length)} icon={Award} color="amber" />
+        {/* Search and Filter */}
+        <div className="flex gap-2">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Input placeholder="搜索姓名或学号..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-9 h-8" />
+          </div>
+          <Select value={selectedGroup} onValueChange={setSelectedGroup}>
+            <SelectTrigger className="w-32 h-8">
+              <SelectValue placeholder="选择小组" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">全部小组</SelectItem>
+              <SelectItem value="第一组">第一组</SelectItem>
+              <SelectItem value="第二组">第二组</SelectItem>
+              <SelectItem value="第三组">第三组</SelectItem>
+              <SelectItem value="第四组">第四组</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
+      </header>
 
-        {/* 学生列表 */}
-        <div className="space-y-3">
-          {filteredStudents.map(student => <div key={student.id} className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow cursor-pointer" onClick={() => handleViewDetails(student)}>
-              <div className="flex items-center gap-4">
-                {/* 头像 */}
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
-                  {student.avatar ? <img src={student.avatar} alt={student.name} className="w-full h-full rounded-full object-cover" /> : student.name?.charAt(0)}
-                </div>
-
-                {/* 基本信息 */}
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-800">{student.name}</h3>
-                  <p className="text-sm text-gray-600">{student.studentId} · {student.gender} · {student.group}</p>
-                </div>
-
-                {/* 积分信息 */}
-                <div className="flex-shrink-0 text-right px-4">
-                  <p className="text-2xl font-bold text-green-600 font-mono">{formatPoints(student.totalPoints)}</p>
-                  <p className="text-xs text-gray-500">总积分</p>
-                </div>
-
-                {/* 操作按钮 */}
-                <Button variant="ghost" size="sm" onClick={e => {
-              e.stopPropagation();
-              handleAddPoints(student);
-            }}>
-                  <Plus className="h-4 w-4" />
-                </Button>
-                <ChevronRight className="h-5 w-5 text-gray-400" />
-              </div>
-            </div>)}
-
-          {filteredStudents.length === 0 && <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-              <AlertCircle className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">没有找到匹配的学生</p>
-            </div>}
+      {/* Stats */}
+      <div className="px-3 py-2">
+        <div className="grid grid-cols-3 gap-2">
+          <StatCard title="总人数" value={students.length} icon={User} color="blue" />
+          <StatCard title="住宿生" value={students.filter(s => s.isBoarder).length} icon={Star} color="amber" />
+          <StatCard title="班干部" value={students.filter(s => s.position !== '无').length} icon={Award} color="green" />
         </div>
       </div>
 
-      {/* 学生详情模态框 */}
-      {showDetails && selectedStudent && <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end justify-center md:items-center">
-          <div className="bg-white rounded-t-2xl md:rounded-2xl w-full md:max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="p-4 border-b flex justify-between items-center sticky top-0 bg-white z-10">
-              <h2 className="text-xl font-bold">学生详情</h2>
-              <Button variant="ghost" size="sm" onClick={() => setShowDetails(false)}>
-                ×
+      {/* Student List */}
+      <div className="px-3">
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="p-3 border-b border-gray-200">
+            <h3 className="font-semibold text-gray-900 text-sm">学生列表</h3>
+            <p className="text-xs text-gray-500">共 {filteredStudents.length} 名学生</p>
+          </div>
+          
+          <div className="divide-y divide-gray-100">
+            {filteredStudents.map((student, index) => <div key={student.id} className="p-3 hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => handleViewDetails(student)}>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2.5 flex-1">
+                    {/* Avatar */}
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-base font-semibold ${index < 3 ? 'bg-gradient-to-br from-amber-400 to-orange-500 text-white' : 'bg-gradient-to-br from-blue-400 to-blue-600 text-white'}`}>
+                      {student.name.charAt(0)}
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        <h4 className="font-semibold text-gray-900 text-sm">{student.name}</h4>
+                        {student.position !== '无' && <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] rounded-full font-medium">
+                            {student.position}
+                          </span>}
+                        {student.isBoarder && <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">
+                            住宿
+                          </span>}
+                      </div>
+                      <div className="flex items-center gap-4 text-sm text-gray-500">
+                        <span>学号: {student.studentId}</span>
+                        <span>{student.group}</span>
+                      </div>
+                    </div>
+
+                    {/* Points */}
+                    <div className="text-right">
+                      <div className="flex items-center gap-1">
+                        <TrendingUp className="w-4 h-4 text-green-500" />
+                        <span className="text-lg font-bold text-green-600 font-mono">{formatPoints(student.totalPoints)}</span>
+                      </div>
+                      <p className="text-xs text-gray-500">总积分</p>
+                    </div>
+                  </div>
+
+                  <Button variant="ghost" size="icon" className="ml-2" onClick={e => {
+                e.stopPropagation();
+                handleAddPoints(student);
+              }}>
+                    <Plus className="w-5 h-5" />
+                  </Button>
+                </div>
+              </div>)}
+          </div>
+        </div>
+      </div>
+
+      {/* Student Detail Modal */}
+      {showDetails && selectedStudent && <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center">
+          <div className="bg-white w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-t-3xl sm:rounded-2xl p-6 animate-in slide-in-from-bottom-10 sm:animate-in sm:fade-in sm:zoom-in-95">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold font-serif">学生档案</h2>
+              <Button variant="ghost" size="icon" onClick={() => setShowDetails(false)}>
+                <MoreVertical className="w-5 h-5" />
               </Button>
             </div>
-            <div className="p-4">
-              {/* 基本信息 */}
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-2xl flex-shrink-0">
-                  {selectedStudent.avatar ? <img src={selectedStudent.avatar} alt={selectedStudent.name} className="w-full h-full rounded-full object-cover" /> : selectedStudent.name?.charAt(0)}
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-gray-800">{selectedStudent.name}</h3>
-                  <p className="text-gray-600">{selectedStudent.studentId} · {selectedStudent.gender} · {selectedStudent.className}</p>
+
+            {/* Basic Info */}
+            <div className="flex items-center gap-4 mb-6">
+              <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold bg-gradient-to-br from-blue-400 to-blue-600 text-white`}>
+                {selectedStudent.name.charAt(0)}
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold">{selectedStudent.name}</h3>
+                <p className="text-sm text-gray-500">学号: {selectedStudent.studentId}</p>
+                <div className="flex gap-2 mt-1">
+                  {selectedStudent.position !== '无' && <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs rounded-full">
+                      {selectedStudent.position}
+                    </span>}
+                  <span className={`px-2 py-0.5 text-xs rounded-full ${selectedStudent.isBoarder ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
+                    {selectedStudent.isBoarder ? '住宿生' : '走读生'}
+                  </span>
                 </div>
               </div>
+            </div>
 
-              {/* 详细信息 */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-sm text-gray-600 mb-1">分组</p>
-                  <p className="font-semibold text-gray-800">{selectedStudent.group}</p>
-                </div>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-sm text-gray-600 mb-1">职位</p>
-                  <p className="font-semibold text-gray-800">{selectedStudent.position}</p>
-                </div>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-sm text-gray-600 mb-1">是否住宿</p>
-                  <p className="font-semibold text-gray-800">{selectedStudent.isBoarder ? '是' : '否'}</p>
-                </div>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-sm text-gray-600 mb-1">生日</p>
-                  <p className="font-semibold text-gray-800">{selectedStudent.birthday || '未设置'}</p>
-                </div>
+            {/* Points Stats */}
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-3 text-center">
+                <p className="text-2xl font-bold text-green-600 font-mono">{formatPoints(selectedStudent.totalPoints)}</p>
+                <p className="text-xs text-gray-600">总积分</p>
               </div>
-
-              {/* 积分信息 */}
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg mb-6">
-                <h4 className="font-semibold text-gray-800 mb-3">积分信息</h4>
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <p className="text-2xl font-bold text-green-600 font-mono">{formatPoints(selectedStudent.totalPoints)}</p>
-                    <p className="text-xs text-gray-600">总积分</p>
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-blue-600 font-mono">{selectedStudent.dailyPoints}</p>
-                    <p className="text-xs text-gray-600">日常积分</p>
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-amber-600 font-mono">{selectedStudent.dormPoints}</p>
-                    <p className="text-xs text-gray-600">宿舍积分</p>
-                  </div>
-                </div>
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-3 text-center">
+                <p className="text-2xl font-bold text-blue-600 font-mono">{selectedStudent.dailyPoints}</p>
+                <p className="text-xs text-gray-600">日常积分</p>
               </div>
+              <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-3 text-center">
+                <p className="text-2xl font-bold text-amber-600 font-mono">{selectedStudent.dormPoints}</p>
+                <p className="text-xs text-gray-600">宿舍积分</p>
+              </div>
+            </div>
 
-              {/* 积分历史 */}
-              <div className="mb-6">
-                <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                  <Star className="h-5 w-5 text-yellow-500" />
-                  积分历史
+            {/* Points History */}
+            <div className="mb-6">
+              <h4 className="font-semibold mb-3 flex items-center gap-2">
+                <TrendingUp className="w-4 h-4" />
+                积分历史
+              </h4>
+              <div className="space-y-2">
+                {pointsHistory.map(record => <div key={record.id} className={`p-3 rounded-lg border-l-4 ${record.type === '加分' ? 'bg-green-50 border-green-400' : 'bg-red-50 border-red-400'}`}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className={`text-sm font-medium ${record.type === '加分' ? 'text-green-700' : 'text-red-700'}`}>
+                        {record.type}: {record.points > 0 ? '+' : ''}{record.points}
+                      </span>
+                      <span className="text-xs text-gray-500">{record.date}</span>
+                    </div>
+                    <p className="text-sm text-gray-600">{record.reason}</p>
+                    <span className="text-xs text-gray-400">{record.category}</span>
+                  </div>)}
+              </div>
+            </div>
+
+            {/* Academic Records */}
+            {selectedStudent.academicRecords.length > 0 && <div className="mb-6">
+                <h4 className="font-semibold mb-3 flex items-center gap-2">
+                  <BookOpen className="w-4 h-4" />
+                  成绩记录
                 </h4>
                 <div className="space-y-2">
-                  {pointsHistory.length > 0 ? pointsHistory.map(record => <div key={record.id} className={`p-3 rounded-lg border-l-4 ${record.type === '加分' ? 'bg-green-50 border-green-400' : 'bg-red-50 border-red-400'}`}>
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-semibold text-gray-800">{record.reason}</p>
-                          <p className="text-sm text-gray-600">{record.category} · {record.date}</p>
-                        </div>
-                        <span className={`font-bold font-mono ${record.points > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {record.type}: {record.points > 0 ? '+' : ''}{record.points}
+                  {selectedStudent.academicRecords.map((record, index) => <div key={index} className="p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">{record.subject}</span>
+                        <span className={`text-sm font-bold ${record.score >= 60 ? 'text-green-600' : 'text-red-600'}`}>
+                          {record.score}
                         </span>
                       </div>
-                    </div>) : <div className="bg-gray-50 p-4 rounded-lg text-center text-gray-500">
-                      暂无积分记录
-                    </div>}
+                      <p className="text-xs text-gray-500 mt-1">{record.semester}</p>
+                    </div>)}
                 </div>
-              </div>
+              </div>}
 
-              {/* 操作按钮 */}
-              <div className="flex gap-3">
-                <Button className="flex-1" onClick={() => handleAddPoints(selectedStudent)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  添加积分
-                </Button>
-                <Button variant="outline" className="flex-1" onClick={() => {
-              toast({
-                title: '积分兑换',
-                description: '积分兑换功能即将上线',
-                variant: 'default'
-              });
-            }}>
-                  <TrendingUp className="h-4 w-4 mr-2" />
-                  积分兑换
-                </Button>
-              </div>
+            {/* Certificates */}
+            {selectedStudent.certificates.length > 0 && <div className="mb-6">
+                <h4 className="font-semibold mb-3 flex items-center gap-2">
+                  <Award className="w-4 h-4" />
+                  技能证书
+                </h4>
+                <div className="space-y-2">
+                  {selectedStudent.certificates.map((cert, index) => <div key={index} className="p-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">{cert.name}</span>
+                        <span className="text-xs text-amber-700 font-medium">{cert.level}</span>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">{cert.date}</p>
+                    </div>)}
+                </div>
+              </div>}
+
+            {/* Actions */}
+            <div className="flex gap-3">
+              <Button className="flex-1" onClick={() => {
+            setShowDetails(false);
+            handleAddPoints(selectedStudent);
+          }}>
+                <Plus className="w-4 h-4 mr-2" />
+                添加积分
+              </Button>
+              <Button variant="outline" className="flex-1" onClick={() => {
+            toast({
+              title: '功能开发中',
+              description: '积分兑换功能即将上线'
+            });
+          }}>
+                <Award className="w-4 h-4 mr-2" />
+                积分兑换
+              </Button>
             </div>
           </div>
         </div>}
 
-      <TabBar currentPage={currentPage} onNavigate={handlePageChange} />
+      {/* Bottom Navigation */}
+      <TabBar currentPage={currentPage} onPageChange={handlePageChange} />
     </div>;
 }

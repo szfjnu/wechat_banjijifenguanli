@@ -48,10 +48,26 @@ export default function Home(props) {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
 
-      // 加载学生数据（移除限制以获取全部数据用于统计）
-      const studentResult = await db.collection('student').orderBy('current_score', 'desc').get();
-      if (studentResult.data && studentResult.data.length > 0) {
-        const transformedStudents = studentResult.data.map(student => ({
+      // 1. 先查询所有学生总数（用于统计）
+      const totalStudentsResult = await db.collection('student').count();
+      const totalStudents = totalStudentsResult.total || 0;
+
+      // 2. 查询所有学生的积分数据（用于计算平均积分）
+      const allStudentsResult = await db.collection('student').field({
+        _id: true,
+        name: true,
+        current_score: true
+      }).get();
+      const allStudents = allStudentsResult.data || [];
+
+      // 计算总积分和平均积分
+      const totalScore = allStudents.reduce((sum, s) => sum + (s.current_score || 0), 0);
+      const avgScore = totalStudents > 0 ? Math.round(totalScore / totalStudents) : 0;
+
+      // 3. 查询积分排行榜前10名学生
+      const topStudentsResult = await db.collection('student').orderBy('current_score', 'desc').limit(10).get();
+      if (topStudentsResult.data && topStudentsResult.data.length > 0) {
+        const transformedStudents = topStudentsResult.data.map(student => ({
           id: student._id,
           name: student.name,
           group: student.group || '未分组',
@@ -60,44 +76,37 @@ export default function Home(props) {
           avatar: student.avatar_url
         }));
         setStudents(transformedStudents);
-      } else {
-        setStudents([]);
-      }
 
-      // 加载积分数据
-      if (studentResult.data && studentResult.data.length > 0) {
-        const transformedPointsData = studentResult.data.map(student => ({
+        // 加载积分图表数据
+        const transformedPointsData = topStudentsResult.data.map(student => ({
           name: student.name,
           points: formatPoints(student.current_score || 0),
           daily: formatPoints(student.current_score || 0),
           dorm: student.dorm_score || 0
         }));
         setPointsData(transformedPointsData);
-
-        // 计算数据概览统计
-        const totalStudents = studentResult.data.length;
-        const avgScore = studentResult.data.reduce((sum, s) => sum + (s.current_score || 0), 0) / totalStudents;
-        const pendingTasks = 3; // 可以从实际任务表查询
-        setStatsData({
-          totalStudents,
-          avgScore: Math.round(avgScore),
-          pendingTasks
-        });
-
-        // 只取前5名学生用于排行榜展示
-        const top5Students = transformedStudents.slice(0, 5);
-        setStudents(top5Students);
       } else {
+        setStudents([]);
         setPointsData([]);
-        setStatsData({
-          totalStudents: 0,
-          avgScore: 0,
-          pendingTasks: 0
-        });
       }
 
-      // 加载今日生日学生（使用 date_of_birth 字段）
+      // 4. 查询今日待处理任务（从 duty_task 数据模型）
       const today = getBeijingTime();
+      const todayDateString = today.toISOString().split('T')[0];
+      const pendingTasksResult = await db.collection('duty_task').where({
+        date: todayDateString,
+        status: 'pending'
+      }).get();
+      const pendingTasks = pendingTasksResult.data ? pendingTasksResult.data.length : 0;
+
+      // 设置统计数据
+      setStatsData({
+        totalStudents,
+        avgScore,
+        pendingTasks
+      });
+
+      // 加载今日生日学生（使用 date_of_birth 字段）
       const todayMonth = String(today.getMonth() + 1).padStart(2, '0');
       const todayDay = String(today.getDate()).padStart(2, '0');
       const todayDateStr = `-${todayMonth}-${todayDay}`;
