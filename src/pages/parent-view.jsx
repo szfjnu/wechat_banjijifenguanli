@@ -11,6 +11,15 @@ import ExcelExport from '@/components/ExcelExport';
 import ReportGenerator from '@/components/ReportGenerator';
 import GrowthTimeline from '@/components/GrowthTimeline';
 import GrowthChart from '@/components/GrowthChart';
+
+// 格式化积分：整数显示整数，小数最多显示两位
+const formatPoints = points => {
+  if (points === undefined || points === null || isNaN(points)) return '0';
+  const num = Number(points);
+  const rounded = Math.round(num * 100) / 100;
+  // 如果小数部分为0，显示整数；否则最多显示两位小数
+  return rounded === Math.floor(rounded) ? String(Math.floor(rounded)) : rounded.toFixed(2);
+};
 const ParentView = ({
   $w
 }) => {
@@ -180,7 +189,7 @@ const ParentView = ({
                         backgroundColor: scoreLevel.bgColor,
                         color: scoreLevel.color
                       }}>
-                          {student.current_score}分
+                          {formatPoints(student.current_score)}分
                         </Badge>
                       </div>
                     </CardContent>
@@ -253,7 +262,7 @@ const ParentView = ({
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">当前积分</p>
                     <p className="font-medium text-orange-600">
-                      {selectedStudent.current_score}
+                      {formatPoints(selectedStudent.current_score)}
                     </p>
                   </div>
                   <div className="space-y-1">

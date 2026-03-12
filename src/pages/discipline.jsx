@@ -8,6 +8,15 @@ import { Button, useToast } from '@/components/ui';
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 
+// 格式化积分：整数显示整数，小数最多显示两位
+const formatPoints = points => {
+  if (points === undefined || points === null || isNaN(points)) return '0';
+  const num = Number(points);
+  const rounded = Math.round(num * 100) / 100;
+  // 如果小数部分为0，显示整数；否则最多显示两位小数
+  return rounded === Math.floor(rounded) ? String(Math.floor(rounded)) : rounded.toFixed(2);
+};
+
 // 模拟学生数据
 export default function DisciplinePage(props) {
   const {
@@ -404,7 +413,7 @@ export default function DisciplinePage(props) {
         });
       }
       // 模拟导出
-      const csvContent = `学生姓名,学号,处分级别,扣分,原因,日期,状态,有效期\n${exportRecords.map(r => `${r.studentName},${r.studentId},${r.levelName},${r.pointsDeducted},${r.reason},${r.date},${r.status},${r.expiryDate}`).join('\n')}`;
+      const csvContent = `学生姓名,学号,处分级别,扣分,原因,日期,状态,有效期\n${exportRecords.map(r => `${r.studentName},${r.studentId},${r.levelName},${formatPoints(r.pointsDeducted)},${r.reason},${r.date},${r.status},${r.expiryDate}`).join('\n')}`;
       const blob = new Blob([csvContent], {
         type: 'text/csv;charset=utf-8;'
       });
@@ -546,7 +555,7 @@ export default function DisciplinePage(props) {
                             {getStatusText(record.status)}
                           </span>
                           <span className="text-[10px] text-gray-400">
-                            {record.pointsDeducted}分
+                            {formatPoints(record.pointsDeducted)}分
                           </span>
                           <span className="text-[10px] text-gray-400">
                             {record.date}
@@ -658,7 +667,7 @@ export default function DisciplinePage(props) {
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">扣分</span>
                     <span className={`text-sm font-medium text-red-600`}>
-                      扣{Math.abs(selectedRecord.pointsDeducted)}分
+                      扣{Math.abs(formatPoints(selectedRecord.pointsDeducted))}分
                     </span>
                   </div>
                   <div className="flex justify-between">

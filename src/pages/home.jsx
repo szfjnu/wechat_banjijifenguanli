@@ -66,15 +66,15 @@ export default function Home(props) {
       if (studentResult.data && studentResult.data.length > 0) {
         const transformedPointsData = studentResult.data.map(student => ({
           name: student.name,
-          points: student.current_score || 0,
-          daily: student.current_score || 0,
+          points: formatPoints(student.current_score || 0),
+          daily: formatPoints(student.current_score || 0),
           dorm: student.dorm_score || 0
         }));
         setPointsData(transformedPointsData);
 
         // 计算数据概览统计
         const totalStudents = studentResult.data.length;
-        const avgScore = studentResult.data.reduce((sum, s) => sum + (s.current_score || 0), 0) / totalStudents;
+        const avgScoreRaw = studentResult.data.reduce((sum, s) => sum + (s.current_score || 0), 0) / totalStudents;
         const pendingTasks = 3; // 可以从实际任务表查询
         setStatsData({
           totalStudents,

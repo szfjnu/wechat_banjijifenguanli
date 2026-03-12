@@ -6,6 +6,15 @@ import { Gift, Search, Filter, TrendingUp, Clock, AlertCircle, Trophy, CheckCirc
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, useToast, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, StatCard } from '@/components/ui';
 
 import { TabBar } from '@/components/TabBar';
+
+// 格式化积分：整数显示整数，小数最多显示两位
+const formatPoints = points => {
+  if (points === undefined || points === null || isNaN(points)) return '0';
+  const num = Number(points);
+  const rounded = Math.round(num * 100) / 100;
+  // 如果小数部分为0，显示整数；否则最多显示两位小数
+  return rounded === Math.floor(rounded) ? String(Math.floor(rounded)) : rounded.toFixed(2);
+};
 export default function ExchangePage({
   $w
 }) {
@@ -272,7 +281,7 @@ export default function ExchangePage({
       } : i));
       toast({
         title: '投标成功',
-        description: `您已成功参与"${item?.name || '该物品'}"的投标，投标积分：${points}分`
+        description: `您已成功参与"${item?.name || '该物品'}"的投标，投标积分：${formatPoints(points)}分`
       });
       setBidDialogOpen(false);
     } catch (error) {
@@ -291,7 +300,7 @@ export default function ExchangePage({
     if (item.pointsRequired > currentStudent.totalPoints) {
       toast({
         title: '积分不足',
-        description: `您需要${item.pointsRequired}积分，当前只有${currentStudent.totalPoints}积分`,
+        description: `您需要${formatPoints(item.pointsRequired)}积分，当前只有${formatPoints(currentStudent.totalPoints)}积分`,
         variant: 'destructive'
       });
       return;
@@ -497,7 +506,7 @@ export default function ExchangePage({
             </div>
             <div className="text-right">
               <div className="text-xs opacity-90 mb-0.5">可用积分</div>
-              <div className="text-2xl font-bold">{currentStudent?.totalPoints || 0}</div>
+              <div className="text-2xl font-bold">{formatPoints(currentStudent?.totalPoints || 0)}</div>
             </div>
           </div>
         </div>}
@@ -519,7 +528,7 @@ export default function ExchangePage({
             </div>
             <div className="text-right">
               <div className="text-sm opacity-90 mb-1">当前可用积分</div>
-              <div className="text-4xl font-bold">{currentStudent?.totalPoints || 0}</div>
+              <div className="text-4xl font-bold">{formatPoints(currentStudent?.totalPoints || 0)}</div>
             </div>
           </div>
         </div>}
@@ -732,7 +741,7 @@ export default function ExchangePage({
                 
                 <div className="bg-gray-50 rounded-lg p-3 mt-4">
                   <div className="text-sm text-gray-600 mb-1">您的当前积分</div>
-                  <div className="text-lg font-bold text-gray-900">{currentStudent?.totalPoints || 0} 分</div>
+                  <div className="text-lg font-bold text-gray-900">{formatPoints(currentStudent?.totalPoints || 0)} 分</div>
                 </div>
               </div>}
             
@@ -771,7 +780,7 @@ export default function ExchangePage({
                 
                 <div className="bg-gray-50 rounded-lg p-3 mt-4">
                   <div className="text-sm text-gray-600 mb-1">兑换后剩余积分</div>
-                  <div className="text-lg font-bold text-gray-900">{currentStudent && selectedItem ? currentStudent.totalPoints - (selectedItem?.pointsRequired || 0) : 0} 分</div>
+                  <div className="text-lg font-bold text-gray-900">{currentStudent && selectedItem ? formatPoints(currentStudent.totalPoints - (selectedItem?.pointsRequired || 0)) : '0.00'} 分</div>
                 </div>
               </div>}
             

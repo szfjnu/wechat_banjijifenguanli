@@ -9,6 +9,15 @@ import { TabBar } from '@/components/TabBar';
 import { StatCard } from '@/components/StatCard';
 import { StudentForm } from '@/components/StudentForm';
 import { StudentDetail } from '@/components/StudentDetail';
+
+// 格式化积分：整数显示整数，小数最多显示两位
+const formatPoints = points => {
+  if (points === undefined || points === null || isNaN(points)) return '0';
+  const num = Number(points);
+  const rounded = Math.round(num * 100) / 100;
+  // 如果小数部分为0，显示整数；否则最多显示两位小数
+  return rounded === Math.floor(rounded) ? String(Math.floor(rounded)) : rounded.toFixed(2);
+};
 export default function StudentsManage(props) {
   const {
     $w
@@ -225,7 +234,7 @@ export default function StudentsManage(props) {
         班级: s.class_name,
         手机号: s.phone_number,
         家长手机: s.parent_phone_number,
-        当前积分: s.current_score,
+        当前积分: formatPoints(s.current_score),
         是否住宿: s.is_boarding ? '是' : '否',
         职务: s.position || '无'
       }));
@@ -274,7 +283,7 @@ export default function StudentsManage(props) {
           <StatCard title="学生总数" value={students.length} icon={User} color="text-orange-500" bgColor="bg-orange-100" />
           <StatCard title="住宿生" value={students.filter(s => s.is_boarding).length} icon={Calendar} color="text-blue-500" bgColor="bg-blue-100" />
           <StatCard title="班干部" value={students.filter(s => s.position).length} icon={Award} color="text-purple-500" bgColor="bg-purple-100" />
-          <StatCard title="平均积分" value={Math.round(students.reduce((sum, s) => sum + (s.current_score || 0), 0) / (students.length || 1))} icon={TrendingUp} color="text-green-500" bgColor="bg-green-100" />
+          <StatCard title="平均积分" value={formatPoints(students.reduce((sum, s) => sum + (s.current_score || 0), 0) / (students.length || 1))} icon={TrendingUp} color="text-green-500" bgColor="bg-green-100" />
         </div>
 
         {/* 操作栏 */}
@@ -369,7 +378,7 @@ export default function StudentsManage(props) {
                         <td className="py-3 px-4 text-sm">{student.gender}</td>
                         <td className="py-3 px-4">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${scoreLevel.color}`}>
-                            {student.current_score || 0}
+                            {formatPoints(student.current_score || 0)}
                           </span>
                         </td>
                         <td className="py-3 px-4 text-sm">{student.position || '-'}</td>

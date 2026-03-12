@@ -7,6 +7,15 @@ import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, Select
 
 import { TabBar } from '@/components/TabBar';
 import { StatCard } from '@/components/StatCard';
+
+// 格式化积分：整数显示整数，小数最多显示两位
+const formatPoints = points => {
+  if (points === undefined || points === null || isNaN(points)) return '0';
+  const num = Number(points);
+  const rounded = Math.round(num * 100) / 100;
+  // 如果小数部分为0，显示整数；否则最多显示两位小数
+  return rounded === Math.floor(rounded) ? String(Math.floor(rounded)) : rounded.toFixed(2);
+};
 export default function Students(props) {
   const {
     $w
@@ -234,7 +243,7 @@ export default function Students(props) {
                     <div className="text-right">
                       <div className="flex items-center gap-1">
                         <TrendingUp className="w-4 h-4 text-green-500" />
-                        <span className="text-lg font-bold text-green-600 font-mono">{student.totalPoints}</span>
+                        <span className="text-lg font-bold text-green-600 font-mono">{formatPoints(student.totalPoints)}</span>
                       </div>
                       <p className="text-xs text-gray-500">总积分</p>
                     </div>
@@ -284,7 +293,7 @@ export default function Students(props) {
             {/* Points Stats */}
             <div className="grid grid-cols-3 gap-3 mb-6">
               <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-3 text-center">
-                <p className="text-2xl font-bold text-green-600 font-mono">{selectedStudent.totalPoints}</p>
+                <p className="text-2xl font-bold text-green-600 font-mono">{formatPoints(selectedStudent.totalPoints)}</p>
                 <p className="text-xs text-gray-600">总积分</p>
               </div>
               <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-3 text-center">

@@ -7,6 +7,15 @@ import { Button, useToast } from '@/components/ui';
 
 import { TabBar } from '@/components/TabBar';
 
+// 格式化积分：整数显示整数，小数最多显示两位
+const formatPoints = points => {
+  if (points === undefined || points === null || isNaN(points)) return '0';
+  const num = Number(points);
+  const rounded = Math.round(num * 100) / 100;
+  // 如果小数部分为0，显示整数；否则最多显示两位小数
+  return rounded === Math.floor(rounded) ? String(Math.floor(rounded)) : rounded.toFixed(2);
+};
+
 // 时间范围选项
 const TIME_RANGE_OPTIONS = [{
   id: 'month',
@@ -266,7 +275,7 @@ export default function AIReviewPage(props) {
 
 ### 整体表现概况
 
-本学期全班同学整体表现优秀，在德智体美劳各方面均有显著进步。班级总积分达到${data.totalPoints}分，平均GPA为${data.gpa}，每位同学平均获得${data.certificates}项技能证书，累计志愿服务时长${data.volunteerHours}小时。
+本学期全班同学整体表现优秀，在德智体美劳各方面均有显著进步。班级总积分达到${formatPoints(data.totalPoints)}分，平均GPA为${data.gpa}，每位同学平均获得${data.certificates}项技能证书，累计志愿服务时长${data.volunteerHours}小时。
 
 ### 积分管理表现
 
@@ -301,7 +310,7 @@ export default function AIReviewPage(props) {
 
 ### 综合表现总评
 
-${name}同学在本学期表现优异，总积分达到${data.totalPoints}分，在班级中排名前列。学习态度端正，积极参与课堂互动，展现出良好的学习习惯和自律能力。
+${name}同学在本学期表现优异，总积分达到${formatPoints(data.totalPoints)}分，在班级中排名前列。学习态度端正，积极参与课堂互动，展现出良好的学习习惯和自律能力。
 
 ### 学习成绩分析
 
@@ -309,7 +318,7 @@ ${name}同学在本学期表现优异，总积分达到${data.totalPoints}分，
 
 ### 积分表现亮点
 
-在积分管理方面表现突出，累计获得${data.totalPoints}分。主要亮点包括：
+在积分管理方面表现突出，累计获得${formatPoints(data.totalPoints)}分。主要亮点包括：
 - 按时完成作业，学习认真负责
 - 课堂积极参与，思维活跃
 - 团队协作能力强，乐于帮助同学
@@ -333,7 +342,7 @@ ${name}同学在本学期表现优异，总积分达到${data.totalPoints}分，
 ---
 
 **点评时间**：${new Date().toLocaleDateString('zh-CN')}  
-**积分情况**：${data.totalPoints}分  
+**积分情况**：${formatPoints(data.totalPoints)}分  
 **学业成绩**：GPA ${data.gpa}  
 **技能证书**：${data.certificates}项  
 **志愿服务**：${data.volunteerHours}小时  
@@ -452,7 +461,7 @@ ${name}同学在本学期表现优异，总积分达到${data.totalPoints}分，
           }}>
                 <option value="">请选择学生</option>
                 {students.map(student => <option key={student.id} value={student.id}>
-                    {student.name}（{student.studentId}）- {student.group} - 当前积分：{student.totalPoints}分
+                    {student.name}（{student.studentId}）- {student.group} - 当前积分：{formatPoints(student.totalPoints)}分
                   </option>)}
               </select>
               {selectedStudent && <div className="mt-4 p-4 bg-gradient-to-r from-amber-50 to-rose-50 rounded-lg">
@@ -467,7 +476,7 @@ ${name}同学在本学期表现优异，总积分达到${data.totalPoints}分，
                   </div>
                   <div className="mt-4 grid grid-cols-4 gap-4">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-amber-600">{selectedStudent.totalPoints}</div>
+                      <div className="text-2xl font-bold text-amber-600">{formatPoints(selectedStudent.totalPoints)}</div>
                       <div className="text-xs text-gray-600">当前积分</div>
                     </div>
                     <div className="text-center">

@@ -7,6 +7,15 @@ import { Button, useToast } from '@/components/ui';
 
 import { TabBar } from '@/components/TabBar';
 
+// 格式化积分：整数显示整数，小数最多显示两位
+const formatPoints = points => {
+  if (points === undefined || points === null || isNaN(points)) return '0';
+  const num = Number(points);
+  const rounded = Math.round(num * 100) / 100;
+  // 如果小数部分为0，显示整数；否则最多显示两位小数
+  return rounded === Math.floor(rounded) ? String(Math.floor(rounded)) : rounded.toFixed(2);
+};
+
 // 积分项目预设数据
 const POINT_ITEMS = [{
   id: 1,
@@ -552,7 +561,7 @@ export default function PointsPage(props) {
               })} className="w-full px-4 py-3 bg-gray-100 rounded-xl border-0 focus:ring-2 focus:ring-blue-500">
                     <option value="">请选择学生</option>
                     {students.map(student => <option key={student.id} value={student.id}>
-                        {student.name} ({student.group}) - 当前积分: {student.totalPoints}
+                        {student.name} ({student.group}) - 当前积分: {formatPoints(student.totalPoints)}
                       </option>)}
                   </select>
                 </div>

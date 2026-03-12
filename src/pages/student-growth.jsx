@@ -8,6 +8,15 @@ import { Activity, TrendingUp, BarChart3, Calendar, Filter, Download, Search, Ar
 import { TabBar } from '@/components/TabBar';
 import { GrowthChart } from '@/components/GrowthChart';
 import { GrowthTimeline } from '@/components/GrowthTimeline';
+
+// 格式化积分：整数显示整数，小数最多显示两位
+const formatPoints = points => {
+  if (points === undefined || points === null || isNaN(points)) return '0';
+  const num = Number(points);
+  const rounded = Math.round(num * 100) / 100;
+  // 如果小数部分为0，显示整数；否则最多显示两位小数
+  return rounded === Math.floor(rounded) ? String(Math.floor(rounded)) : rounded.toFixed(2);
+};
 export default function StudentGrowth(props) {
   const {
     $w

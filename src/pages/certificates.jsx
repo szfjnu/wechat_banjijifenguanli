@@ -8,6 +8,15 @@ import { Button, useToast } from '@/components/ui';
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 
+// 格式化积分：整数显示整数，小数最多显示两位
+const formatPoints = points => {
+  if (points === undefined || points === null || isNaN(points)) return '0';
+  const num = Number(points);
+  const rounded = Math.round(num * 100) / 100;
+  // 如果小数部分为0，显示整数；否则最多显示两位小数
+  return rounded === Math.floor(rounded) ? String(Math.floor(rounded)) : rounded.toFixed(2);
+};
+
 // 证书级别预设数据（包含奖励积分）
 const CERTIFICATE_LEVELS = [{
   id: 1,
@@ -437,7 +446,7 @@ export default function CertificatesPage(props) {
           {/* 统计概览 - 紧凑 */}
           <div className="grid grid-cols-2 gap-2 mb-3">
             <StatCard title="证书总数" value={stats.total} icon={Award} color="purple" />
-            <StatCard title="总积分" value={stats.totalPoints} icon={TrendingUp} color="blue" />
+            <StatCard title="总积分" value={formatPoints(stats.totalPoints)} icon={TrendingUp} color="blue" />
             <StatCard title="获奖学生" value={stats.studentsCount} icon={CheckCircle} color="green" />
             <StatCard title="本月新增" value={stats.thisMonth} icon={Calendar} color="amber" />
           </div>
@@ -491,7 +500,7 @@ export default function CertificatesPage(props) {
                             {getStatusText(certificate.status)}
                           </span>
                           <span className={`text-[10px] font-medium ${certificate.points > 0 ? 'text-green-600' : 'text-gray-600'}`}>
-                            +{certificate.points}分
+                            +{formatPoints(certificate.points)}分
                           </span>
                           <span className="text-[10px] text-gray-400">
                             {certificate.date}
@@ -542,7 +551,7 @@ export default function CertificatesPage(props) {
               levelId: e.target.value
             })}>
                     <option value="">请选择证书级别</option>
-                    {CERTIFICATE_LEVELS.map(level => <option key={level.id} value={level.id}>{level.name} ({level.points}分)</option>)}
+                    {CERTIFICATE_LEVELS.map(level => <option key={level.id} value={level.id}>{level.name} ({formatPoints(level.points)}分)</option>)}
                   </select>
                 </div>
                 <div>
