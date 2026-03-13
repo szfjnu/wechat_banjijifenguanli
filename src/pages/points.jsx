@@ -89,7 +89,7 @@ export default function PointsPage(props) {
       }
 
       // 加载学生数据
-      const studentsResult = await tcb.database().collection('student').get();
+      const studentsResult = await tcb.database().collection('students').get();
       if (studentsResult.data && studentsResult.data.length > 0) {
         const transformedStudents = studentsResult.data.map(student => ({
           id: student._id,
