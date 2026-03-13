@@ -4,9 +4,23 @@ import React, { useState, useEffect } from 'react';
 import { Clock, MapPin, Calendar, AlertCircle, ChevronRight, Bell, BookOpen } from 'lucide-react';
 // @ts-ignore;
 import { Card } from '@/components/ui';
-// @ts-ignore;
-import { getBeijingTime, getBeijingDateString } from '@/lib/utils';
 
+// 获取北京时间（UTC+8）
+const getBeijingTime = () => {
+  const now = new Date();
+  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+  const beijingOffset = 8;
+  return new Date(utc + 3600000 * beijingOffset);
+};
+
+// 获取北京时间字符串（YYYY-MM-DD格式）
+const getBeijingDateString = () => {
+  const beijingTime = getBeijingTime();
+  const year = beijingTime.getFullYear();
+  const month = String(beijingTime.getMonth() + 1).padStart(2, '0');
+  const day = String(beijingTime.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 export function TeacherScheduleReminder(props) {
   const {
     $w
