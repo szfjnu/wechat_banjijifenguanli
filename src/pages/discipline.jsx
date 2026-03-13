@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 // @ts-ignore;
 import { AlertTriangle, FileText, Search, Filter, Shield, ShieldAlert, Calendar, Clock, CheckCircle, XCircle, User, Plus, History, Download, Eye, Settings } from 'lucide-react';
 // @ts-ignore;
-import { Button, useToast } from '@/components/ui';
+import { Button, useToast, Progress } from '@/components/ui';
 // @ts-ignore;
 import { getBeijingTimeISO, getBeijingDateString } from '@/lib/utils';
 
@@ -55,7 +55,10 @@ export default function DisciplinePage(props) {
     studentId: '',
     levelId: '',
     reason: '',
-    date: getBeijingDateString()
+    date: getBeijingDateString(),
+    months: '',
+    volunteerHoursRequired: '',
+    reportCountRequired: ''
   });
 
   // 加载数据
@@ -92,7 +95,10 @@ export default function DisciplinePage(props) {
           deductPoints: level.deduct_points,
           validDays: level.valid_days,
           description: level.description,
-          sortOrder: level.sort_order
+          sortOrder: level.sort_order,
+          months: level.months || 0,
+          volunteerHoursRequired: level.volunteer_hours_required || 0,
+          reportCountRequired: level.report_count_required || 0
         }));
         setDisciplineLevels(transformedLevels);
       }
@@ -114,7 +120,15 @@ export default function DisciplinePage(props) {
           operator: record.operator_name || '管理员',
           revokeRequests: record.revoke_requests || [],
           semesterId: record.semester_id || '',
-          semesterName: record.semester_name || ''
+          semesterName: record.semester_name || '',
+          months: record.months || 0,
+          volunteerHoursRequired: record.volunteer_hours_required || 0,
+          completedVolunteerHours: record.completed_volunteer_hours || 0,
+          reportCountRequired: record.report_count_required || 0,
+          completedReportCount: record.completed_report_count || 0,
+          startDate: record.start_date || '',
+          endDate: record.end_date || '',
+          revocationStatus: record.revocation_status || '考察中'
         }));
         setRecords(transformedRecords);
       }
@@ -205,6 +219,23 @@ export default function DisciplinePage(props) {
     }
   };
 
+  // 处分级别变化时自动设置撤销条件
+  const handleLevelChange = levelId => {
+    setNewRecord(prev => ({
+      ...prev,
+      levelId
+    }));
+    const level = disciplineLevels.find(l => l.id === levelId);
+    if (level) {
+      setNewRecord(prev => ({
+        ...prev,
+        months: level.months || '',
+        volunteerHoursRequired: level.volunteer_hours_required || '',
+        reportCountRequired: level.report_count_required || ''
+      }));
+    }
+  };
+
   // 创建处分
   const handleCreateRecord = async () => {
     if (!newRecord.studentId || !newRecord.levelId || !newRecord.reason) {
@@ -229,6 +260,15 @@ export default function DisciplinePage(props) {
         return;
       }
 
+      // 根据处分级别设置默认撤销条件，允许班主任调整
+      const months = parseInt(newRecord.months) !== '' ? parseInt(newRecord.months) : level.months || 0;
+      const volunteerHoursRequired = parseInt(newRecord.volunteerHoursRequired) !== '' ? parseInt(newRecord.volunteerHoursRequired) : level.volunteerHoursRequired || 0;
+      const reportCountRequired = parseInt(newRecord.reportCountRequired) !== '' ? parseInt(newRecord.reportCountRequired) : level.reportCountRequired || 0;
+
+      // 计算处分开始和结束日期
+      const startDate = newRecord.date;
+      const endDate = months > 0 ? new Date(new Date(newRecord.date).getTime() + months * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] : '';
+
       // 添加处分记录到数据库
       const recordResult = await db.collection('discipline_record').add({
         record_id: `DR${getBeijingTime().getTime()}`,
@@ -244,7 +284,15 @@ export default function DisciplinePage(props) {
         status: 'active',
         expiry_date: getBeijingDateString(),
         operator_name: '班主任',
-        revoke_requests: []
+        revoke_requests: [],
+        months: months,
+        volunteer_hours_required: volunteerHoursRequired,
+        completed_volunteer_hours: 0,
+        report_count_required: reportCountRequired,
+        completed_report_count: 0,
+        start_date: startDate,
+        end_date: endDate,
+        revocation_status: months > 0 ? '考察中' : '无考察期'
       });
       const createdRecord = {
         id: recordResult.id || recordResult.ids?.[0] || `DR${getBeijingTime().getTime()}`,
@@ -258,7 +306,15 @@ export default function DisciplinePage(props) {
         status: 'active',
         expiryDate: getBeijingDateString(),
         operator: '班主任',
-        revokeRequests: []
+        revokeRequests: [],
+        months: months,
+        volunteerHoursRequired: volunteerHoursRequired,
+        completedVolunteerHours: 0,
+        reportCountRequired: reportCountRequired,
+        completedReportCount: 0,
+        startDate: startDate,
+        endDate: endDate,
+        revocationStatus: months > 0 ? '考察中' : '无考察期'
       };
       setRecords([...records, createdRecord]);
       setShowCreateDialog(false);
@@ -266,7 +322,10 @@ export default function DisciplinePage(props) {
         studentId: '',
         levelId: '',
         reason: '',
-        date: getBeijingDateString()
+        date: getBeijingDateString(),
+        months: '',
+        volunteerHoursRequired: '',
+        reportCountRequired: ''
       });
       toast({
         title: '创建成功',
@@ -452,6 +511,13 @@ export default function DisciplinePage(props) {
         return status;
     }
   };
+
+  // 计算撤销条件完成度
+  const calculateProgress = (required, completed) => {
+    if (required <= 0) return 100;
+    const progress = completed / required * 100;
+    return Math.min(progress, 100).toFixed(0);
+  };
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen bg-gray-50">
           <div className="text-center">
@@ -561,6 +627,10 @@ export default function DisciplinePage(props) {
                           <span className="text-[10px] text-gray-400">
                             {record.date}
                           </span>
+                          {/* 显示考察状态 */}
+                          {record.months > 0 && <span className={`text-[10px] ${record.revocationStatus === '考察中' ? 'text-amber-600' : record.revocationStatus === '符合条件' ? 'text-green-600' : 'text-gray-500'}`}>
+                              {record.revocationStatus}
+                            </span>}
                         </div>
                       </div>
                       {/* 操作按钮 */}
@@ -604,13 +674,54 @@ export default function DisciplinePage(props) {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">处分级别</label>
-                  <select className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm" value={newRecord.levelId} onChange={e => setNewRecord({
-              ...newRecord,
-              levelId: e.target.value
-            })}>
+                  <select className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm" value={newRecord.levelId} onChange={e => handleLevelChange(e.target.value)}>
                     <option value="">请选择处分级别</option>
                     {disciplineLevels.map(level => <option key={level.id} value={level.id}>{level.levelName} (扣{level.deductPoints}分, 有效{level.validDays}天)</option>)}
                   </select>
+                </div>
+
+                {/* 撤销条件设置 */}
+                {newRecord.levelId && <div className="bg-blue-50 rounded-lg p-3 space-y-2 border border-blue-200">
+                    <p className="text-sm font-medium text-blue-800">撤销条件设置</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">考察期（月）</label>
+                        <input type="number" min="0" className="w-full px-2 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-xs" value={newRecord.months} onChange={e => setNewRecord({
+                  ...newRecord,
+                  months: e.target.value
+                })} placeholder="0" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">志愿时长（小时）</label>
+                        <input type="number" min="0" step="0.5" className="w-full px-2 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-xs" value={newRecord.volunteerHoursRequired} onChange={e => setNewRecord({
+                  ...newRecord,
+                  volunteerHoursRequired: e.target.value
+                })} placeholder="0" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">思想汇报（次）</label>
+                        <input type="number" min="0" className="w-full px-2 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-xs" value={newRecord.reportCountRequired} onChange={e => setNewRecord({
+                  ...newRecord,
+                  reportCountRequired: e.target.value
+                })} placeholder="0" />
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500">选择处分级别后自动设置，可调整</p>
+                  </div>}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">处分原因</label>
+                  <textarea className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm" rows={3} value={newRecord.reason} onChange={e => setNewRecord({
+              ...newRecord,
+              reason: e.target.value
+            })} placeholder="请详细描述违纪原因..." />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">日期</label>
+                  <input type="date" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm" value={newRecord.date} onChange={e => setNewRecord({
+              ...newRecord,
+              date: e.target.value
+            })} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">处分原因</label>
@@ -694,6 +805,41 @@ export default function DisciplinePage(props) {
                     <span className="text-sm text-gray-800">{selectedRecord.operator}</span>
                   </div>
                 </div>
+
+                {/* 撤销条件和考察进度 */}
+                {selectedRecord.months > 0 && <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-3 space-y-3 border border-blue-200">
+                    <p className="text-sm font-medium text-blue-800">撤销条件与考察进度</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-600">考察状态</span>
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${selectedRecord.revocationStatus === '考察中' ? 'bg-amber-100 text-amber-700' : selectedRecord.revocationStatus === '符合条件' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                        {selectedRecord.revocationStatus}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-600">考察期</span>
+                      <span className="text-xs font-medium text-gray-800">
+                        {selectedRecord.startDate} ~ {selectedRecord.endDate}
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-600">志愿服务</span>
+                        <span className="text-xs font-medium text-gray-800">
+                          {formatPoints(selectedRecord.completedVolunteerHours)} / {formatPoints(selectedRecord.volunteerHoursRequired)} 小时
+                        </span>
+                      </div>
+                      <Progress value={calculateProgress(selectedRecord.volunteerHoursRequired, selectedRecord.completedVolunteerHours)} className="h-1.5" />
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-600">思想汇报</span>
+                        <span className="text-xs font-medium text-gray-800">
+                          {selectedRecord.completedReportCount} / {selectedRecord.reportCountRequired} 篇
+                        </span>
+                      </div>
+                      <Progress value={calculateProgress(selectedRecord.reportCountRequired, selectedRecord.completedReportCount)} className="h-1.5" />
+                    </div>
+                  </div>}
                 {selectedRecord.revokeRequests && selectedRecord.revokeRequests.length > 0 && <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
                     <p className="text-sm font-medium text-amber-800 mb-2">撤销申请</p>
                     {selectedRecord.revokeRequests.map((request, index) => <div key={index} className="text-xs text-amber-700">

@@ -1,0 +1,86 @@
+{
+  "name": "revocation_volunteer",
+  "title": "撤销志愿服务记录",
+  "schemas": [
+    {
+      "name": "student_id",
+      "title": "学生ID",
+      "type": "String"
+    },
+    {
+      "name": "discipline_record_id",
+      "title": "关联处分记录ID",
+      "type": "String"
+    },
+    {
+      "name": "hours",
+      "title": "服务时长",
+      "type": "Number"
+    },
+    {
+      "name": "service_date",
+      "title": "服务日期",
+      "type": "Date"
+    },
+    {
+      "name": "description",
+      "title": "服务内容",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "witness",
+      "title": "证明人",
+      "type": "String"
+    },
+    {
+      "name": "review_status",
+      "title": "审核状态",
+      "type": "String"
+    },
+    {
+      "name": "activity_name",
+      "title": "志愿服务活动名称",
+      "type": "String"
+    },
+    {
+      "name": "activity_type",
+      "title": "活动类型",
+      "type": "String"
+    },
+    {
+      "name": "location",
+      "title": "服务地点",
+      "type": "String"
+    },
+    {
+      "name": "certificate_image",
+      "title": "证明图片/证书",
+      "type": "Image"
+    },
+    {
+      "name": "review_date",
+      "title": "审核日期",
+      "type": "Date"
+    },
+    {
+      "name": "reviewer",
+      "title": "审核人",
+      "type": "String"
+    },
+    {
+      "name": "review_comments",
+      "title": "审核意见",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "created_by",
+      "title": "创建人",
+      "type": "String"
+    },
+    {
+      "name": "submit_by",
+      "title": "提交人（学生或家长）",
+      "type": "String"
+    }
+  ]
+}

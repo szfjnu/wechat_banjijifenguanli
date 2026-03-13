@@ -26,6 +26,7 @@ import NOTICE_PUBLISH from '../pages/notice-publish.jsx';
 import INIT_SCHEDULE-DATA from '../pages/init-schedule-data.jsx';
 import INIT_TIMETABLE-DATA from '../pages/init-timetable-data.jsx';
 import DISCIPLINE_LEVEL-CONFIG from '../pages/discipline-level-config.jsx';
+import REVOCATION_VOLUNTEER from '../pages/revocation-volunteer.jsx';
 export const routers = [{
   id: "home",
   component: HOME
@@ -110,4 +111,7 @@ export const routers = [{
 }, {
   id: "discipline-level-config",
   component: DISCIPLINE_LEVEL-CONFIG
+}, {
+  id: "revocation-volunteer",
+  component: REVOCATION_VOLUNTEER
 }]

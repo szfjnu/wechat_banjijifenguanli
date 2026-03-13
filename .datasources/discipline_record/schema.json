@@ -98,6 +98,56 @@
       "type": "String"
     },
     {
+      "name": "months",
+      "title": "考察期时长",
+      "type": "Number"
+    },
+    {
+      "name": "volunteer_hours_required",
+      "title": "志愿服务时长要求",
+      "type": "Number"
+    },
+    {
+      "name": "completed_volunteer_hours",
+      "title": "已完成志愿服务时长",
+      "type": "Number"
+    },
+    {
+      "name": "report_count_required",
+      "title": "思想汇报要求次数",
+      "type": "Number"
+    },
+    {
+      "name": "completed_report_count",
+      "title": "已完成思想汇报次数",
+      "type": "Number"
+    },
+    {
+      "name": "start_date",
+      "title": "处分开始日期",
+      "type": "Date",
+      "format": "string"
+    },
+    {
+      "name": "end_date",
+      "title": "处分结束日期",
+      "type": "Date",
+      "format": "string"
+    },
+    {
+      "name": "revocation_status",
+      "title": "撤销状态",
+      "type": "String"
+    },
+    {
+      "name": "revocation_application_records",
+      "title": "撤销申请记录",
+      "type": "Array",
+      "items": {
+        "type": "Object"
+      }
+    },
+    {
       "name": "note",
       "title": "备注",
       "type": "MultiLineString"

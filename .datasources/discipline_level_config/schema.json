@@ -21,6 +21,21 @@
       "name": "description",
       "title": "描述",
       "type": "String"
+    },
+    {
+      "name": "months",
+      "title": "考察期时长（月）",
+      "type": "Number"
+    },
+    {
+      "name": "volunteer_hours_required",
+      "title": "志愿服务时长要求（小时）",
+      "type": "Number"
+    },
+    {
+      "name": "report_count_required",
+      "title": "思想汇报要求次数",
+      "type": "Number"
     }
   ]
 }

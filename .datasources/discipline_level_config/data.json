@@ -5,6 +5,9 @@
     "deduct_points": 2,
     "valid_days": 7,
     "description": "轻微违规行为，口头提醒",
+    "months": 0,
+    "volunteer_hours_required": 0,
+    "report_count_required": 0,
     "createdAt": 1741555200000,
     "updatedAt": 1741555200000
   },
@@ -14,6 +17,9 @@
     "deduct_points": 5,
     "valid_days": 14,
     "description": "一般违规行为，全校通报",
+    "months": 0,
+    "volunteer_hours_required": 0,
+    "report_count_required": 0,
     "createdAt": 1741555200000,
     "updatedAt": 1741555200000
   },
@@ -23,6 +29,9 @@
     "deduct_points": 10,
     "valid_days": 30,
     "description": "较严重违规行为，正式警告",
+    "months": 1,
+    "volunteer_hours_required": 5,
+    "report_count_required": 1,
     "createdAt": 1741555200000,
     "updatedAt": 1741555200000
   },
@@ -32,6 +41,9 @@
     "deduct_points": 15,
     "valid_days": 60,
     "description": "严重违规行为，加重警告",
+    "months": 2,
+    "volunteer_hours_required": 10,
+    "report_count_required": 2,
     "createdAt": 1741555200000,
     "updatedAt": 1741555200000
   },
@@ -41,6 +53,9 @@
     "deduct_points": 20,
     "valid_days": 90,
     "description": "重大违规行为，记入档案",
+    "months": 3,
+    "volunteer_hours_required": 15,
+    "report_count_required": 3,
     "createdAt": 1741555200000,
     "updatedAt": 1741555200000
   },
@@ -50,6 +65,9 @@
     "deduct_points": 30,
     "valid_days": 180,
     "description": "严重违规行为，留校察看",
+    "months": 6,
+    "volunteer_hours_required": 30,
+    "report_count_required": 6,
     "createdAt": 1741555200000,
     "updatedAt": 1741555200000
   }

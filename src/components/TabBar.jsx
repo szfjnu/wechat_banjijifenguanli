@@ -88,6 +88,22 @@ export function TabBar({
       label: '志愿服务',
       pageId: 'volunteer',
       icon: Trophy
+    }, {
+      label: '撤销申请',
+      pageId: 'discipline-revocation',
+      icon: Trophy
+    }, {
+      label: '考察进度',
+      pageId: 'discipline-progress',
+      icon: Trophy
+    }, {
+      label: '思想汇报',
+      pageId: 'thought-report',
+      icon: Trophy
+    }, {
+      label: '撤销志愿服务',
+      pageId: 'revocation-volunteer',
+      icon: Trophy
     }]
   }, {
     id: 'class',
