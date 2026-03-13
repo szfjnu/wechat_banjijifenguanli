@@ -1,0 +1,84 @@
+{
+  "name": "duty_task_template",
+  "title": "值日任务模板",
+  "schemas": [
+    {
+      "name": "task_name",
+      "title": "任务名称",
+      "type": "String"
+    },
+    {
+      "name": "task_description",
+      "title": "任务描述",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "task_type",
+      "title": "任务类型",
+      "type": "String"
+    },
+    {
+      "name": "task_icon",
+      "title": "任务图标",
+      "type": "String"
+    },
+    {
+      "name": "default_points",
+      "title": "默认分数",
+      "type": "Number"
+    },
+    {
+      "name": "default_duration",
+      "title": "默认时长",
+      "type": "Number"
+    },
+    {
+      "name": "task_category",
+      "title": "任务分类",
+      "type": "String"
+    },
+    {
+      "name": "task_difficulty",
+      "title": "任务难度",
+      "type": "String"
+    },
+    {
+      "name": "task_frequency",
+      "title": "执行频率",
+      "type": "String"
+    },
+    {
+      "name": "is_active",
+      "title": "是否启用",
+      "type": "Boolean"
+    },
+    {
+      "name": "sort_order",
+      "title": "排序",
+      "type": "Number"
+    },
+    {
+      "name": "required_tools",
+      "title": "所需工具",
+      "type": "Array",
+      "items": {
+        "type": "String"
+      }
+    },
+    {
+      "name": "safety_notes",
+      "title": "安全提示",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "created_by",
+      "title": "创建人",
+      "type": "String"
+    },
+    {
+      "name": "is_system",
+      "title": "是否系统预设",
+      "type": "Boolean"
+    }
+  ]
+}
