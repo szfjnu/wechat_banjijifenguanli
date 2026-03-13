@@ -30,6 +30,7 @@ import REVOCATION_VOLUNTEER from '../pages/revocation-volunteer.jsx';
 import DISCIPLINE_REVOCATION from '../pages/discipline-revocation.jsx';
 import DISCIPLINE_PROGRESS from '../pages/discipline-progress.jsx';
 import THOUGHT_REPORT from '../pages/thought-report.jsx';
+import LOGIN from '../pages/login.jsx';
 export const routers = [{
   id: "home",
   component: HOME
@@ -126,4 +127,7 @@ export const routers = [{
 }, {
   id: "thought-report",
   component: THOUGHT_REPORT
+}, {
+  id: "login",
+  component: LOGIN
 }]
