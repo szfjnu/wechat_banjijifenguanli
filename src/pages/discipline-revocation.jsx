@@ -4,11 +4,27 @@ import React, { useState, useEffect } from 'react';
 import { Button, useToast, Progress, Card, CardContent } from '@/components/ui';
 // @ts-ignore;
 import { Trophy, Calendar, Clock, FileText, Upload, AlertCircle, CheckCircle, XCircle, File, Eye, Plus, History } from 'lucide-react';
-// @ts-ignore;
-import { getBeijingDateString } from '@/lib/utils';
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
+import { ProgressStatCard } from '@/components/ProgressStatCard';
+
+// 获取北京时间（UTC+8）
+const getBeijingTime = () => {
+  const now = new Date();
+  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+  const beijingOffset = 8;
+  return new Date(utc + 3600000 * beijingOffset);
+};
+
+// 获取北京时间字符串（YYYY-MM-DD格式）
+const getBeijingDateString = () => {
+  const beijingTime = getBeijingTime();
+  const year = beijingTime.getFullYear();
+  const month = String(beijingTime.getMonth() + 1).padStart(2, '0');
+  const day = String(beijingTime.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 export default function DisciplineRevocationPage(props) {
   const {
     $w
@@ -176,6 +192,13 @@ export default function DisciplineRevocationPage(props) {
         };
     }
   };
+  const handleCardClick = type => {
+    toast({
+      title: '点击详情',
+      description: `查看${type}详情`,
+      variant: 'default'
+    });
+  };
   const calculateProgress = (required, completed) => {
     if (required <= 0) return 100;
     const progress = completed / required * 100;
@@ -201,11 +224,15 @@ export default function DisciplineRevocationPage(props) {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-        {/* 统计卡片 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <StatCard title="考察中处分" value={disciplineRecords.length} icon={AlertCircle} color="amber" />
-          <StatCard title="申请中" value={requests.filter(r => r.status === '待审核').length} icon={Clock} color="orange" />
-          <StatCard title="已通过" value={requests.filter(r => r.status === '已通过').length} icon={CheckCircle} color="green" />
+        {/* 统计概览 - 处分状态 */}
+        <div>
+          <h2 className="text-sm font-semibold text-gray-600 mb-3 px-1">处分状态</h2>
+          <div className="border-b border-gray-200 mb-4" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <ProgressStatCard title="考察中处分" value={disciplineRecords.length} suffix="项" icon={AlertCircle} color="amber" onClick={() => handleCardClick('考察中')} />
+            <ProgressStatCard title="申请中" value={requests.filter(r => r.status === '待审核').length} suffix="项" icon={Clock} color="orange" onClick={() => handleCardClick('申请中')} />
+            <ProgressStatCard title="已通过" value={requests.filter(r => r.status === '已通过').length} suffix="项" icon={CheckCircle} color="green" trend="up" onClick={() => handleCardClick('已通过')} />
+          </div>
         </div>
 
         {/* 创建申请按钮 */}

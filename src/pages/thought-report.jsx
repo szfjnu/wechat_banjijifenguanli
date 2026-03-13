@@ -4,11 +4,27 @@ import React, { useState, useEffect } from 'react';
 import { Button, useToast, Card, CardContent } from '@/components/ui';
 // @ts-ignore;
 import { Trophy, FileText, Calendar, Clock, AlertCircle, CheckCircle, XCircle, Book, Upload, History, FileCheck, Plus, Eye } from 'lucide-react';
-// @ts-ignore;
-import { getBeijingDateString } from '@/lib/utils';
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
+import { ProgressStatCard } from '@/components/ProgressStatCard';
+
+// 获取北京时间（UTC+8）
+const getBeijingTime = () => {
+  const now = new Date();
+  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+  const beijingOffset = 8;
+  return new Date(utc + 3600000 * beijingOffset);
+};
+
+// 获取北京时间字符串（YYYY-MM-DD格式）
+const getBeijingDateString = () => {
+  const beijingTime = getBeijingTime();
+  const year = beijingTime.getFullYear();
+  const month = String(beijingTime.getMonth() + 1).padStart(2, '0');
+  const day = String(beijingTime.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 export default function ThoughtReportPage(props) {
   const {
     $w
@@ -198,6 +214,13 @@ export default function ThoughtReportPage(props) {
         };
     }
   };
+  const handleCardClick = type => {
+    toast({
+      title: '点击详情',
+      description: `查看${type}详情`,
+      variant: 'default'
+    });
+  };
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50">
         <div className="text-center">
@@ -218,11 +241,15 @@ export default function ThoughtReportPage(props) {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-        {/* 统计卡片 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <StatCard title="已提交汇报" value={reports.filter(r => r.status === '已通过').length} icon={FileCheck} color="purple" />
-          <StatCard title="待审核" value={reports.filter(r => r.status === '待审核').length} icon={Clock} color="amber" />
-          <StatCard title="还需完成" value={reports.filter(r => r.status === '未通过').length} icon={XCircle} color="red" />
+        {/* 统计概览 - 汇报状态 */}
+        <div>
+          <h2 className="text-sm font-semibold text-gray-600 mb-3 px-1">汇报状态</h2>
+          <div className="border-b border-gray-200 mb-4" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <ProgressStatCard title="已提交汇报" value={reports.filter(r => r.status === '已通过').length} suffix="篇" icon={FileCheck} color="purple" trend="up" onClick={() => handleCardClick('已提交')} />
+            <ProgressStatCard title="待审核" value={reports.filter(r => r.status === '待审核').length} suffix="篇" icon={Clock} color="amber" onClick={() => handleCardClick('待审核')} />
+            <ProgressStatCard title="需重写" value={reports.filter(r => r.status === '未通过').length} suffix="篇" icon={XCircle} color="red" onClick={() => handleCardClick('需重写')} />
+          </div>
         </div>
 
         {/* 创建汇报按钮 */}
