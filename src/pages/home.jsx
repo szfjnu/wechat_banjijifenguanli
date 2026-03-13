@@ -5,8 +5,13 @@ import { Calendar, Users, TrendingUp, AlertCircle, Sun, CloudRain, CloudSnow, Wi
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
 // @ts-ignore;
-import { getBeijingTime, formatPoints } from '@/lib/utils';
+import { getBeijingTime } from '@/lib/utils';
 
+// 格式化积分显示
+const formatPoints = points => {
+  if (points === null || points === undefined) return '0.00';
+  return Number(points).toFixed(2);
+};
 import { TabBar } from '@/components/TabBar';
 import { StatCard } from '@/components/StatCard';
 import { PointsChart } from '@/components/PointsChart';

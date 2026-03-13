@@ -5,8 +5,13 @@ import { Plus, Calendar, Clock, Search, Filter, ChevronDown, CheckCircle, XCircl
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
 // @ts-ignore;
-import { getBeijingTime, getBeijingTimeISO, getBeijingDateString, formatPoints } from '@/lib/utils';
+import { getBeijingTime, getBeijingTimeISO, getBeijingDateString } from '@/lib/utils';
 
+// 格式化积分显示
+const formatPoints = points => {
+  if (points === null || points === undefined) return '0.00';
+  return Number(points).toFixed(2);
+};
 import { TabBar } from '@/components/TabBar';
 export default function PointsPage(props) {
   const {

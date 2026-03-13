@@ -5,8 +5,13 @@ import { Bed, AlertTriangle, Search, Filter, TrendingDown, Shield, ShieldAlert, 
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
 // @ts-ignore;
-import { getBeijingTime, getBeijingTimeISO, getBeijingDateString, formatPoints } from '@/lib/utils';
+import { getBeijingTime, getBeijingTimeISO, getBeijingDateString } from '@/lib/utils';
 
+// 格式化积分显示
+const formatPoints = points => {
+  if (points === null || points === undefined) return '0.00';
+  return Number(points).toFixed(2);
+};
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 
