@@ -85,9 +85,7 @@ export default function DisciplinePage(props) {
       }
 
       // 加载处分级别数据
-      const levelResult = await db.collection('discipline_level_config').where({
-        is_active: true
-      }).orderBy('sort_order', 'asc').get();
+      const levelResult = await db.collection('discipline_level_config').get();
       if (levelResult.data && levelResult.data.length > 0) {
         const transformedLevels = levelResult.data.map(level => ({
           id: level._id,
@@ -709,20 +707,6 @@ export default function DisciplinePage(props) {
                     <p className="text-xs text-gray-500">选择处分级别后自动设置，可调整</p>
                   </div>}
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">处分原因</label>
-                  <textarea className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm" rows={3} value={newRecord.reason} onChange={e => setNewRecord({
-              ...newRecord,
-              reason: e.target.value
-            })} placeholder="请详细描述违纪原因..." />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">日期</label>
-                  <input type="date" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm" value={newRecord.date} onChange={e => setNewRecord({
-              ...newRecord,
-              date: e.target.value
-            })} />
-                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">处分原因</label>
                   <textarea className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm" rows={3} value={newRecord.reason} onChange={e => setNewRecord({
