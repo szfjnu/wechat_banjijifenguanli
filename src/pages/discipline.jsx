@@ -609,7 +609,7 @@ export default function DisciplinePage(props) {
               levelId: e.target.value
             })}>
                     <option value="">请选择处分级别</option>
-                    {disciplineLevels.map(level => <option key={level.id} value={level.id}>{level.levelName} (扣{formatPoints(level.deductPoints)}分, 有效{level.validDays}天)</option>)}
+                    {disciplineLevels.map(level => <option key={level.id} value={level.id}>{level.levelName} (扣{level.deductPoints}分, 有效{level.validDays}天)</option>)}
                   </select>
                 </div>
                 <div>

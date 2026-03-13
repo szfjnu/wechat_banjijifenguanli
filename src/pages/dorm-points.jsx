@@ -380,13 +380,13 @@ export default function DormPointsPage(props) {
       if (newDormPoints < 40) {
         toast({
           title: '严重预警：勒令退宿',
-          description: `${student.name}的宿舍积分已降至${formatPoints(newDormPoints)}分，低于40分警戒线！`,
+          description: `${student.name}的宿舍积分已降至${newDormPoints}分，低于40分警戒线！`,
           variant: 'destructive'
         });
       } else if (newDormPoints < 60) {
         toast({
           title: '预警：留宿察看',
-          description: `${student.name}的宿舍积分已降至${formatPoints(newDormPoints)}分，低于60分警戒线`,
+          description: `${student.name}的宿舍积分已降至${newDormPoints}分，低于60分警戒线`,
           variant: 'destructive'
         });
       } else {
@@ -566,7 +566,7 @@ export default function DormPointsPage(props) {
       setDeductionHistory([]);
       toast({
         title: '重置成功',
-        description: `所有住宿生宿舍积分已重置为${formatPoints(initialScore)}分，历史记录已清空`,
+        description: `所有住宿生宿舍积分已重置为${initialScore}分，历史记录已清空`,
         variant: 'default'
       });
       setShowResetConfirm(false);

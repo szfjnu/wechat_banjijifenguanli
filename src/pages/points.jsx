@@ -385,7 +385,7 @@ export default function PointsPage(props) {
                         </div>
                       </div>
                       <div className={`text-2xl font-bold ${record.points > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                        {record.points > 0 ? '+' : ''}{formatPoints(record.points)}
+                        {record.points > 0 ? '+' : ''}{record.points}
                       </div>
                     </div>
 
@@ -444,7 +444,7 @@ export default function PointsPage(props) {
                   <select value={formData.itemId} onChange={e => handleItemChange(e.target.value)} className="w-full px-4 py-3 bg-gray-100 rounded-xl border-0 focus:ring-2 focus:ring-blue-500">
                     <option value="">请选择积分项目</option>
                     {filteredRules.map(rule => <option key={rule.id} value={rule.id}>
-                        {rule.name} ({rule.points > 0 ? '+' : ''}{formatPoints(rule.points)}分)
+                        {rule.name} ({rule.points > 0 ? '+' : ''}{rule.points}分)
                       </option>)}
                   </select>
                 </div>

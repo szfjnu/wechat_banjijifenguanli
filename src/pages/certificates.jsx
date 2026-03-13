@@ -617,7 +617,7 @@ export default function CertificatesPage(props) {
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">积分</span>
                     <span className={`text-sm font-medium ${selectedCertificate.points > 0 ? 'text-green-600' : 'text-gray-800'}`}>
-                      +{formatPoints(selectedCertificate.points)}
+                      +{selectedCertificate.points}
                     </span>
                   </div>
                   <div className="flex justify-between">

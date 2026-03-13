@@ -323,7 +323,7 @@ export default function Students(props) {
                 {pointsHistory.map(record => <div key={record.id} className={`p-3 rounded-lg border-l-4 ${record.type === '加分' ? 'bg-green-50 border-green-400' : 'bg-red-50 border-red-400'}`}>
                     <div className="flex items-center justify-between mb-1">
                       <span className={`text-sm font-medium ${record.type === '加分' ? 'text-green-700' : 'text-red-700'}`}>
-                        {record.type}: {record.points > 0 ? '+' : ''}{record.points}
+                        {record.type}: {record.points > 0 ? '+' : ''}{formatPoints(record.points)}
                       </span>
                       <span className="text-xs text-gray-500">{record.date}</span>
                     </div>
