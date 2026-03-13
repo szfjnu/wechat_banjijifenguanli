@@ -343,10 +343,15 @@ export default function DormPointsPage(props) {
       });
 
       // 2. 更新学生的宿舍积分
-      await db.collection('students').doc(student.id).update({
+      const updateResult = await db.collection('students').where({
+        student_id: student.studentId
+      }).update({
         dorm_score: newDormPoints,
         current_score: newTotalPoints
       });
+      if (!updateResult || updateResult.updated === 0) {
+        throw new Error('更新学生积分失败');
+      }
 
       // 3. 更新前端状态
       const updatedStudents = students.map(s => s.id === student.id ? {
@@ -541,10 +546,15 @@ export default function DormPointsPage(props) {
       // 批量更新所有住宿生的宿舍积分为学期配置的初始积分
       const boardingStudents = students.filter(s => s.isBoarding);
       for (const student of boardingStudents) {
-        await db.collection('students').doc(student.id).update({
+        const updateResult = await db.collection('students').where({
+          student_id: student.studentId
+        }).update({
           dorm_score: initialScore,
           current_score: student.totalPoints - student.convertedPoints // 恢复到不含宿舍积分的状态
         });
+        if (!updateResult || updateResult.updated === 0) {
+          console.warn(`更新学生 ${student.name} 失败`);
+        }
       }
 
       // 清空宿舍扣分记录表中的所有记录

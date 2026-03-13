@@ -367,9 +367,14 @@ export default function ExchangePage({
       });
 
       // 更新学生积分
-      await db.collection('students').doc(student.id).update({
+      const updateResult = await db.collection('students').where({
+        student_id: student.studentId
+      }).update({
         current_score: newTotalPoints
       });
+      if (!updateResult || updateResult.updated === 0) {
+        throw new Error('更新学生积分失败');
+      }
 
       // 创建兑换记录
       const newExchange = {
