@@ -5,18 +5,10 @@ import { Bed, AlertTriangle, Search, Filter, TrendingDown, Shield, ShieldAlert, 
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
 // @ts-ignore;
-import { getBeijingTimeISO, getBeijingDateString } from '@/lib/utils';
+import { getBeijingTime, getBeijingTimeISO, getBeijingDateString, formatPoints } from '@/lib/utils';
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
-// 格式化积分：整数显示整数，小数最多显示两位
-const formatPoints = points => {
-  if (points === undefined || points === null || isNaN(points)) return '0';
-  const num = Number(points);
-  const rounded = Math.round(num * 100) / 100;
-  // 如果小数部分为0，显示整数；否则最多显示两位小数
-  return rounded === Math.floor(rounded) ? String(Math.floor(rounded)) : rounded.toFixed(2);
-};
 
 // 折算比例配置（默认30%）
 const CONVERSION_RATE = 0.3;
