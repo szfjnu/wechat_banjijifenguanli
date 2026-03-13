@@ -85,6 +85,11 @@
       "name": "reminder_sent",
       "title": "已发送提醒",
       "type": "Boolean"
+    },
+    {
+      "name": "task_description",
+      "title": "任务描述",
+      "type": "MultiLineString"
     }
   ]
 }

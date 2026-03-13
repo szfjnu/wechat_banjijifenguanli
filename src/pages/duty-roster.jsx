@@ -375,7 +375,7 @@ export default function DutyRoster(props) {
     }
     const weekNumber = getWeekNumber(new Date(newTask.date));
     const student = students.find(s => s.id === newTask.studentId);
-    const presetTask = PRESET_TASKS.find(t => t.name === newTask.taskName);
+    const presetTask = presetTasks.find(t => t.name === newTask.taskName);
     try {
       const tcb = await $w.cloud.getCloudInstance();
 
@@ -385,7 +385,7 @@ export default function DutyRoster(props) {
         student_name: student.name,
         student_no: student.studentId,
         task_name: newTask.taskName,
-        task_icon: presetTask ? presetTask.icon : '📌',
+        task_icon: presetTask?.icon || '📌',
         points: newTask.points,
         date: newTask.date,
         semester_id: 1,
@@ -815,7 +815,7 @@ export default function DutyRoster(props) {
                 </Button>
                 {isCustomTask && <input type="text" value={customTaskName} onChange={e => setCustomTaskName(e.target.value)} placeholder="请输入自定义任务名称" className="w-full px-3 py-2 border rounded-md" />}
                 {!isCustomTask && <Select value={newTask.taskName} onValueChange={val => {
-                const task = PRESET_TASKS.find(t => t.name === val);
+                const task = presetTasks.find(t => t.name === val);
                 setNewTask({
                   ...newTask,
                   taskName: val,
@@ -826,7 +826,7 @@ export default function DutyRoster(props) {
                       <SelectValue placeholder="请选择预设任务" />
                     </SelectTrigger>
                     <SelectContent>
-                      {PRESET_TASKS.map(task => <SelectItem key={task.id} value={task.name}>
+                      {presetTasks.map(task => <SelectItem key={task.id} value={task.name}>
                           <div className="flex items-center gap-2">
                             <span>{task.icon}</span>
                             <div>

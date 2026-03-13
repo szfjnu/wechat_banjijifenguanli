@@ -17,6 +17,7 @@
     "images": ["https://example.com/duty-images/clean-floor-001.jpg"],
     "is_custom": false,
     "reminder_sent": true,
+    "task_description": "清扫教室地面，保持地面干净无垃圾",
     "createdAt": 1738368000000,
     "updatedAt": 1738368000000
   },
@@ -38,6 +39,7 @@
     "images": ["https://example.com/duty-images/trash-001.jpg", "https://example.com/duty-images/trash-002.jpg"],
     "is_custom": false,
     "reminder_sent": false,
+    "task_description": "清理垃圾桶，定期更换垃圾袋",
     "createdAt": 1738454400000,
     "updatedAt": 1738454400000
   },
@@ -59,6 +61,7 @@
     "images": [],
     "is_custom": false,
     "reminder_sent": false,
+    "task_description": "清理黑板，擦拭干净",
     "createdAt": 1738540800000,
     "updatedAt": 1738540800000
   },
@@ -80,6 +83,7 @@
     "images": [],
     "is_custom": false,
     "reminder_sent": false,
+    "task_description": "擦拭窗户，保持窗户明亮干净",
     "createdAt": 1738540800000,
     "updatedAt": 1738540800000
   },
@@ -101,6 +105,7 @@
     "images": [],
     "is_custom": false,
     "reminder_sent": false,
+    "task_description": "整理课桌，保持桌面整洁有序",
     "createdAt": 1738627200000,
     "updatedAt": 1738627200000
   },
@@ -122,6 +127,7 @@
     "images": [],
     "is_custom": false,
     "reminder_sent": false,
+    "task_description": "打扫走廊，保持走廊清洁无杂物",
     "createdAt": 1738627200000,
     "updatedAt": 1738627200000
   },
@@ -143,6 +149,7 @@
     "images": [],
     "is_custom": false,
     "reminder_sent": false,
+    "task_description": "整理图书角，保持图书摆放有序",
     "createdAt": 1738713600000,
     "updatedAt": 1738713600000
   },
@@ -164,6 +171,7 @@
     "images": [],
     "is_custom": false,
     "reminder_sent": false,
+    "task_description": "浇花，保持植物健康生长",
     "createdAt": 1738713600000,
     "updatedAt": 1738713600000
   },
@@ -185,6 +193,7 @@
     "images": [],
     "is_custom": true,
     "reminder_sent": false,
+    "task_description": "清扫教室后门区域，保持门附近清洁",
     "createdAt": 1738800000000,
     "updatedAt": 1738800000000
   },
@@ -206,6 +215,7 @@
     "images": ["https://example.com/duty-images/clean-floor-002.jpg"],
     "is_custom": false,
     "reminder_sent": true,
+    "task_description": "清扫教室地面，保持地面干净无垃圾",
     "createdAt": 1737763200000,
     "updatedAt": 1737763200000
   },
@@ -227,6 +237,7 @@
     "images": [],
     "is_custom": false,
     "reminder_sent": false,
+    "task_description": "清理黑板，擦拭干净",
     "createdAt": 1737849600000,
     "updatedAt": 1737849600000
   },
@@ -248,6 +259,7 @@
     "images": ["https://example.com/duty-images/windows-001.jpg"],
     "is_custom": false,
     "reminder_sent": true,
+    "task_description": "擦拭窗户，保持窗户明亮干净",
     "createdAt": 1737936000000,
     "updatedAt": 1737936000000
   },
@@ -269,6 +281,7 @@
     "images": [],
     "is_custom": false,
     "reminder_sent": false,
+    "task_description": "整理课桌，保持桌面整洁有序",
     "createdAt": 1738022400000,
     "updatedAt": 1738022400000
   },
@@ -290,7 +303,52 @@
     "images": ["https://example.com/duty-images/trash-003.jpg"],
     "is_custom": false,
     "reminder_sent": false,
+    "task_description": "清理垃圾桶，定期更换垃圾袋",
     "createdAt": 1738108800000,
     "updatedAt": 1738108800000
+  },
+  {
+    "_id": "drag_floor",
+    "student_id": "2024009",
+    "student_name": "陈十一",
+    "student_no": "2024009",
+    "task_name": "拖地板",
+    "task_icon": "💧",
+    "points": 4,
+    "date": "2025-03-09",
+    "semester_id": 2,
+    "semester_name": "2024-2025第二学期",
+    "week_number": 10,
+    "status": "pending",
+    "score": null,
+    "comment": "",
+    "images": [],
+    "is_custom": false,
+    "reminder_sent": false,
+    "task_description": "拖教室地板，保持地面清洁和湿润",
+    "createdAt": 1738886400000,
+    "updatedAt": 1738886400000
+  },
+  {
+    "_id": "clean_area",
+    "student_id": "2024010",
+    "student_name": "林十二",
+    "student_no": "2024010",
+    "task_name": "打扫包干区",
+    "task_icon": "🔖",
+    "points": 5,
+    "date": "2025-03-09",
+    "semester_id": 2,
+    "semester_name": "2024-2025第二学期",
+    "week_number": 10,
+    "status": "pending",
+    "score": null,
+    "comment": "",
+    "images": [],
+    "is_custom": false,
+    "reminder_sent": false,
+    "task_description": "打扫班级指定的包干区域，包括清洁卫生、整理物品",
+    "createdAt": 1738886400000,
+    "updatedAt": 1738886400000
   }
 ]
