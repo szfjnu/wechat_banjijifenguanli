@@ -219,13 +219,13 @@ export function TabBar({
             return <button key={category.id} onClick={() => handleNavClick(category)} className={`flex flex-col items-center justify-center flex-1 py-1 transition-all duration-200
                     ${isActive ? 'scale-105' : 'scale-100'}`}>
                   <Icon className={`w-6 h-6 mb-1 transition-colors duration-200
-                      ${isActive ? 'text-[#1aad19]' : 'text-[#333333]'}`} />
+                      ${isActive ? 'text-[#22c55e]' : 'text-[#9ca3af]'}`} />
                   <span className={`text-[12px] transition-all duration-200
-                    ${isActive ? 'text-[#1aad19] font-medium' : 'text-[#333333]'}`}>
+                    ${isActive ? 'text-[#22c55e] font-medium' : 'text-[#9ca3af]'}`}>
                     {category.label}
                   </span>
                   {/* 选中状态的小圆点 */}
-                  {isActive && <div className="w-1 h-1 bg-[#1aad19] rounded-full mt-1" />}
+                  {isActive && <div className="w-1 h-1 bg-[#22c55e] rounded-full mt-1" />}
                 </button>;
           })}
           </div>

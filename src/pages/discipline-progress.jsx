@@ -3,12 +3,20 @@ import React, { useState, useEffect } from 'react';
 // @ts-ignore;
 import { Button, useToast, Progress, Card, CardContent } from '@/components/ui';
 // @ts-ignore;
-import { Trophy, Calendar, Clock, FileText, AlertCircle, CheckCircle, Timer, BookOpen, Activity, TrendingUp } from 'lucide-react';
+import { Trophy, Calendar, Clock, FileText, AlertCircle, CheckCircle, Timer, BookOpen, Activity, TrendingUp, ChevronRight, TrendingDown } from 'lucide-react';
 // @ts-ignore;
 import { getBeijingDateString } from '@/lib/utils';
 
-import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
+import { ProgressStatCard } from '@/components/ProgressStatCard';
+
+// 获取北京时间（UTC+8）
+const getBeijingTime = () => {
+  const now = new Date();
+  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+  const beijingOffset = 8;
+  return new Date(utc + 3600000 * beijingOffset);
+};
 export default function DisciplineProgressPage(props) {
   const {
     $w
@@ -130,6 +138,13 @@ export default function DisciplineProgressPage(props) {
         };
     }
   };
+  const handleCardClick = type => {
+    toast({
+      title: '点击详情',
+      description: `查看${type}详情`,
+      variant: 'default'
+    });
+  };
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
         <div className="text-center">
@@ -150,12 +165,24 @@ export default function DisciplineProgressPage(props) {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-        {/* 统计概览 */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <StatCard title="考察中处分" value={records.filter(r => r.revocation_status === '考察中').length} icon={AlertCircle} color="amber" />
-          <StatCard title="符合条件" value={records.filter(r => r.revocation_status === '符合条件').length} icon={CheckCircle} color="green" />
-          <StatCard title="已完成志愿" value={records.reduce((sum, r) => sum + (r.completed_volunteer_hours || 0), 0).toFixed(1)} icon={Activity} color="blue" suffix="小时" />
-          <StatCard title="已提交汇报" value={records.reduce((sum, r) => sum + (r.completed_report_count || 0), 0)} icon={BookOpen} color="purple" suffix="篇" />
+        {/* 统计概览 - 纪律状态 */}
+        <div>
+          <h2 className="text-sm font-semibold text-gray-600 mb-3 px-1">纪律状态</h2>
+          <div className="border-b border-gray-200 mb-4" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <ProgressStatCard title="考察中处分" value={records.filter(r => r.revocation_status === '考察中').length} suffix="项" icon={AlertCircle} color="red" highlight={true} onClick={() => handleCardClick('考察中')} />
+            <ProgressStatCard title="符合条件" value={records.filter(r => r.revocation_status === '符合条件').length} suffix="项" icon={CheckCircle} color="green" trend="up" onClick={() => handleCardClick('符合条件')} />
+          </div>
+        </div>
+
+        {/* 统计概览 - 任务进度 */}
+        <div>
+          <h2 className="text-sm font-semibold text-gray-600 mb-3 px-1">任务进度</h2>
+          <div className="border-b border-gray-200 mb-4" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <ProgressStatCard title="已完成志愿" showProgress={true} progressValue={records.reduce((sum, r) => sum + (r.completed_volunteer_hours || 0), 0)} progressTotal={records.reduce((sum, r) => sum + (r.volunteer_hours_required || 0), 0)} suffix="小时" icon={Activity} color="blue" onClick={() => handleCardClick('志愿')} />
+            <ProgressStatCard title="已提交汇报" value={records.reduce((sum, r) => sum + (r.completed_report_count || 0), 0)} suffix="篇" icon={BookOpen} color="purple" trend="up" onClick={() => handleCardClick('汇报')} />
+          </div>
         </div>
 
         {/* 处分记录列表 */}
@@ -168,7 +195,7 @@ export default function DisciplineProgressPage(props) {
           const volunteerProgress = calculateProgress(record.volunteer_hours_required, record.completed_volunteer_hours);
           const reportStatus = getReportStatus(record.completed_report_count, record.report_count_required, record.start_date, record.end_date);
           const statusStyles = getStatusStyles(record.revocation_status);
-          return <Card key={record.record_id} className={`${statusStyles.bgColor} border-2`}>
+          return <Card key={record.record_id} className={`${statusStyles.bgColor} border-2 hover:shadow-md transition-shadow duration-200`}>
                   <CardContent className="p-6">
                     {/* 头部信息 */}
                     <div className="flex items-start justify-between mb-6">
@@ -182,6 +209,7 @@ export default function DisciplineProgressPage(props) {
                         <p className="text-gray-600 mb-2">{record.reason}</p>
                         <p className="text-sm text-gray-500">处分日期: {record.date}</p>
                       </div>
+                      <ChevronRight className="w-5 h-5 text-gray-400 mt-2" />
                     </div>
 
                     {/* 考察期倒计时 */}
@@ -209,19 +237,21 @@ export default function DisciplineProgressPage(props) {
                       </h4>
 
                       {/* 志愿服务时长 */}
-                      <div className="bg-white/60 rounded-lg p-4 border border-gray-200">
+                      <div className="bg-white/60 rounded-lg p-4 border border-gray-200 hover:bg-white/80 transition-colors duration-200">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
-                            <Activity className="w-4 h-4 text-blue-500" />
+                            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-500/20">
+                              <Activity className="w-3.5 h-3.5 text-blue-500" />
+                            </div>
                             <span className="font-medium text-gray-800">志愿服务时长</span>
                           </div>
-                          <span className={`font-bold ${parseInt(volunteerProgress) >= 100 ? 'text-green-600' : 'text-blue-600'}`}>
+                          <span className={`text-lg font-bold ${parseInt(volunteerProgress) >= 100 ? 'text-green-600' : 'text-blue-600'}`}>
                             {record.completed_volunteer_hours} / {record.volunteer_hours_required} 小时
                           </span>
                         </div>
                         <div className="flex items-center gap-3">
                           <Progress value={volunteerProgress} className="flex-1" />
-                          <span className={`text-sm font-semibold ${parseInt(volunteerProgress) >= 100 ? 'text-green-600' : 'text-blue-600'}`}>
+                          <span className={`text-lg font-bold ${parseInt(volunteerProgress) >= 100 ? 'text-green-600' : 'text-blue-600'}`}>
                             {volunteerProgress}%
                           </span>
                         </div>
@@ -234,19 +264,24 @@ export default function DisciplineProgressPage(props) {
                       </div>
 
                       {/* 思想汇报 */}
-                      <div className="bg-white/60 rounded-lg p-4 border border-gray-200">
+                      <div className="bg-white/60 rounded-lg p-4 border border-gray-200 hover:bg-white/80 transition-colors duration-200">
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-2">
-                            <BookOpen className="w-4 h-4 text-purple-500" />
+                            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-purple-500/20">
+                              <BookOpen className="w-3.5 h-3.5 text-purple-500" />
+                            </div>
                             <span className="font-medium text-gray-800">思想汇报</span>
                           </div>
-                          <span className={`font-bold ${reportStatus.completed >= reportStatus.total ? 'text-green-600' : 'text-purple-600'}`}>
-                            {reportStatus.completed} / {reportStatus.total} 篇
-                          </span>
+                          <div className="flex items-center gap-1">
+                            <span className={`text-lg font-bold ${reportStatus.completed >= reportStatus.total ? 'text-green-600' : 'text-purple-600'}`}>
+                              {reportStatus.completed} / {reportStatus.total} 篇
+                            </span>
+                            <TrendingDown className={`w-4 h-4 ${reportStatus.completed >= reportStatus.total ? 'text-green-600' : 'text-purple-600'}`} />
+                          </div>
                         </div>
                         <div className="flex items-center gap-3 mb-3">
                           <Progress value={calculateProgress(reportStatus.total, reportStatus.completed)} className="flex-1" />
-                          <span className={`text-sm font-semibold ${reportStatus.completed >= reportStatus.total ? 'text-green-600' : 'text-purple-600'}`}>
+                          <span className={`text-lg font-bold ${reportStatus.completed >= reportStatus.total ? 'text-green-600' : 'text-purple-600'}`}>
                             {calculateProgress(reportStatus.total, reportStatus.completed)}%
                           </span>
                         </div>

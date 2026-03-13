@@ -9,3 +9,4 @@ export * from './GrowthTimeline.jsx';
 export * from './StudentComparison.jsx';
 export * from './ExcelExport.jsx';
 export * from './ReportGenerator.jsx';
+export * from './ProgressStatCard.jsx';
