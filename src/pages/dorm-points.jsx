@@ -330,7 +330,7 @@ export default function DormPointsPage(props) {
         item_name: deductionItem.name,
         item_category: deductionItem.category || '其他',
         score_change: deductionItem.points,
-        converted_points: convertedPoints.toFixed(1),
+        converted_points: convertedPoints,
         original_score: student.dormPoints,
         reason: remark || deductionItem.name,
         evidence_images: uploadedImages.map(img => img.url),
