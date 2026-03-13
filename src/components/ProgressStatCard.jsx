@@ -78,34 +78,41 @@ export function ProgressStatCard({
   const theme = colorClasses[color] || colorClasses.blue;
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus;
   const trendColor = trend === 'up' ? 'text-green-600' : trend === 'down' ? 'text-red-600' : 'text-gray-400';
-  return <div onClick={onClick} className={`relative bg-white rounded-xl shadow-sm p-5 cursor-pointer transition-all duration-200 ${highlight ? 'h-[140px]' : 'h-[120px]'} ${highlight ? theme.border + ' border-2' : 'border border-gray-200'} ${theme.hover} hover:shadow-md overflow-hidden`}>
+  return <div onClick={onClick} className={`relative bg-white rounded-xl shadow-sm cursor-pointer transition-all duration-200 ${highlight ? 'h-[100px]' : 'h-[90px]'} ${highlight ? theme.border + ' border-2' : 'border border-gray-200'} ${theme.hover} hover:shadow-md overflow-hidden`}>
       {/* 右上角箭头图标 */}
-      <div className="absolute top-4 right-4 text-gray-400">
-        <ChevronRight className="w-5 h-5" />
+      <div className="absolute top-3 right-3 text-gray-400">
+        <ChevronRight className="w-4 h-4" />
       </div>
 
-      {/* 图标圆形背景 */}
-      <div className={`flex items-center justify-center w-10 h-10 rounded-full ${theme.iconBg} mb-3`}>
-        <Icon className={`w-5 h-5 ${theme.icon}`} />
-      </div>
-
-      {/* 标题 */}
-      <p className="text-sm text-gray-600 mb-2">{title}</p>
-
-      {/* 数值 */}
-      {showProgress ? <div className="space-y-2">
-          <div className="flex items-baseline gap-1">
-            <span className={`text-lg font-bold ${highlight ? 'text-red-600' : theme.text}`}>
-              {progressValue}/{progressTotal}{suffix}
-            </span>
+      {/* 水平布局：左侧图标+标题，右侧数值 */}
+      <div className="flex items-center justify-between h-full px-4 py-3">
+        {/* 左侧：图标和标题 */}
+        <div className="flex items-center gap-3">
+          {/* 图标圆形背景 */}
+          <div className={`flex items-center justify-center w-8 h-8 rounded-full ${theme.iconBg}`}>
+            <Icon className={`w-4 h-4 ${theme.icon}`} />
           </div>
-          {/* 进度条 */}
-          <Progress value={progressValue / progressTotal * 100} className="h-2" />
-        </div> : <div className="flex items-center gap-2">
-          <span className={`text-lg font-bold ${highlight ? 'text-red-600' : theme.text}`}>
-            {value}{suffix}
-          </span>
-          {trend && <TrendIcon className={`w-4 h-4 ${trendColor}`} />}
-        </div>}
+          {/* 标题 */}
+          <p className="text-sm text-gray-600 font-medium">{title}</p>
+        </div>
+
+        {/* 右侧：数值和详情 */}
+        <div className="flex items-center gap-2">
+          {showProgress ? <div className="flex items-center gap-2">
+              <span className={`text-lg font-bold ${highlight ? 'text-red-600' : theme.text}`}>
+                {progressValue}/{progressTotal}{suffix}
+              </span>
+              {/* 进度条 */}
+              <div className="w-16">
+                <Progress value={progressValue / progressTotal * 100} className="h-2" />
+              </div>
+            </div> : <div className="flex items-center gap-1">
+            <span className={`text-lg font-bold ${highlight ? 'text-red-600' : theme.text}`}>
+              {value}{suffix}
+            </span>
+            {trend && <TrendIcon className={`w-4 h-4 ${trendColor}`} />}
+          </div>}
+        </div>
+      </div>
     </div>;
 }
