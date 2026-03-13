@@ -1,0 +1,89 @@
+{
+  "name": "revocation_request",
+  "title": "处分撤销申请",
+  "schemas": [
+    {
+      "name": "request_id",
+      "title": "申请ID",
+      "type": "String"
+    },
+    {
+      "name": "discipline_record_id",
+      "title": "关联处分记录ID",
+      "type": "String"
+    },
+    {
+      "name": "student_id",
+      "title": "学生ID",
+      "type": "String"
+    },
+    {
+      "name": "student_name",
+      "title": "学生姓名",
+      "type": "String"
+    },
+    {
+      "name": "level_name",
+      "title": "处分级别",
+      "type": "String"
+    },
+    {
+      "name": "reason",
+      "title": "申请原因",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "volunteer_progress",
+      "title": "志愿服务完成进度（小时）",
+      "type": "Number"
+    },
+    {
+      "name": "report_progress",
+      "title": "思想汇报完成进度（篇）",
+      "type": "Number"
+    },
+    {
+      "name": "attachments",
+      "title": "附件",
+      "type": "Array",
+      "items": {
+        "type": "String"
+      }
+    },
+    {
+      "name": "status",
+      "title": "审核状态",
+      "type": "String"
+    },
+    {
+      "name": "request_date",
+      "title": "申请日期",
+      "type": "Date"
+    },
+    {
+      "name": "review_date",
+      "title": "审核日期",
+      "type": "Date"
+    },
+    {
+      "name": "reviewer",
+      "title": "审核人",
+      "type": "String"
+    },
+    {
+      "name": "review_comments",
+      "title": "审核意见",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "created_by",
+      "title": "创建人",
+      "type": "String"
+    },
+    {
+      "name": "submit_by",
+      "title": "提交人",
+      "type": "String"
+    }
+  ]
+}

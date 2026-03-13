@@ -1,0 +1,81 @@
+{
+  "name": "thought_report",
+  "title": "思想汇报记录",
+  "schemas": [
+    {
+      "name": "report_id",
+      "title": "汇报ID",
+      "type": "String"
+    },
+    {
+      "name": "discipline_record_id",
+      "title": "关联处分记录ID",
+      "type": "String"
+    },
+    {
+      "name": "student_id",
+      "title": "学生ID",
+      "type": "String"
+    },
+    {
+      "name": "student_name",
+      "title": "学生姓名",
+      "type": "String"
+    },
+    {
+      "name": "title",
+      "title": "汇报标题",
+      "type": "String"
+    },
+    {
+      "name": "content",
+      "title": "汇报内容",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "submit_date",
+      "title": "提交日期",
+      "type": "Date"
+    },
+    {
+      "name": "report_month",
+      "title": "汇报月份",
+      "type": "String"
+    },
+    {
+      "name": "status",
+      "title": "审核状态",
+      "type": "String"
+    },
+    {
+      "name": "review_date",
+      "title": "审核日期",
+      "type": "Date"
+    },
+    {
+      "name": "reviewer",
+      "title": "审核人",
+      "type": "String"
+    },
+    {
+      "name": "review_comments",
+      "title": "审核意见",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "created_by",
+      "title": "创建人",
+      "type": "String"
+    },
+    {
+      "name": "submit_by",
+      "title": "提交人",
+      "type": "String"
+    },
+    {
+      "name": "word_count",
+      "title": "字数",
+      "type": "Number"
+    }
+  ]
+}

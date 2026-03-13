@@ -27,6 +27,9 @@ import INIT_SCHEDULE-DATA from '../pages/init-schedule-data.jsx';
 import INIT_TIMETABLE-DATA from '../pages/init-timetable-data.jsx';
 import DISCIPLINE_LEVEL-CONFIG from '../pages/discipline-level-config.jsx';
 import REVOCATION_VOLUNTEER from '../pages/revocation-volunteer.jsx';
+import DISCIPLINE_REVOCATION from '../pages/discipline-revocation.jsx';
+import DISCIPLINE_PROGRESS from '../pages/discipline-progress.jsx';
+import THOUGHT_REPORT from '../pages/thought-report.jsx';
 export const routers = [{
   id: "home",
   component: HOME
@@ -114,4 +117,13 @@ export const routers = [{
 }, {
   id: "revocation-volunteer",
   component: REVOCATION_VOLUNTEER
+}, {
+  id: "discipline-revocation",
+  component: DISCIPLINE_REVOCATION
+}, {
+  id: "discipline-progress",
+  component: DISCIPLINE_PROGRESS
+}, {
+  id: "thought-report",
+  component: THOUGHT_REPORT
 }]
