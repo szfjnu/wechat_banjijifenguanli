@@ -380,13 +380,13 @@ export default function DormPointsPage(props) {
       if (newDormPoints < 40) {
         toast({
           title: '严重预警：勒令退宿',
-          description: `${student.name}的宿舍积分已降至${newDormPoints}分，低于40分警戒线！`,
+          description: `${student.name}的宿舍积分已降至${formatPoints(newDormPoints)}分，低于40分警戒线！`,
           variant: 'destructive'
         });
       } else if (newDormPoints < 60) {
         toast({
           title: '预警：留宿察看',
-          description: `${student.name}的宿舍积分已降至${newDormPoints}分，低于60分警戒线`,
+          description: `${student.name}的宿舍积分已降至${formatPoints(newDormPoints)}分，低于60分警戒线`,
           variant: 'destructive'
         });
       } else {
@@ -566,7 +566,7 @@ export default function DormPointsPage(props) {
       setDeductionHistory([]);
       toast({
         title: '重置成功',
-        description: `所有住宿生宿舍积分已重置为${initialScore}分，历史记录已清空`,
+        description: `所有住宿生宿舍积分已重置为${formatPoints(initialScore)}分，历史记录已清空`,
         variant: 'default'
       });
       setShowResetConfirm(false);
@@ -711,7 +711,7 @@ export default function DormPointsPage(props) {
                         <div>
                           <p className="text-[10px] text-gray-500">原始</p>
                           <p className={`text-sm font-bold ${student.dormPoints < 60 ? 'text-red-600' : 'text-gray-800'}`}>
-                            {student.dormPoints}
+                            {formatPoints(student.dormPoints)}
                           </p>
                         </div>
                         <div>
@@ -823,7 +823,7 @@ export default function DormPointsPage(props) {
                     <div className="flex items-center justify-between text-sm text-gray-600 mt-1">
                       <span>扣分后宿舍积分</span>
                       <span className={`font-medium ${selectedStudent.dormPoints + selectedDeductionItem.points < 60 ? 'text-red-600' : 'text-gray-800'}`}>
-                        {selectedStudent.dormPoints + selectedDeductionItem.points}分
+                        {formatPoints(selectedStudent.dormPoints + selectedDeductionItem.points)}分
                       </span>
                     </div>
                   </div>}

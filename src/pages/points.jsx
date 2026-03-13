@@ -5,7 +5,7 @@ import { Plus, Calendar, Clock, Search, Filter, ChevronDown, CheckCircle, XCircl
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
 // @ts-ignore;
-import { getBeijingTime, getBeijingTimeISO, getBeijingDateString } from '@/lib/utils';
+import { getBeijingTime, getBeijingTimeISO, getBeijingDateString, formatPoints } from '@/lib/utils';
 
 import { TabBar } from '@/components/TabBar';
 export default function PointsPage(props) {
@@ -385,7 +385,7 @@ export default function PointsPage(props) {
                         </div>
                       </div>
                       <div className={`text-2xl font-bold ${record.points > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                        {record.points > 0 ? '+' : ''}{record.points}
+                        {record.points > 0 ? '+' : ''}{formatPoints(record.points)}
                       </div>
                     </div>
 
@@ -431,7 +431,7 @@ export default function PointsPage(props) {
               })} className="w-full px-4 py-3 bg-gray-100 rounded-xl border-0 focus:ring-2 focus:ring-blue-500">
                     <option value="">请选择学生</option>
                     {students.map(student => <option key={student.id} value={student.id}>
-                        {student.name} ({student.group}) - 当前积分: {student.totalPoints}
+                        {student.name} ({student.group}) - 当前积分: {formatPoints(student.totalPoints)}
                       </option>)}
                   </select>
                 </div>
@@ -444,7 +444,7 @@ export default function PointsPage(props) {
                   <select value={formData.itemId} onChange={e => handleItemChange(e.target.value)} className="w-full px-4 py-3 bg-gray-100 rounded-xl border-0 focus:ring-2 focus:ring-blue-500">
                     <option value="">请选择积分项目</option>
                     {filteredRules.map(rule => <option key={rule.id} value={rule.id}>
-                        {rule.name} ({rule.points > 0 ? '+' : ''}{rule.points}分)
+                        {rule.name} ({rule.points > 0 ? '+' : ''}{formatPoints(rule.points)}分)
                       </option>)}
                   </select>
                 </div>

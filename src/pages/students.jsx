@@ -304,11 +304,11 @@ export default function Students(props) {
                 <p className="text-xs text-gray-600">总积分</p>
               </div>
               <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-3 text-center">
-                <p className="text-2xl font-bold text-blue-600 font-mono">{selectedStudent.dailyPoints}</p>
+                <p className="text-2xl font-bold text-blue-600 font-mono">{formatPoints(selectedStudent.dailyPoints)}</p>
                 <p className="text-xs text-gray-600">日常积分</p>
               </div>
               <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-3 text-center">
-                <p className="text-2xl font-bold text-amber-600 font-mono">{selectedStudent.dormPoints}</p>
+                <p className="text-2xl font-bold text-amber-600 font-mono">{formatPoints(selectedStudent.dormPoints)}</p>
                 <p className="text-xs text-gray-600">宿舍积分</p>
               </div>
             </div>

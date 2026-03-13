@@ -6,6 +6,14 @@ import { useToast } from '@/components/ui';
 import { AlertTriangle, Plus, Edit2, Trash2, Save, X, Calendar, ChevronUp, ChevronDown, ArrowLeft } from 'lucide-react';
 
 import { TabBar } from '@/components/TabBar';
+
+// 格式化积分：整数显示整数，小数最多显示两位
+const formatPoints = points => {
+  if (points === undefined || points === null || isNaN(points)) return '0';
+  const num = Number(points);
+  const rounded = Math.round(num * 100) / 100;
+  return rounded === Math.floor(rounded) ? String(Math.floor(rounded)) : rounded.toFixed(2);
+};
 export default function DisciplineLevelConfig({
   $w,
   className,
@@ -239,7 +247,7 @@ export default function DisciplineLevelConfig({
             <div className="text-white/80 text-sm">级别总数</div>
           </div>
           <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center">
-            <div className="text-3xl font-bold">{levels.reduce((sum, l) => sum + (l.deduct_points || 0), 0)}</div>
+            <div className="text-3xl font-bold">{formatPoints(levels.reduce((sum, l) => sum + (l.deduct_points || 0), 0))}</div>
             <div className="text-white/80 text-sm">最大扣分值</div>
           </div>
           <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center">
@@ -283,7 +291,7 @@ export default function DisciplineLevelConfig({
                           <div className="flex items-center gap-2 mb-1">
                             <h3 className="text-lg font-bold text-gray-800">{level.level_name}</h3>
                             <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${severityStyle.badge}`}>
-                              扣{level.deduct_points}分
+                              扣{formatPoints(level.deduct_points)}分
                             </span>
                           </div>
                           <p className="text-sm text-gray-600 mb-2">{level.description || '暂无描述'}</p>
