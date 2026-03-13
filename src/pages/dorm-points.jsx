@@ -314,6 +314,8 @@ export default function DormPointsPage(props) {
   // 扣分处理
   const handleDeduction = async (student, deductionItem, remark) => {
     try {
+      console.log('开始扣分操作，学生信息:', student);
+      console.log('扣分项目:', deductionItem);
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
       const convertedPoints = deductionItem.points * conversionRate;
@@ -341,14 +343,19 @@ export default function DormPointsPage(props) {
         approval_status: '已通过',
         remark: remark || ''
       });
+      console.log('扣分记录添加成功:', recordResult);
 
       // 2. 更新学生的宿舍积分
-      const updateResult = await db.collection('students').where({
+      const updateQuery = {
         student_id: student.studentId
-      }).update({
+      };
+      const updateData = {
         dorm_score: newDormPoints,
         current_score: newTotalPoints
-      });
+      };
+      console.log('更新学生积分，查询条件:', updateQuery, '更新数据:', updateData);
+      const updateResult = await db.collection('students').where(updateQuery).update(updateData);
+      console.log('更新结果:', updateResult);
       if (!updateResult || updateResult.updated === 0) {
         throw new Error('更新学生积分失败');
       }
@@ -408,7 +415,7 @@ export default function DormPointsPage(props) {
       console.error('扣分失败:', error);
       toast({
         title: '操作失败',
-        description: '扣分操作失败，请重试',
+        description: `扣分操作失败：${error.message || '请重试'}`,
         variant: 'destructive'
       });
     }
