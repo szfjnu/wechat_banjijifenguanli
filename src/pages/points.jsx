@@ -69,6 +69,12 @@ export default function PointsPage(props) {
       setLoading(true);
       const tcb = await $w.cloud.getCloudInstance();
 
+      // 获取当前用户信息
+      const currentUser = $w.auth.currentUser;
+      const userType = currentUser?.type || '';
+      const userName = currentUser?.name || '';
+      const userId = currentUser?.userId || '';
+
       // 加载积分规则（从 point_rule 数据模型）
       const rulesResult = await tcb.database().collection('point_rule').where({
         is_enabled: true
@@ -90,7 +96,15 @@ export default function PointsPage(props) {
       }
 
       // 加载积分记录（从 point_record 数据模型）
-      const recordsResult = await tcb.database().collection('point_record').orderBy('record_date', 'desc').limit(50).get();
+      // 根据用户身份筛选积分记录
+      let recordsQuery = tcb.database().collection('point_record');
+      if (userType === '学生') {
+        // 学生只看自己的积分记录
+        recordsQuery = recordsQuery.where({
+          student_name: userName
+        });
+      }
+      const recordsResult = await recordsQuery.orderBy('record_date', 'desc').limit(50).get();
       if (recordsResult.data && recordsResult.data.length > 0) {
         const transformedRecords = recordsResult.data.map(record => ({
           id: record._id,
@@ -108,8 +122,37 @@ export default function PointsPage(props) {
         setHistoryRecords([]);
       }
 
-      // 加载学生数据
-      const studentsResult = await tcb.database().collection('students').get();
+      // 加载学生数据，根据用户身份筛选
+      let studentsQuery = tcb.database().collection('students');
+      if (userType === '学生') {
+        // 学生只看自己的数据
+        studentsQuery = studentsQuery.where({
+          name: userName
+        });
+      } else if (userType === '班主任') {
+        // 班主任只看自己班级的学生
+        try {
+          const userResult = await tcb.database().collection('user').where({
+            name: userName,
+            type: '班主任'
+          }).get();
+          if (userResult.data && userResult.data.length > 0) {
+            const userData = userResult.data[0];
+            if (userData.managed_class_name) {
+              studentsQuery = studentsQuery.where({
+                class_name: userData.managed_class_name
+              });
+            }
+          }
+        } catch (err) {
+          console.error('查询班主任班级信息失败:', err);
+        }
+      } else if (userType === '家长') {
+        // 家长看自己的孩子（这里简化处理，实际应该从关联表获取）
+        // 暂时显示所有学生数据
+        studentsQuery = studentsQuery;
+      }
+      const studentsResult = await studentsQuery.get();
       if (studentsResult.data && studentsResult.data.length > 0) {
         const transformedStudents = studentsResult.data.map(student => ({
           id: student._id,
@@ -122,6 +165,12 @@ export default function PointsPage(props) {
       } else {
         setStudents([]);
       }
+      console.log('points.jsx 加载积分数据:', {
+        用户类型: userType,
+        用户名称: userName,
+        学生数: studentsResult.data?.length || 0,
+        积分记录数: recordsResult.data?.length || 0
+      });
       setLoading(false);
     } catch (error) {
       console.error('加载积分数据失败:', error);

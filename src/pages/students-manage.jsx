@@ -75,10 +75,36 @@ export default function StudentsManage(props) {
       setLoading(true);
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
-      const result = await db.collection('students').get();
+
+      // 获取当前用户信息
+      const currentUser = $w.auth.currentUser;
+      const userType = currentUser?.type || '';
+      const userName = currentUser?.name || '';
+      const userId = currentUser?.userId || '';
+
+      // 根据用户类型构建查询条件
+      let query = {};
+      if (userType === '学生') {
+        // 学生只看自己的数据
+        query = {
+          name: userName
+        };
+      } else if (userType === '班主任') {
+        // 班主任看自己班级的学生（这里简化为不筛选，实际应该从班级管理获取班主任管理的班级）
+        // 由于缺少班主任-班级关联模型，暂时班主任能看到所有学生
+        query = {};
+      } else if (userType === '家长') {
+        // 家长看自己的孩子（这里简化为不筛选，实际应该从关联表获取）
+        // 由于缺少家长-学生关联模型，暂时家长能看到所有学生
+        query = {};
+      }
+      const result = await db.collection('students').where(query).get();
 
       // 添加调试日志
       console.log('students-manage.jsx 加载学生数据:', {
+        用户类型: userType,
+        用户名称: userName,
+        查询条件: query,
         数据总数: result.data ? result.data.length : 0,
         数据库集合名: 'students',
         查询结果: result

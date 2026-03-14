@@ -43,6 +43,9 @@ export default function Home(props) {
     avgScore: 0,
     pendingTasks: 0
   });
+  const [userClass, setUserClass] = useState(null);
+  const [hasClass, setHasClass] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
   useEffect(() => {
     loadDashboardData();
     loadWeatherData();
@@ -53,12 +56,66 @@ export default function Home(props) {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
 
-      // 1. 先查询所有学生总数（用于统计）
-      const totalStudentsResult = await db.collection('students').count();
+      // 获取当前用户信息
+      const user = $w.auth.currentUser;
+      setCurrentUser(user);
+      const userType = user?.type || '';
+      const userName = user?.name || '';
+
+      // 根据用户类型构建查询条件
+      let studentQuery = {};
+      if (userType === '学生') {
+        // 学生只看自己的数据
+        studentQuery = {
+          name: userName
+        };
+      } else if (userType === '班主任') {
+        // 班主任检查是否创建了班级
+        try {
+          const userResult = await db.collection('user').where({
+            name: userName,
+            type: '班主任'
+          }).get();
+          if (userResult.data && userResult.data.length > 0) {
+            const userData = userResult.data[0];
+            if (userData.managed_class_name) {
+              setUserClass(userData.managed_class_name);
+              setHasClass(true);
+              studentQuery = {
+                class_name: userData.managed_class_name
+              };
+            } else {
+              setHasClass(false);
+              // 未创建班级，不显示学生数据
+              setStudents([]);
+              setStatsData({
+                totalStudents: 0,
+                avgScore: 0,
+                pendingTasks: 0
+              });
+              setLoading(false);
+              return;
+            }
+          } else {
+            setHasClass(false);
+          }
+        } catch (err) {
+          console.error('查询班主任班级信息失败:', err);
+          setHasClass(false);
+        }
+      } else if (userType === '家长') {
+        // 家长看自己的孩子（这里简化处理，实际应该从关联表获取）
+        // 暂时显示所有学生数据
+        studentQuery = {};
+      }
+      // 其他角色（管理员、教师等）查看所有数据
+
+      // 1. 先查询符合条件的学生总数（用于统计）
+      const totalStudentsResult = await db.collection('students').where(studentQuery).count();
       const totalStudents = totalStudentsResult.total || 0;
 
-      // 2. 查询所有学生的积分数据（用于计算平均积分）
-      const allStudentsResult = await db.collection('students').field({
+      // 2. 查询符合条件的学生积分数据（用于计算平均积分）
+      const allStudentsResult = await db.collection('students').where(studentQuery).field({
         _id: true,
         name: true,
         current_score: true
@@ -69,8 +126,8 @@ export default function Home(props) {
       const totalScore = allStudents.reduce((sum, s) => sum + (s.current_score || 0), 0);
       const avgScore = totalStudents > 0 ? Math.round(totalScore / totalStudents) : 0;
 
-      // 3. 查询积分排行榜前10名学生
-      const topStudentsResult = await db.collection('students').orderBy('current_score', 'desc').limit(10).get();
+      // 3. 查询积分排行榜前10名学生（基于筛选条件）
+      const topStudentsResult = await db.collection('students').where(studentQuery).orderBy('current_score', 'desc').limit(10).get();
       if (topStudentsResult.data && topStudentsResult.data.length > 0) {
         const transformedStudents = topStudentsResult.data.map(student => ({
           id: student._id,
@@ -274,6 +331,41 @@ export default function Home(props) {
           <p className="text-gray-600">加载中...</p>
         </div>
       </div>;
+  }
+
+  // 班主任未创建班级时显示引导界面
+  if (currentUser?.type === '班主任' && !hasClass) {
+    return <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Users className="w-8 h-8 text-blue-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">欢迎使用班级管理系统</h2>
+          <p className="text-gray-600">您还未创建班级，请先创建班级开始管理</p>
+        </div>
+        
+        <div className="space-y-4">
+          <div className="bg-blue-50 rounded-lg p-4">
+            <h3 className="font-semibold text-blue-900 mb-2">创建班级后您可以：</h3>
+            <ul className="text-sm text-blue-800 space-y-1">
+              <li>• 管理班级学生信息</li>
+              <li>• 记录学生积分和表现</li>
+              <li>• 发布班级公告和通知</li>
+              <li>• 查看班级统计数据</li>
+            </ul>
+          </div>
+          
+          <Button onClick={() => $w.utils.navigateTo({
+            pageId: 'classes-manage',
+            params: {}
+          })} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3">
+            <Plus className="w-4 h-4 mr-2" />
+            创建班级
+          </Button>
+        </div>
+      </div>
+    </div>;
   }
   return <div className="min-h-screen bg-gray-50 pb-16">
       {/* Header - Fixed Position for WeChat Style */}

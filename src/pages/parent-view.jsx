@@ -76,10 +76,38 @@ const ParentView = ({
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
 
-      // 加载所有学生（实际项目中需要根据家长手机号查询关联的学生）
+      // 获取当前用户信息
+      const currentUser = $w.auth.currentUser;
+      const userType = currentUser?.type || '';
+      const userName = currentUser?.name || '';
+      const userId = currentUser?.userId || '';
+
+      // 验证用户是否为家长
+      if (userType !== '家长') {
+        toast({
+          title: '权限错误',
+          description: '当前页面仅限家长访问',
+          variant: 'destructive'
+        });
+        setLoading(false);
+        return;
+      }
+
+      // 加载家长关联的学生（根据家长电话号码或ID查询）
+      // 这里使用 parent_phone_number 字段匹配当前用户的 userId 或 name
       const studentsRes = await db.collection('students').get();
       const allStudents = studentsRes.data || [];
-      setStudents(allStudents);
+
+      // 筛选家长关联的学生（这里简化为匹配家长电话）
+      // 实际项目中应该有专门的家长-学生关联表
+      const parentStudents = allStudents.filter(student => {
+        // 匹配家长电话号码（如果有这个字段）
+        if (student.parent_phone_number && (student.parent_phone_number === userId || student.parent_phone_number === userName)) {
+          return true;
+        }
+        return false;
+      });
+      setStudents(parentStudents);
 
       // 加载学期列表
       const semesterRes = await db.collection('semesters').get();
@@ -89,14 +117,24 @@ const ParentView = ({
         setSelectedSemester(semesterList[0]._id);
       }
 
-      // 默认选中第一个学期
-      if (semesterList.length > 0) {
-        setSelectedSemester(semesterList[0]._id);
+      // 如果没有关联的学生，显示提示
+      if (parentStudents.length === 0) {
+        toast({
+          title: '提示',
+          description: '系统未找到您关联的学生信息，请联系班主任确认。',
+          variant: 'info'
+        });
       }
-
-      // 模拟：家长关联的学生（实际项目中需要从家长数据表查询）
-      // 这里假设家长关联了学号 2025001 和 2025002 的学生
-      const parentStudentIds = ['2025001', '2025002'];
+      console.log('parent-view.jsx 加载家长数据:', {
+        用户类型: userType,
+        用户名称: userName,
+        用户ID: userId,
+        关联学生数: parentStudents.length,
+        学生信息: parentStudents.map(s => ({
+          学号: s.student_id,
+          姓名: s.name
+        }))
+      });
       const relatedStudents = allStudents.filter(s => parentStudentIds.includes(s.student_id));
       setParentStudents(relatedStudents);
 

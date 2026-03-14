@@ -90,8 +90,53 @@ export default function DisciplinePage(props) {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
 
+      // 获取当前用户信息
+      const currentUser = $w.auth.currentUser;
+      const userType = currentUser?.type || '';
+      const userName = currentUser?.name || '';
+
+      // 根据用户类型构建查询条件
+      let studentQuery = {};
+      let recordQuery = {};
+      if (userType === '学生') {
+        // 学生只看自己的数据
+        studentQuery = {
+          name: userName
+        };
+        recordQuery = {
+          student_name: userName
+        };
+      } else if (userType === '班主任') {
+        // 班主任只看自己班级的学生（需要先获取班主任管理的班级）
+        try {
+          const userResult = await db.collection('user').where({
+            name: userName,
+            type: '班主任'
+          }).get();
+          if (userResult.data && userResult.data.length > 0) {
+            const userData = userResult.data[0];
+            if (userData.managed_class_name) {
+              studentQuery = {
+                class_name: userData.managed_class_name
+              };
+              recordQuery = {
+                class_name: userData.managed_class_name
+              };
+            }
+          }
+        } catch (err) {
+          console.error('查询班主任班级信息失败:', err);
+        }
+      } else if (userType === '家长') {
+        // 家长看自己的孩子（这里简化处理，实际应该从关联表获取）
+        // 暂时显示所有学生数据
+        studentQuery = {};
+        recordQuery = {};
+      }
+      // 其他角色（管理员、教师等）查看所有数据
+
       // 加载学生数据
-      const studentResult = await db.collection('students').get();
+      const studentResult = await db.collection('students').where(studentQuery).get();
       if (studentResult.data && studentResult.data.length > 0) {
         const transformedStudents = studentResult.data.map(student => ({
           id: student._id,
@@ -120,8 +165,8 @@ export default function DisciplinePage(props) {
         setDisciplineLevels(transformedLevels);
       }
 
-      // 加载处分记录数据
-      const recordResult = await db.collection('discipline_record').orderBy('date', 'desc').limit(50).get();
+      // 加载处分记录数据（根据用户身份筛选）
+      const recordResult = await db.collection('discipline_record').where(recordQuery).orderBy('date', 'desc').limit(50).get();
       if (recordResult.data && recordResult.data.length > 0) {
         const transformedRecords = recordResult.data.map(record => ({
           id: record._id,

@@ -115,8 +115,67 @@ export default function ClassesManagePage(props) {
   const [classes, setClasses] = useState(MOCK_CLASSES);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGrade, setSelectedGrade] = useState('all');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [selectedClass, setSelectedClass] = useState(null);
+
+  // 加载班级数据
+  React.useEffect(() => {
+    loadClassesData();
+  }, []);
+  const loadClassesData = async () => {
+    try {
+      setLoading(true);
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+
+      // 获取当前用户信息
+      const currentUser = $w.auth.currentUser;
+      const userType = currentUser?.type || '';
+      const userName = currentUser?.name || '';
+      const userId = currentUser?.userId || '';
+
+      // 根据用户类型筛选班级数据
+      let filteredClasses = MOCK_CLASSES;
+      if (userType === '班主任') {
+        // 班主任只看自己管理的班级
+        filteredClasses = MOCK_CLASSES.filter(cls => cls.headTeacher === userName);
+
+        // 如果班主任没有管理的班级，显示提示
+        if (filteredClasses.length === 0) {
+          toast({
+            title: '提示',
+            description: '您还未管理任何班级，请联系管理员分配班级。',
+            variant: 'info'
+          });
+        }
+      } else if (userType === '学生' || userType === '学生班委') {
+        // 学生只看自己所在的班级
+        // 从学生数据中获取班级名称
+        const studentResult = await db.collection('students').where({
+          name: userName
+        }).get();
+        if (studentResult.data && studentResult.data.length > 0) {
+          const studentClassName = studentResult.data[0].class_name;
+          filteredClasses = MOCK_CLASSES.filter(cls => cls.name === studentClassName);
+        }
+      }
+      setClasses(filteredClasses);
+      console.log('classes-manage.jsx 加载班级数据:', {
+        用户类型: userType,
+        用户名称: userName,
+        班级总数: filteredClasses.length
+      });
+    } catch (error) {
+      console.error('加载班级数据失败:', error);
+      toast({
+        title: '加载失败',
+        description: error.message || '加载班级数据失败，请稍后重试',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // 权限检查
   const {
