@@ -52,6 +52,20 @@ export default function DormPointsPage(props) {
   const [deductionItems, setDeductionItems] = useState([]);
   const [loadingDeductionItems, setLoadingDeductionItems] = useState(true);
   const [editingItem, setEditingItem] = useState(null);
+
+  // 权限检查
+  const {
+    permission: canViewDormPoints,
+    loading: loadingViewDormPoints
+  } = usePermission($w, 'dorm_points', 'view');
+  const {
+    permission: canDeductDormPoints,
+    loading: loadingDeductDormPoints
+  } = usePermission($w, 'dorm_points', 'deduct');
+  const {
+    permission: canManageDormSettings,
+    loading: loadingManageDormSettings
+  } = usePermission($w, 'dorm_points', 'manage');
   const [showAddForm, setShowAddForm] = useState(false);
   const [itemFormData, setItemFormData] = useState({
     id: null,

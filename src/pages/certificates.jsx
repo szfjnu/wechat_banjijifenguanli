@@ -9,6 +9,7 @@ import { getBeijingDateString, getBeijingTimeISO, getBeijingTime } from '@/lib/u
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
+import { usePermission } from '@/components/PermissionGuard';
 // 格式化积分：整数显示整数，小数最多显示两位
 const formatPoints = points => {
   if (points === undefined || points === null || isNaN(points)) return '0';
@@ -104,6 +105,28 @@ export default function CertificatesPage(props) {
     studentsCount: 0,
     thisMonth: 0
   });
+
+  // 权限检查
+  const {
+    permission: canViewCertificates,
+    loading: loadingViewCertificates
+  } = usePermission($w, 'certificate', 'view');
+  const {
+    permission: canAddCertificates,
+    loading: loadingAddCertificates
+  } = usePermission($w, 'certificate', 'add');
+  const {
+    permission: canEditCertificates,
+    loading: loadingEditCertificates
+  } = usePermission($w, 'certificate', 'edit');
+  const {
+    permission: canDeleteCertificates,
+    loading: loadingDeleteCertificates
+  } = usePermission($w, 'certificate', 'delete');
+  const {
+    permission: canVerifyCertificates,
+    loading: loadingVerifyCertificates
+  } = usePermission($w, 'certificate', 'verify');
 
   // 表单状态
   const [formData, setFormData] = useState({

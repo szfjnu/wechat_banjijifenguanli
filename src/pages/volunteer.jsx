@@ -7,6 +7,7 @@ import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
+import { usePermission } from '@/components/PermissionGuard';
 
 // 志愿服务活动预设数据
 const ACTIVITY_TYPES = [{
@@ -66,6 +67,24 @@ export default function VolunteerPage({
       params: {}
     });
   };
+
+  // 权限检查
+  const {
+    permission: canViewVolunteer,
+    loading: loadingViewVolunteer
+  } = usePermission($w, 'volunteer', 'view');
+  const {
+    permission: canAddVolunteer,
+    loading: loadingAddVolunteer
+  } = usePermission($w, 'volunteer', 'add');
+  const {
+    permission: canEditVolunteer,
+    loading: loadingEditVolunteer
+  } = usePermission($w, 'volunteer', 'edit');
+  const {
+    permission: canVerifyVolunteer,
+    loading: loadingVerifyVolunteer
+  } = usePermission($w, 'volunteer', 'verify');
 
   // 加载数据
   useEffect(() => {

@@ -8,6 +8,7 @@ import { Activity, TrendingUp, BarChart3, Calendar, Filter, Download, Search, Ar
 import { TabBar } from '@/components/TabBar';
 import { GrowthChart } from '@/components/GrowthChart';
 import { GrowthTimeline } from '@/components/GrowthTimeline';
+import { usePermission } from '@/components/PermissionGuard';
 
 // 格式化积分：整数显示整数，小数最多显示两位
 const formatPoints = points => {
@@ -30,6 +31,20 @@ export default function StudentGrowth(props) {
   const [scoreRecords, setScoreRecords] = useState([]);
   const [filteredRecords, setFilteredRecords] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // 权限检查
+  const {
+    permission: canViewGrowthData,
+    loading: loadingViewGrowthData
+  } = usePermission($w, 'growth_data', 'view');
+  const {
+    permission: canExportGrowthData,
+    loading: loadingExportGrowthData
+  } = usePermission($w, 'growth_data', 'export');
+  const {
+    permission: canManageGrowthData,
+    loading: loadingManageGrowthData
+  } = usePermission($w, 'growth_data', 'manage');
 
   // 筛选条件
   const [searchKeyword, setSearchKeyword] = useState('');

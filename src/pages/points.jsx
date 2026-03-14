@@ -13,6 +13,7 @@ const formatPoints = points => {
   return Number(points).toFixed(2);
 };
 import { TabBar } from '@/components/TabBar';
+import { usePermission } from '@/components/PermissionGuard';
 export default function PointsPage(props) {
   const {
     $w
@@ -28,6 +29,20 @@ export default function PointsPage(props) {
       params: {}
     });
   };
+
+  // 权限检查
+  const {
+    permission: canViewPoints,
+    loading: loadingViewPoints
+  } = usePermission($w, 'points', 'view');
+  const {
+    permission: canAddPoints,
+    loading: loadingAddPoints
+  } = usePermission($w, 'points', 'add');
+  const {
+    permission: canDeductPoints,
+    loading: loadingDeductPoints
+  } = usePermission($w, 'points', 'deduct');
   const [showAddModal, setShowAddModal] = useState(false);
   const [showHistory, setShowHistory] = useState(true);
   const [filterCategory, setFilterCategory] = useState('all');
