@@ -34,19 +34,19 @@ export default function ScheduleManage(props) {
   const {
     permission: canViewSchedule,
     loading: loadingViewSchedule
-  } = usePermission($w, 'schedule', 'view');
+  } = usePermission($w, 'schedule_manage', 'view');
   const {
     permission: canEditSchedule,
     loading: loadingEditSchedule
-  } = usePermission($w, 'schedule', 'edit');
+  } = usePermission($w, 'schedule_manage', 'edit');
   const {
     permission: canDeleteSchedule,
     loading: loadingDeleteSchedule
-  } = usePermission($w, 'schedule', 'delete');
+  } = usePermission($w, 'schedule_manage', 'delete');
   const {
     permission: canManageReminders,
     loading: loadingManageReminders
-  } = usePermission($w, 'schedule', 'reminders');
+  } = usePermission($w, 'schedule_manage', 'create');
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);

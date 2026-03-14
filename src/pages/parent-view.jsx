@@ -58,7 +58,7 @@ const ParentView = ({
   const {
     permission: canExportData,
     loading: loadingExportData
-  } = usePermission($w, 'parent', 'view');
+  } = usePermission($w, 'parent_view', 'view');
 
   // 模拟家长关联的学生（实际项目中需要从数据库查询家长关联的学生）
   const [parentStudents, setParentStudents] = useState([]);

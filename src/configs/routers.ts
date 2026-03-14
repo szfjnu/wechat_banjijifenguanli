@@ -34,6 +34,7 @@ import LOGIN from '../pages/login.jsx';
 import USERS_MANAGE from '../pages/users-manage.jsx';
 import CLASSES_MANAGE from '../pages/classes-manage.jsx';
 import SYSTEM_CONFIG from '../pages/system-config.jsx';
+import PERMISSION_AUDIT from '../pages/permission-audit.jsx';
 export const routers = [{
   id: "home",
   component: HOME
@@ -142,4 +143,7 @@ export const routers = [{
 }, {
   id: "system-config",
   component: SYSTEM_CONFIG
+}, {
+  id: "permission-audit",
+  component: PERMISSION_AUDIT
 }]
