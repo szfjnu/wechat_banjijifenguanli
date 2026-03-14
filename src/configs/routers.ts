@@ -31,6 +31,9 @@ import DISCIPLINE_REVOCATION from '../pages/discipline-revocation.jsx';
 import DISCIPLINE_PROGRESS from '../pages/discipline-progress.jsx';
 import THOUGHT_REPORT from '../pages/thought-report.jsx';
 import LOGIN from '../pages/login.jsx';
+import USERS_MANAGE from '../pages/users-manage.jsx';
+import CLASSES_MANAGE from '../pages/classes-manage.jsx';
+import SYSTEM_CONFIG from '../pages/system-config.jsx';
 export const routers = [{
   id: "home",
   component: HOME
@@ -130,4 +133,13 @@ export const routers = [{
 }, {
   id: "login",
   component: LOGIN
+}, {
+  id: "users-manage",
+  component: USERS_MANAGE
+}, {
+  id: "classes-manage",
+  component: CLASSES_MANAGE
+}, {
+  id: "system-config",
+  component: SYSTEM_CONFIG
 }]
