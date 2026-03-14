@@ -9,6 +9,7 @@ import { TabBar } from '@/components/TabBar';
 import { StatCard } from '@/components/StatCard';
 import { StudentForm } from '@/components/StudentForm';
 import { StudentDetail } from '@/components/StudentDetail';
+import { usePermission } from '@/components/PermissionGuard';
 
 // 格式化积分：整数显示整数，小数最多显示两位
 const formatPoints = points => {
@@ -33,6 +34,24 @@ export default function StudentsManage(props) {
       params: {}
     });
   };
+
+  // 权限检查
+  const {
+    permission: canAddStudent,
+    loading: loadingAddStudent
+  } = usePermission($w, 'student', 'add');
+  const {
+    permission: canEditStudent,
+    loading: loadingEditStudent
+  } = usePermission($w, 'student', 'edit');
+  const {
+    permission: canDeleteStudent,
+    loading: loadingDeleteStudent
+  } = usePermission($w, 'student', 'delete');
+  const {
+    permission: canExportStudent,
+    loading: loadingExportStudent
+  } = usePermission($w, 'student', 'export');
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
@@ -349,14 +368,14 @@ export default function StudentsManage(props) {
               <Button variant="outline" size="icon" onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')} className={sortOrder === 'asc' ? 'bg-orange-50 border-orange-300' : ''}>
                 {sortOrder === 'asc' ? '↑' : '↓'}
               </Button>
-              <Button onClick={() => setShowAddDialog(true)} className="bg-orange-500 hover:bg-orange-600">
-                <Plus className="h-4 w-4 mr-2" />
-                添加学生
-              </Button>
-              <Button variant="outline" onClick={handleExportData}>
-                <Download className="h-4 w-4 mr-2" />
-                导出
-              </Button>
+              {canAddStudent && <Button onClick={() => setShowAddDialog(true)} className="bg-orange-500 hover:bg-orange-600">
+                  <Plus className="h-4 w-4 mr-2" />
+                  添加学生
+                </Button>}
+              {canExportStudent && <Button variant="outline" onClick={handleExportData}>
+                  <Download className="h-4 w-4 mr-2" />
+                  导出
+                </Button>}
             </div>
           </div>
         </div>
@@ -410,15 +429,15 @@ export default function StudentsManage(props) {
                       }}>
                               查看
                             </Button>
-                            <Button variant="ghost" size="sm" onClick={() => {
+                            {canEditStudent && <Button variant="ghost" size="sm" onClick={() => {
                         setSelectedStudent(student);
                         setShowEditDialog(true);
                       }}>
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm" onClick={() => handleDeleteStudent(student)}>
-                              <Trash2 className="h-4 w-4 text-red-500" />
-                            </Button>
+                                <Edit className="h-4 w-4" />
+                              </Button>}
+                            {canDeleteStudent && <Button variant="ghost" size="sm" onClick={() => handleDeleteStudent(student)}>
+                                <Trash2 className="h-4 w-4 text-red-500" />
+                              </Button>}
                           </div>
                         </td>
                       </tr>;

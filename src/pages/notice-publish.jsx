@@ -9,6 +9,7 @@ import { getBeijingTimeISO, getBeijingTime } from '@/lib/utils';
 
 import { TabBar } from '@/components/TabBar';
 import { useForm } from 'react-hook-form';
+import { usePermission } from '@/components/PermissionGuard';
 export default function NoticePublish(props) {
   const {
     toast
@@ -24,6 +25,20 @@ export default function NoticePublish(props) {
   const [activeTab, setActiveTab] = useState('publish');
   const [targetType, setTargetType] = useState('all');
   const [noticeHistory, setNoticeHistory] = useState([]);
+
+  // 权限检查
+  const {
+    permission: canPublishNotice,
+    loading: loadingPublishNotice
+  } = usePermission($w, 'notice', 'publish');
+  const {
+    permission: canDeleteNotice,
+    loading: loadingDeleteNotice
+  } = usePermission($w, 'notice', 'delete');
+  const {
+    permission: canTargetSpecificUsers,
+    loading: loadingTargetSpecificUsers
+  } = usePermission($w, 'notice', 'target_specific');
   const handlePageChange = pageId => {
     setCurrentPage(pageId);
     $w.utils.navigateTo({
@@ -359,12 +374,12 @@ export default function NoticePublish(props) {
                   </div>
 
                   {/* 提交按钮 */}
-                  <Button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-[#2A52BE] to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-md">
-                    {loading ? '发布中...' : <span>
-                        <Send className="w-4 h-4 inline mr-2" />
-                        立即发布
-                      </span>}
-                  </Button>
+                  {canPublishNotice && <Button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-[#2A52BE] to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-md">
+                      {loading ? '发布中...' : <span>
+                          <Send className="w-4 h-4 inline mr-2" />
+                          立即发布
+                        </span>}
+                    </Button>}
                 </form>
               </Form>
             </Card>

@@ -9,6 +9,7 @@ import { getBeijingTimeISO, getBeijingDateString, getBeijingTime } from '@/lib/u
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
+import { usePermission } from '@/components/PermissionGuard';
 export default function PointsSettings({
   $w,
   className,
@@ -28,6 +29,16 @@ export default function PointsSettings({
 
   // 标签页切换
   const [activeTab, setActiveTab] = useState('points'); // 'points' or 'discipline'
+
+  // 权限检查
+  const {
+    permission: canEditPointRules,
+    loading: loadingEditPointRules
+  } = usePermission($w, 'point_rule', 'edit');
+  const {
+    permission: canEditDisciplineLevels,
+    loading: loadingEditDisciplineLevels
+  } = usePermission($w, 'discipline_level', 'edit');
 
   // 积分项目数据状态
   const [items, setItems] = useState([]);
@@ -642,12 +653,12 @@ export default function PointsSettings({
             </div>
             
             {/* Add Button */}
-            <div className="mb-4">
-              <button onClick={handleAdd} className="flex items-center gap-2 bg-emerald-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-emerald-600 transition-colors shadow-md">
-                <Plus className="w-5 h-5" />
-                添加积分项目
-              </button>
-            </div>
+            {canEditPointRules && <div className="mb-4">
+                <button onClick={handleAdd} className="flex items-center gap-2 bg-emerald-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-emerald-600 transition-colors shadow-md">
+                  <Plus className="w-5 h-5" />
+                  添加积分项目
+                </button>
+              </div>}
             
             {/* Items List */}
             <div className="space-y-4">

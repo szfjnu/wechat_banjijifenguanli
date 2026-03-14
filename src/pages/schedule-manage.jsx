@@ -9,6 +9,7 @@ import { getBeijingTimeISO, getBeijingDateString, getBeijingTime } from '@/lib/u
 
 import { TabBar } from '@/components/TabBar';
 import { TeacherScheduleReminder } from '@/components/TeacherScheduleReminder';
+import { usePermission } from '@/components/PermissionGuard';
 export default function ScheduleManage(props) {
   const {
     $w
@@ -28,6 +29,24 @@ export default function ScheduleManage(props) {
   const [scheduleData, setScheduleData] = useState([]);
   const [timetableData, setTimetableData] = useState([]);
   const [sections, setSections] = useState([]);
+
+  // 权限检查
+  const {
+    permission: canViewSchedule,
+    loading: loadingViewSchedule
+  } = usePermission($w, 'schedule', 'view');
+  const {
+    permission: canEditSchedule,
+    loading: loadingEditSchedule
+  } = usePermission($w, 'schedule', 'edit');
+  const {
+    permission: canDeleteSchedule,
+    loading: loadingDeleteSchedule
+  } = usePermission($w, 'schedule', 'delete');
+  const {
+    permission: canManageReminders,
+    loading: loadingManageReminders
+  } = usePermission($w, 'schedule', 'reminders');
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -426,10 +445,10 @@ export default function ScheduleManage(props) {
             <p className="text-orange-100 text-sm">管理课程表和作息时间</p>
           </div>
           <div className="flex space-x-2">
-            <Button size="sm" className="bg-white text-orange-600 hover:bg-orange-50" onClick={handleAddSchedule}>
-              <Plus className="w-4 h-4 mr-1" />
-              添加课程
-            </Button>
+            {canEditSchedule && <Button size="sm" className="bg-white text-orange-600 hover:bg-orange-50" onClick={handleAddSchedule}>
+                <Plus className="w-4 h-4 mr-1" />
+                添加课程
+              </Button>}
           </div>
         </div>
         <div className="flex space-x-2 bg-white/20 backdrop-blur rounded-lg p-1">
