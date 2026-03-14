@@ -39,19 +39,19 @@ export default function StudentsManage(props) {
   const {
     permission: canAddStudent,
     loading: loadingAddStudent
-  } = usePermission($w, 'student', 'add');
+  } = usePermission($w, 'students', 'add');
   const {
     permission: canEditStudent,
     loading: loadingEditStudent
-  } = usePermission($w, 'student', 'edit');
+  } = usePermission($w, 'students', 'edit');
   const {
     permission: canDeleteStudent,
     loading: loadingDeleteStudent
-  } = usePermission($w, 'student', 'delete');
+  } = usePermission($w, 'students', 'delete');
   const {
     permission: canExportStudent,
     loading: loadingExportStudent
-  } = usePermission($w, 'student', 'export');
+  } = usePermission($w, 'students', 'export');
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);

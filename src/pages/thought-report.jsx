@@ -40,6 +40,24 @@ export default function ThoughtReportPage(props) {
   const [disciplineRecords, setDisciplineRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState(null);
+
+  // 权限检查
+  const {
+    permission: canViewThoughtReport,
+    loading: loadingViewThoughtReport
+  } = usePermission($w, 'thought_report', 'view');
+  const {
+    permission: canCreateThoughtReport,
+    loading: loadingCreateThoughtReport
+  } = usePermission($w, 'thought_report', 'create');
+  const {
+    permission: canApproveThoughtReport,
+    loading: loadingApproveThoughtReport
+  } = usePermission($w, 'thought_report', 'approve');
+  const {
+    permission: canRejectThoughtReport,
+    loading: loadingRejectThoughtReport
+  } = usePermission($w, 'thought_report', 'reject');
   const [newReport, setNewReport] = useState({
     disciplineRecordId: '',
     title: '',

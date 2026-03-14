@@ -107,15 +107,15 @@ export default function ExamMonitorPage(props) {
   const {
     permission: canViewExamData,
     loading: loadingViewExamData
-  } = usePermission($w, 'exam_data', 'view');
+  } = usePermission($w, 'exam_monitor', 'view');
   const {
     permission: canEditExamData,
     loading: loadingEditExamData
-  } = usePermission($w, 'exam_data', 'edit');
+  } = usePermission($w, 'exam_monitor', 'edit');
   const {
     permission: canExportExamData,
     loading: loadingExportExamData
-  } = usePermission($w, 'exam_data', 'export');
+  } = usePermission($w, 'exam_monitor', 'export');
 
   // 数据状态
   const [students, setStudents] = useState([]);

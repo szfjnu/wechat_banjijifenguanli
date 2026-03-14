@@ -7,6 +7,7 @@ import { Clock, FileText, User, CheckCircle, AlertCircle, Plus, History } from '
 
 // @ts-ignore;
 import { TabBar } from '@/components/TabBar';
+import { usePermission } from '@/components/PermissionGuard';
 
 // 获取北京时间（UTC+8）
 const getBeijingTime = () => {
@@ -30,6 +31,24 @@ export default function RevocationVolunteerPage(props) {
   } = useToast();
   const currentUser = props.$w.auth.currentUser;
   const [loading, setLoading] = useState(true);
+
+  // 权限检查
+  const {
+    permission: canViewRevocationVolunteer,
+    loading: loadingViewRevocationVolunteer
+  } = usePermission($w, 'revocation_volunteer', 'view');
+  const {
+    permission: canCreateRevocationVolunteer,
+    loading: loadingCreateRevocationVolunteer
+  } = usePermission($w, 'revocation_volunteer', 'create');
+  const {
+    permission: canApproveRevocationVolunteer,
+    loading: loadingApproveRevocationVolunteer
+  } = usePermission($w, 'revocation_volunteer', 'approve');
+  const {
+    permission: canRejectRevocationVolunteer,
+    loading: loadingRejectRevocationVolunteer
+  } = usePermission($w, 'revocation_volunteer', 'reject');
   const [submitting, setSubmitting] = useState(false);
   const [disciplineRecords, setDisciplineRecords] = useState([]);
   const [volunteerRecords, setVolunteerRecords] = useState([]);

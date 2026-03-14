@@ -103,23 +103,23 @@ export default function CertificatesPage(props) {
   const {
     permission: canViewCertificates,
     loading: loadingViewCertificates
-  } = usePermission($w, 'certificate', 'view');
+  } = usePermission($w, 'certificates', 'view');
   const {
     permission: canAddCertificates,
     loading: loadingAddCertificates
-  } = usePermission($w, 'certificate', 'add');
+  } = usePermission($w, 'certificates', 'create');
   const {
     permission: canEditCertificates,
     loading: loadingEditCertificates
-  } = usePermission($w, 'certificate', 'edit');
+  } = usePermission($w, 'certificates', 'edit');
   const {
     permission: canDeleteCertificates,
     loading: loadingDeleteCertificates
-  } = usePermission($w, 'certificate', 'delete');
+  } = usePermission($w, 'certificates', 'delete');
   const {
     permission: canVerifyCertificates,
     loading: loadingVerifyCertificates
-  } = usePermission($w, 'certificate', 'verify');
+  } = usePermission($w, 'certificates', 'approve');
   const [exportRange, setExportRange] = useState('all');
   const [stats, setStats] = useState({
     total: 0,

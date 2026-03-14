@@ -34,11 +34,11 @@ export default function PointsSettings({
   const {
     permission: canEditPointRules,
     loading: loadingEditPointRules
-  } = usePermission($w, 'point_rule', 'edit');
+  } = usePermission($w, 'points_settings', 'view');
   const {
     permission: canEditDisciplineLevels,
     loading: loadingEditDisciplineLevels
-  } = usePermission($w, 'discipline_level', 'edit');
+  } = usePermission($w, 'discipline_level_config', 'view');
 
   // 积分项目数据状态
   const [items, setItems] = useState([]);

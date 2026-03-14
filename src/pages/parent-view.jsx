@@ -46,19 +46,19 @@ const ParentView = ({
   const {
     permission: canViewStudentData,
     loading: loadingViewStudentData
-  } = usePermission($w, 'student_data', 'view');
+  } = usePermission($w, 'students', 'view');
   const {
     permission: canViewDisciplineRecords,
     loading: loadingViewDisciplineRecords
-  } = usePermission($w, 'discipline_record', 'view');
+  } = usePermission($w, 'discipline', 'view');
   const {
     permission: canViewGrowthRecords,
     loading: loadingViewGrowthRecords
-  } = usePermission($w, 'growth_record', 'view');
+  } = usePermission($w, 'student_growth', 'view');
   const {
     permission: canExportData,
     loading: loadingExportData
-  } = usePermission($w, 'export', 'view');
+  } = usePermission($w, 'parent', 'view');
 
   // 模拟家长关联的学生（实际项目中需要从数据库查询家长关联的学生）
   const [parentStudents, setParentStudents] = useState([]);
