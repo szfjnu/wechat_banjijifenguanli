@@ -8,6 +8,7 @@ import { Trophy, Calendar, Clock, FileText, Upload, AlertCircle, CheckCircle, XC
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 import { ProgressStatCard } from '@/components/ProgressStatCard';
+import { usePermission } from '@/components/PermissionGuard';
 
 // 获取北京时间（UTC+8）
 const getBeijingTime = () => {
@@ -39,6 +40,28 @@ export default function DisciplineRevocationPage(props) {
   const [disciplineRecords, setDisciplineRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState(null);
+
+  // 权限检查
+  const {
+    permission: canViewDisciplineRevocation,
+    loading: loadingViewDisciplineRevocation
+  } = usePermission($w, 'discipline_revocation', 'view');
+  const {
+    permission: canCreateDisciplineRevocation,
+    loading: loadingCreateDisciplineRevocation
+  } = usePermission($w, 'discipline_revocation', 'create');
+  const {
+    permission: canEditDisciplineRevocation,
+    loading: loadingEditDisciplineRevocation
+  } = usePermission($w, 'discipline_revocation', 'edit');
+  const {
+    permission: canApproveDisciplineRevocation,
+    loading: loadingApproveDisciplineRevocation
+  } = usePermission($w, 'discipline_revocation', 'approve');
+  const {
+    permission: canRejectDisciplineRevocation,
+    loading: loadingRejectDisciplineRevocation
+  } = usePermission($w, 'discipline_revocation', 'reject');
   const [newRequest, setNewRequest] = useState({
     disciplineRecordId: '',
     reason: '',

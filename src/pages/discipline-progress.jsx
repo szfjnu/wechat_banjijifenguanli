@@ -9,6 +9,7 @@ import { getBeijingDateString } from '@/lib/utils';
 
 import { TabBar } from '@/components/TabBar';
 import { ProgressStatCard } from '@/components/ProgressStatCard';
+import { usePermission } from '@/components/PermissionGuard';
 
 // 获取北京时间（UTC+8）
 const getBeijingTime = () => {
@@ -27,6 +28,16 @@ export default function DisciplineProgressPage(props) {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState(null);
+
+  // 权限检查
+  const {
+    permission: canViewDisciplineProgress,
+    loading: loadingViewDisciplineProgress
+  } = usePermission($w, 'discipline_progress', 'view');
+  const {
+    permission: canEditDisciplineProgress,
+    loading: loadingEditDisciplineProgress
+  } = usePermission($w, 'discipline_progress', 'edit');
   useEffect(() => {
     if ($w && $w.auth && $w.auth.currentUser) {
       setCurrentUser($w.auth.currentUser);

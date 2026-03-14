@@ -8,6 +8,7 @@ import { Trophy, FileText, Calendar, Clock, AlertCircle, CheckCircle, XCircle, B
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 import { ProgressStatCard } from '@/components/ProgressStatCard';
+import { usePermission } from '@/components/PermissionGuard';
 
 // 获取北京时间（UTC+8）
 const getBeijingTime = () => {

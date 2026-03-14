@@ -6,6 +6,7 @@ import { useToast } from '@/components/ui';
 import { AlertTriangle, Plus, Edit2, Trash2, Save, X, Calendar, ChevronUp, ChevronDown, ArrowLeft } from 'lucide-react';
 
 import { TabBar } from '@/components/TabBar';
+import { usePermission } from '@/components/PermissionGuard';
 export default function DisciplineLevelConfig({
   $w,
   className,
@@ -22,6 +23,24 @@ export default function DisciplineLevelConfig({
       params: {}
     });
   };
+
+  // 权限检查
+  const {
+    permission: canViewDisciplineLevelConfig,
+    loading: loadingViewDisciplineLevelConfig
+  } = usePermission($w, 'discipline_level_config', 'view');
+  const {
+    permission: canCreateDisciplineLevelConfig,
+    loading: loadingCreateDisciplineLevelConfig
+  } = usePermission($w, 'discipline_level_config', 'create');
+  const {
+    permission: canEditDisciplineLevelConfig,
+    loading: loadingEditDisciplineLevelConfig
+  } = usePermission($w, 'discipline_level_config', 'edit');
+  const {
+    permission: canDeleteDisciplineLevelConfig,
+    loading: loadingDeleteDisciplineLevelConfig
+  } = usePermission($w, 'discipline_level_config', 'delete');
 
   // 数据状态
   const [levels, setLevels] = useState([]);

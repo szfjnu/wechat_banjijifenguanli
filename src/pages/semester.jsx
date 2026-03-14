@@ -9,6 +9,7 @@ import { getBeijingTimeISO, getBeijingDateString, getBeijingTime } from '@/lib/u
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
+import { usePermission } from '@/components/PermissionGuard';
 export default function SemesterPage(props) {
   const {
     toast
@@ -19,6 +20,28 @@ export default function SemesterPage(props) {
   const [semesters, setSemesters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState('semester');
+
+  // 权限检查
+  const {
+    permission: canViewSemester,
+    loading: loadingViewSemester
+  } = usePermission($w, 'semester', 'view');
+  const {
+    permission: canCreateSemester,
+    loading: loadingCreateSemester
+  } = usePermission($w, 'semester', 'create');
+  const {
+    permission: canEditSemester,
+    loading: loadingEditSemester
+  } = usePermission($w, 'semester', 'edit');
+  const {
+    permission: canDeleteSemester,
+    loading: loadingDeleteSemester
+  } = usePermission($w, 'semester', 'delete');
+  const {
+    permission: canSetCurrentSemester,
+    loading: loadingSetCurrentSemester
+  } = usePermission($w, 'semester', 'approve');
 
   // 加载学期数据
   useEffect(() => {

@@ -9,6 +9,7 @@ import { getBeijingTimeISO, getBeijingDateString, getBeijingTime } from '@/lib/u
 
 import { TabBar } from '@/components/TabBar';
 import { StatCard } from '@/components/StatCard';
+import { usePermission } from '@/components/PermissionGuard';
 export default function Subjects(props) {
   const {
     $w
@@ -24,6 +25,24 @@ export default function Subjects(props) {
       params: {}
     });
   };
+
+  // 权限检查
+  const {
+    permission: canViewSubjects,
+    loading: loadingViewSubjects
+  } = usePermission($w, 'subjects', 'view');
+  const {
+    permission: canCreateSubjects,
+    loading: loadingCreateSubjects
+  } = usePermission($w, 'subjects', 'create');
+  const {
+    permission: canEditSubjects,
+    loading: loadingEditSubjects
+  } = usePermission($w, 'subjects', 'edit');
+  const {
+    permission: canDeleteSubjects,
+    loading: loadingDeleteSubjects
+  } = usePermission($w, 'subjects', 'delete');
   const [loading, setLoading] = useState(true);
   const [subjects, setSubjects] = useState([]);
   const [filteredSubjects, setFilteredSubjects] = useState([]);

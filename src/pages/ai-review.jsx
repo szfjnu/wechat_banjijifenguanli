@@ -8,6 +8,8 @@ import { Button, useToast } from '@/components/ui';
 import { getBeijingDateString, getBeijingTimeISO, getBeijingTime } from '@/lib/utils';
 
 import { TabBar } from '@/components/TabBar';
+import { usePermission } from '@/components/PermissionGuard';
+
 // 格式化积分：整数显示整数，小数最多显示两位
 const formatPoints = points => {
   if (points === undefined || points === null || isNaN(points)) return '0';
@@ -57,6 +59,28 @@ export default function AIReviewPage(props) {
   const [loadingStudents, setLoadingStudents] = useState(false);
   const [loadingReviews, setLoadingReviews] = useState(false);
   const [studentDetail, setStudentDetail] = useState(null);
+
+  // 权限检查
+  const {
+    permission: canViewAiReview,
+    loading: loadingViewAiReview
+  } = usePermission($w, 'ai_review', 'view');
+  const {
+    permission: canCreateAiReview,
+    loading: loadingCreateAiReview
+  } = usePermission($w, 'ai_review', 'create');
+  const {
+    permission: canEditAiReview,
+    loading: loadingEditAiReview
+  } = usePermission($w, 'ai_review', 'edit');
+  const {
+    permission: canDeleteAiReview,
+    loading: loadingDeleteAiReview
+  } = usePermission($w, 'ai_review', 'delete');
+  const {
+    permission: canExportAiReview,
+    loading: loadingExportAiReview
+  } = usePermission($w, 'ai_review', 'approve');
 
   // 加载学生数据
   const loadStudents = async () => {
