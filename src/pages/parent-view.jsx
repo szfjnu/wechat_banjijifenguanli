@@ -11,6 +11,7 @@ import ExcelExport from '@/components/ExcelExport';
 import ReportGenerator from '@/components/ReportGenerator';
 import GrowthTimeline from '@/components/GrowthTimeline';
 import GrowthChart from '@/components/GrowthChart';
+import { usePermission } from '@/components/PermissionGuard';
 
 // 格式化积分：整数显示整数，小数最多显示两位
 const formatPoints = points => {
@@ -40,6 +41,24 @@ const ParentView = ({
   const [showCompare, setShowCompare] = useState(false);
   const [showExport, setShowExport] = useState(false);
   const [showReport, setShowReport] = useState(false);
+
+  // 权限检查
+  const {
+    permission: canViewStudentData,
+    loading: loadingViewStudentData
+  } = usePermission($w, 'student_data', 'view');
+  const {
+    permission: canViewDisciplineRecords,
+    loading: loadingViewDisciplineRecords
+  } = usePermission($w, 'discipline_record', 'view');
+  const {
+    permission: canViewGrowthRecords,
+    loading: loadingViewGrowthRecords
+  } = usePermission($w, 'growth_record', 'view');
+  const {
+    permission: canExportData,
+    loading: loadingExportData
+  } = usePermission($w, 'export', 'view');
 
   // 模拟家长关联的学生（实际项目中需要从数据库查询家长关联的学生）
   const [parentStudents, setParentStudents] = useState([]);

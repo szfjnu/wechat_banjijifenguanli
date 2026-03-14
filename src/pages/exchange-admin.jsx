@@ -9,6 +9,7 @@ import { getBeijingTimeISO, getBeijingDateString, getBeijingTime } from '@/lib/u
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
+import { usePermission } from '@/components/PermissionGuard';
 export default function ExchangeAdmin({
   $w,
   className,
@@ -39,6 +40,20 @@ export default function ExchangeAdmin({
   const [editedItem, setEditedItem] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [activeTab, setActiveTab] = useState('items');
+
+  // 权限检查
+  const {
+    permission: canManageExchangeItems,
+    loading: loadingManageExchangeItems
+  } = usePermission($w, 'exchange', 'manage');
+  const {
+    permission: canViewExchangeHistory,
+    loading: loadingViewExchangeHistory
+  } = usePermission($w, 'exchange', 'view_history');
+  const {
+    permission: canApproveExchange,
+    loading: loadingApproveExchange
+  } = usePermission($w, 'exchange', 'approve');
   const [newItem, setNewItem] = useState({
     name: '',
     description: '',
@@ -416,10 +431,10 @@ export default function ExchangeAdmin({
                 </div>
               </div>
             </div>
-            <button onClick={() => setIsAddModalOpen(true)} className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-medium transition-all duration-200 flex items-center gap-2 shadow-lg shadow-yellow-500/25">
-              <Plus className="w-4 h-4" />
-              添加物品
-            </button>
+            {canManageExchangeItems && <button onClick={() => setIsAddModalOpen(true)} className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-medium transition-all duration-200 flex items-center gap-2 shadow-lg shadow-yellow-500/25">
+                <Plus className="w-4 h-4" />
+                添加物品
+              </button>}
           </div>
 
           {/* Stats Cards */}

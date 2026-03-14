@@ -14,6 +14,7 @@ const formatPoints = points => {
 };
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
+import { usePermission } from '@/components/PermissionGuard';
 
 // 折算比例配置（默认30%）
 const CONVERSION_RATE = 0.3;

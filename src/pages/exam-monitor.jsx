@@ -9,6 +9,7 @@ import { getBeijingTimeISO, getBeijingDateString, getBeijingTime } from '@/lib/u
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
+import { usePermission } from '@/components/PermissionGuard';
 // 模拟转段考科目配置（可标记为转段考科目）
 const EXAM_SUBJECTS = [{
   id: 1,
@@ -101,6 +102,20 @@ export default function ExamMonitorPage(props) {
       params: {}
     });
   };
+
+  // 权限检查
+  const {
+    permission: canViewExamData,
+    loading: loadingViewExamData
+  } = usePermission($w, 'exam_data', 'view');
+  const {
+    permission: canEditExamData,
+    loading: loadingEditExamData
+  } = usePermission($w, 'exam_data', 'edit');
+  const {
+    permission: canExportExamData,
+    loading: loadingExportExamData
+  } = usePermission($w, 'exam_data', 'export');
 
   // 数据状态
   const [students, setStudents] = useState([]);

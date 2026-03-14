@@ -62,6 +62,24 @@ export default function DisciplinePage(props) {
     reportCountRequired: ''
   });
 
+  // 权限检查
+  const {
+    permission: canCreateDiscipline,
+    loading: loadingCreateDiscipline
+  } = usePermission($w, 'discipline', 'create');
+  const {
+    permission: canEditDiscipline,
+    loading: loadingEditDiscipline
+  } = usePermission($w, 'discipline', 'edit');
+  const {
+    permission: canApproveDiscipline,
+    loading: loadingApproveDiscipline
+  } = usePermission($w, 'discipline', 'approve');
+  const {
+    permission: canRejectDiscipline,
+    loading: loadingRejectDiscipline
+  } = usePermission($w, 'discipline', 'reject');
+
   // 加载数据
   useEffect(() => {
     loadData();
