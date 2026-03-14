@@ -5,6 +5,7 @@ import { Settings2, Target, Home, ShoppingBag, Bed, TrendingUp, ChevronRight, Pl
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
+import { usePermission, ConditionalRender } from '@/components/PermissionGuard';
 export default function PointsManage({
   $w,
   className,
@@ -18,6 +19,24 @@ export default function PointsManage({
       params: {}
     });
   };
+
+  // 权限检查
+  const {
+    permission: canViewPointsSettings,
+    loading: loadingPointsSettings
+  } = usePermission($w, 'points_settings', 'view');
+  const {
+    permission: canViewDormPoints,
+    loading: loadingDormPoints
+  } = usePermission($w, 'dorm_points', 'view');
+  const {
+    permission: canViewExchangeAdmin,
+    loading: loadingExchangeAdmin
+  } = usePermission($w, 'exchange_admin', 'view');
+  const {
+    permission: canViewPoints,
+    loading: loadingPoints
+  } = usePermission($w, 'points', 'view');
   const stats = {
     totalProjects: 10,
     totalStudents: 35,
@@ -159,6 +178,21 @@ export default function PointsManage({
           {menuItems.map((item, index) => {
           const colors = colorClasses[item.color];
           const Icon = item.icon;
+
+          // 权限检查
+          let hasPermission = false;
+          if (item.id === 'points-settings') {
+            hasPermission = canViewPointsSettings && !loadingPointsSettings;
+          } else if (item.id === 'dorm-points') {
+            hasPermission = canViewDormPoints && !loadingDormPoints;
+          } else if (item.id === 'exchange-admin') {
+            hasPermission = canViewExchangeAdmin && !loadingExchangeAdmin;
+          } else if (item.id === 'points') {
+            hasPermission = canViewPoints && !loadingPoints;
+          }
+
+          // 如果没有权限，不显示该菜单项
+          if (!hasPermission) return null;
           return <div key={item.id} onClick={() => $w.utils.navigateTo({
             pageId: item.id,
             params: {}
