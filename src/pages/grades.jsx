@@ -9,6 +9,8 @@ import { getBeijingDateString, getBeijingTimeISO, getBeijingTime } from '@/lib/u
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
+import { usePermission } from '@/components/PermissionGuard';
+
 // 学科预设数据（包含标准学分）
 const SUBJECTS = [{
   id: 1,
@@ -103,6 +105,24 @@ export default function GradesPage(props) {
   };
   const [loading, setLoading] = useState(true);
   const [grades, setGrades] = useState([]);
+
+  // 权限检查
+  const {
+    permission: canViewGrades,
+    loading: loadingViewGrades
+  } = usePermission($w, 'grades', 'view');
+  const {
+    permission: canAddGrades,
+    loading: loadingAddGrades
+  } = usePermission($w, 'grades', 'add');
+  const {
+    permission: canEditGrades,
+    loading: loadingEditGrades
+  } = usePermission($w, 'grades', 'edit');
+  const {
+    permission: canDeleteGrades,
+    loading: loadingDeleteGrades
+  } = usePermission($w, 'grades', 'delete');
   const [students, setStudents] = useState([]);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showDetailDialog, setShowDetailDialog] = useState(false);

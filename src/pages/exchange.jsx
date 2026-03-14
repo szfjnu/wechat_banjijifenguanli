@@ -8,6 +8,8 @@ import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger
 import { getBeijingTimeISO, getBeijingTime } from '@/lib/utils';
 
 import { TabBar } from '@/components/TabBar';
+import { usePermission } from '@/components/PermissionGuard';
+
 // 格式化积分：整数显示整数，小数最多显示两位
 const formatPoints = points => {
   if (points === undefined || points === null || isNaN(points)) return '0';
@@ -49,6 +51,20 @@ export default function ExchangePage({
   const [selectedItem, setSelectedItem] = useState(null);
   const [itemBiddings, setItemBiddings] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // 权限检查
+  const {
+    permission: canViewExchange,
+    loading: loadingViewExchange
+  } = usePermission($w, 'exchange', 'view');
+  const {
+    permission: canBidExchange,
+    loading: loadingBidExchange
+  } = usePermission($w, 'exchange', 'bid');
+  const {
+    permission: canApproveExchange,
+    loading: loadingApproveExchange
+  } = usePermission($w, 'exchange', 'approve');
 
   // 表单状态
   const [bidPoints, setBidPoints] = useState('');

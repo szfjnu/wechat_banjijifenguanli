@@ -98,13 +98,6 @@ export default function CertificatesPage(props) {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showExportDialog, setShowExportDialog] = useState(false);
-  const [exportRange, setExportRange] = useState('all');
-  const [stats, setStats] = useState({
-    total: 0,
-    totalPoints: 0,
-    studentsCount: 0,
-    thisMonth: 0
-  });
 
   // 权限检查
   const {
@@ -127,6 +120,13 @@ export default function CertificatesPage(props) {
     permission: canVerifyCertificates,
     loading: loadingVerifyCertificates
   } = usePermission($w, 'certificate', 'verify');
+  const [exportRange, setExportRange] = useState('all');
+  const [stats, setStats] = useState({
+    total: 0,
+    totalPoints: 0,
+    studentsCount: 0,
+    thisMonth: 0
+  });
 
   // 表单状态
   const [formData, setFormData] = useState({

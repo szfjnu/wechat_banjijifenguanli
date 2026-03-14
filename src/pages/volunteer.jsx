@@ -82,6 +82,10 @@ export default function VolunteerPage({
     loading: loadingEditVolunteer
   } = usePermission($w, 'volunteer', 'edit');
   const {
+    permission: canDeleteVolunteer,
+    loading: loadingDeleteVolunteer
+  } = usePermission($w, 'volunteer', 'delete');
+  const {
     permission: canVerifyVolunteer,
     loading: loadingVerifyVolunteer
   } = usePermission($w, 'volunteer', 'verify');

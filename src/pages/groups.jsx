@@ -7,6 +7,7 @@ import { Button, useToast } from '@/components/ui';
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
+import { usePermission } from '@/components/PermissionGuard';
 
 // 学期预设数据
 // 初始化学期列表为空，后续从数据库加载
@@ -30,6 +31,28 @@ export default function GroupsPage(props) {
   };
   const [loading, setLoading] = useState(true);
   const [groups, setGroups] = useState([]);
+
+  // 权限检查
+  const {
+    permission: canViewGroups,
+    loading: loadingViewGroups
+  } = usePermission($w, 'groups', 'view');
+  const {
+    permission: canCreateGroups,
+    loading: loadingCreateGroups
+  } = usePermission($w, 'groups', 'create');
+  const {
+    permission: canEditGroups,
+    loading: loadingEditGroups
+  } = usePermission($w, 'groups', 'edit');
+  const {
+    permission: canDeleteGroups,
+    loading: loadingDeleteGroups
+  } = usePermission($w, 'groups', 'delete');
+  const {
+    permission: canAssignStudents,
+    loading: loadingAssignStudents
+  } = usePermission($w, 'groups', 'assign');
   const [students, setStudents] = useState([]);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);

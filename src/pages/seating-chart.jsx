@@ -7,6 +7,7 @@ import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
+import { usePermission } from '@/components/PermissionGuard';
 export default function SeatingChart(props) {
   const {
     $w
@@ -24,6 +25,20 @@ export default function SeatingChart(props) {
   };
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState([]);
+
+  // 权限检查
+  const {
+    permission: canViewSeatingChart,
+    loading: loadingViewSeatingChart
+  } = usePermission($w, 'seating_chart', 'view');
+  const {
+    permission: canEditSeatingChart,
+    loading: loadingEditSeatingChart
+  } = usePermission($w, 'seating_chart', 'edit');
+  const {
+    permission: canResetSeatingChart,
+    loading: loadingResetSeatingChart
+  } = usePermission($w, 'seating_chart', 'reset');
   const [seats, setSeats] = useState({});
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [selectedSeat, setSelectedSeat] = useState(null);

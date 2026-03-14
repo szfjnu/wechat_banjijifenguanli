@@ -9,6 +9,7 @@ import { getBeijingTimeISO, getBeijingDateString, getBeijingTime } from '@/lib/u
 
 import { TabBar } from '@/components/TabBar';
 import { StatCard } from '@/components/StatCard';
+import { usePermission } from '@/components/PermissionGuard';
 export default function DutyRoster(props) {
   const {
     $w
@@ -40,6 +41,29 @@ export default function DutyRoster(props) {
   const [customTaskName, setCustomTaskName] = useState('');
   const [isCustomTask, setIsCustomTask] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  // 权限检查
+  const {
+    permission: canViewDutyRoster,
+    loading: loadingViewDutyRoster
+  } = usePermission($w, 'duty_roster', 'view');
+  const {
+    permission: canAddDutyRoster,
+    loading: loadingAddDutyRoster
+  } = usePermission($w, 'duty_roster', 'add');
+  const {
+    permission: canEditDutyRoster,
+    loading: loadingEditDutyRoster
+  } = usePermission($w, 'duty_roster', 'edit');
+  const {
+    permission: canDeleteDutyRoster,
+    loading: loadingDeleteDutyRoster
+  } = usePermission($w, 'duty_roster', 'delete');
+  const {
+    permission: canCheckDutyRoster,
+    loading: loadingCheckDutyRoster
+  } = usePermission($w, 'duty_roster', 'check');
+
   // 新增值日任务表单
   const [newTask, setNewTask] = useState({
     studentId: '',

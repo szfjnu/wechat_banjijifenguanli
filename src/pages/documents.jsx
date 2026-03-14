@@ -9,6 +9,8 @@ import { getBeijingDateString, getBeijingTimeISO, getBeijingTime } from '@/lib/u
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
+import { usePermission } from '@/components/PermissionGuard';
+
 // 文件分类
 const CATEGORIES = [{
   value: 'all',
@@ -110,6 +112,28 @@ export default function DocumentsPage({
   // 文件操作
   const [isUploading, setIsUploading] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // 权限检查
+  const {
+    permission: canViewDocuments,
+    loading: loadingViewDocuments
+  } = usePermission($w, 'documents', 'view');
+  const {
+    permission: canUploadDocuments,
+    loading: loadingUploadDocuments
+  } = usePermission($w, 'documents', 'upload');
+  const {
+    permission: canEditDocuments,
+    loading: loadingEditDocuments
+  } = usePermission($w, 'documents', 'edit');
+  const {
+    permission: canDeleteDocuments,
+    loading: loadingDeleteDocuments
+  } = usePermission($w, 'documents', 'delete');
+  const {
+    permission: canApproveDocuments,
+    loading: loadingApproveDocuments
+  } = usePermission($w, 'documents', 'approve');
 
   // 加载数据
   useEffect(() => {
