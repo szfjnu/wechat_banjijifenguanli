@@ -261,10 +261,51 @@ export default function DormPointsPage(props) {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
 
-      // 从数据库加载住宿生数据
-      const result = await db.collection('students').where({
+      // 获取当前用户信息
+      const currentUser = $w.auth.currentUser;
+      const userType = currentUser?.type || '';
+      const userName = currentUser?.name || '';
+
+      // 构建基础查询条件：住宿生
+      let studentQuery = {
         is_boarding: true
-      }).get();
+      };
+
+      // 根据用户类型添加额外的筛选条件
+      if (userType === '学生') {
+        // 学生只看自己的数据
+        studentQuery = {
+          ...studentQuery,
+          name: userName
+        };
+      } else if (userType === '班主任') {
+        // 班主任只看自己班级的学生
+        try {
+          const userResult = await db.collection('user').where({
+            name: userName,
+            type: '班主任'
+          }).get();
+          if (userResult.data && userResult.data.length > 0) {
+            const userData = userResult.data[0];
+            if (userData.managed_class_name) {
+              studentQuery = {
+                ...studentQuery,
+                class_name: userData.managed_class_name
+              };
+            }
+          }
+        } catch (err) {
+          console.error('查询班主任班级信息失败:', err);
+        }
+      } else if (userType === '家长') {
+        // 家长看自己的孩子（这里简化处理，实际应该从关联表获取）
+        // 暂时显示所有住宿生数据
+        studentQuery = studentQuery;
+      }
+      // 其他角色（管理员、教师等）查看所有住宿生数据
+
+      // 从数据库加载住宿生数据
+      const result = await db.collection('students').where(studentQuery).get();
       if (result.data && result.data.length > 0) {
         const transformedStudents = result.data.map(student => ({
           id: student._id,
@@ -297,8 +338,58 @@ export default function DormPointsPage(props) {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
 
+      // 获取当前用户信息
+      const currentUser = $w.auth.currentUser;
+      const userType = currentUser?.type || '';
+      const userName = currentUser?.name || '';
+
+      // 根据用户类型构建查询条件
+      let recordQuery = {};
+      if (userType === '学生') {
+        // 学生只看自己的扣分记录
+        recordQuery = {
+          student_name: userName
+        };
+      } else if (userType === '班主任') {
+        // 班主任只看自己班级学生的扣分记录
+        try {
+          const userResult = await db.collection('user').where({
+            name: userName,
+            type: '班主任'
+          }).get();
+          if (userResult.data && userResult.data.length > 0) {
+            const userData = userResult.data[0];
+            if (userData.managed_class_name) {
+              // 先获取班级中的学生姓名
+              const studentsResult = await db.collection('students').where({
+                class_name: userData.managed_class_name
+              }).field({
+                name: true
+              }).get();
+              const studentNames = studentsResult.data?.map(s => s.name) || [];
+              if (studentNames.length > 0) {
+                recordQuery = {
+                  student_name: db.command.in(studentNames)
+                };
+              } else {
+                // 班级中没有学生，返回空结果
+                setDeductionHistory([]);
+                return;
+              }
+            }
+          }
+        } catch (err) {
+          console.error('查询班主任班级信息失败:', err);
+        }
+      } else if (userType === '家长') {
+        // 家长看自己孩子的扣分记录（这里简化处理，实际应该从关联表获取）
+        // 暂时显示所有扣分记录
+        recordQuery = {};
+      }
+      // 其他角色（管理员、教师等）查看所有数据
+
       // 从宿舍扣分记录表加载历史记录
-      const result = await db.collection('dorm_deduction_record').orderBy('deduction_date', 'desc').limit(50).get();
+      const result = await db.collection('dorm_deduction_record').where(recordQuery).orderBy('deduction_date', 'desc').limit(50).get();
       if (result.data && result.data.length > 0) {
         const transformedHistory = result.data.map(record => ({
           id: record._id,

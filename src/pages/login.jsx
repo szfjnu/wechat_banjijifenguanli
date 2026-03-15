@@ -52,7 +52,7 @@ export default function LoginPage({
     }
   };
 
-  // 角色配置
+  // 角色配置 - 根据用户身份跳转到对应页面
   const roles = [{
     id: 'admin',
     name: '管理员',
@@ -64,7 +64,7 @@ export default function LoginPage({
     name: '班主任',
     icon: GraduationCap,
     color: 'green',
-    targetPage: 'home'
+    targetPage: 'classes-manage'
   }, {
     id: 'class1_teacher',
     name: '教师',

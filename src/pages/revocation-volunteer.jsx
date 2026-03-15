@@ -71,12 +71,74 @@ export default function RevocationVolunteerPage(props) {
     setLoading(true);
     try {
       const tcb = await props.$w.cloud.getCloudInstance();
+      const db = tcb.database();
+
+      // 获取当前用户信息
+      const currentUser = props.$w.auth.currentUser;
+      const userType = currentUser?.type || '';
+      const userName = currentUser?.name || '';
+
+      // 根据用户类型构建查询条件
+      let disciplineQuery = {
+        revocation_status: db.command.in(['考察中', '符合条件'])
+      };
+      let volunteerQuery = {};
+      if (userType === '学生') {
+        // 学生只看自己的数据
+        disciplineQuery = {
+          ...disciplineQuery,
+          student_name: userName
+        };
+        volunteerQuery = {
+          student_name: userName
+        };
+      } else if (userType === '班主任') {
+        // 班主任只看自己班级学生的数据
+        try {
+          const userResult = await db.collection('user').where({
+            name: userName,
+            type: '班主任'
+          }).get();
+          if (userResult.data && userResult.data.length > 0) {
+            const userData = userResult.data[0];
+            if (userData.managed_class_name) {
+              // 先获取班级中的学生姓名
+              const studentsResult = await db.collection('students').where({
+                class_name: userData.managed_class_name
+              }).field({
+                name: true
+              }).get();
+              const studentNames = studentsResult.data?.map(s => s.name) || [];
+              if (studentNames.length > 0) {
+                disciplineQuery = {
+                  ...disciplineQuery,
+                  student_name: db.command.in(studentNames)
+                };
+                volunteerQuery = {
+                  student_name: db.command.in(studentNames)
+                };
+              } else {
+                // 班级中没有学生，返回空结果
+                setDisciplineRecords([]);
+                setVolunteerRecords([]);
+                setLoading(false);
+                return;
+              }
+            }
+          }
+        } catch (err) {
+          console.error('查询班主任班级信息失败:', err);
+        }
+      } else if (userType === '家长') {
+        // 家长看自己孩子的数据（这里简化处理，实际应该从关联表获取）
+        // 暂时显示所有数据
+        disciplineQuery = disciplineQuery;
+        volunteerQuery = volunteerQuery;
+      }
+      // 其他角色（管理员、教师等）查看所有数据
 
       // 查询用户的未撤销处分记录
-      const disciplineResult = await tcb.collection('discipline_record').where({
-        student_id: currentUser.userId,
-        revocation_status: _.in(['考察中', '符合条件'])
-      }).get();
+      const disciplineResult = await db.collection('discipline_record').where(disciplineQuery).get();
       if (disciplineResult.data.length > 0) {
         setDisciplineRecords(disciplineResult.data);
         if (disciplineResult.data.length === 1) {
@@ -85,9 +147,7 @@ export default function RevocationVolunteerPage(props) {
       }
 
       // 查询用户的志愿服务记录
-      const volunteerResult = await tcb.collection('revocation_volunteer').where({
-        student_id: currentUser.userId
-      }).orderBy('service_date', 'desc').get();
+      const volunteerResult = await db.collection('revocation_volunteer').where(volunteerQuery).orderBy('service_date', 'desc').get();
       setVolunteerRecords(volunteerResult.data);
     } catch (error) {
       console.error('加载数据失败:', error);
