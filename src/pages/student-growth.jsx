@@ -84,8 +84,45 @@ export default function StudentGrowth(props) {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
 
+      // 获取当前用户信息
+      const currentUser = $w.auth.currentUser;
+      const userType = currentUser?.type || '';
+      const userName = currentUser?.name || '';
+
+      // 根据用户类型构建查询条件
+      let studentQuery = {};
+      if (userType === '学生') {
+        // 学生只看自己的数据
+        studentQuery = {
+          name: userName
+        };
+      } else if (userType === '班主任') {
+        // 班主任只看自己班级的学生
+        try {
+          const userResult = await db.collection('user').where({
+            name: userName,
+            type: '班主任'
+          }).get();
+          if (userResult.data && userResult.data.length > 0) {
+            const userData = userResult.data[0];
+            if (userData.managed_class_name) {
+              studentQuery = {
+                class_name: userData.managed_class_name
+              };
+            }
+          }
+        } catch (err) {
+          console.error('查询班主任班级信息失败:', err);
+        }
+      } else if (userType === '家长') {
+        // 家长看自己的孩子（这里简化处理，实际应该从关联表获取）
+        // 暂时显示所有学生数据
+        studentQuery = {};
+      }
+      // 其他角色（管理员、教师等）查看所有数据
+
       // 加载学生列表
-      const result = await db.collection('students').get();
+      const result = await db.collection('students').where(studentQuery).get();
       setStudents(result.data || []);
 
       // 加载学期列表

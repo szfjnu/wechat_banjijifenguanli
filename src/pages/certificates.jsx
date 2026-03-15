@@ -145,7 +145,45 @@ export default function CertificatesPage(props) {
     try {
       const tcb = await props.$w.cloud.getCloudInstance();
       const db = tcb.database();
-      const result = await db.collection('students').get();
+
+      // 获取当前用户信息
+      const currentUser = props.$w.auth.currentUser;
+      const userType = currentUser?.type || '';
+      const userName = currentUser?.name || '';
+
+      // 根据用户类型构建查询条件
+      let studentQuery = {};
+      if (userType === '学生') {
+        // 学生只看自己的数据
+        studentQuery = {
+          name: userName
+        };
+      } else if (userType === '班主任') {
+        // 班主任只看自己班级的学生
+        try {
+          const userResult = await db.collection('user').where({
+            name: userName,
+            type: '班主任'
+          }).get();
+          if (userResult.data && userResult.data.length > 0) {
+            const userData = userResult.data[0];
+            if (userData.managed_class_name) {
+              studentQuery = {
+                class_name: userData.managed_class_name
+              };
+            }
+          }
+        } catch (err) {
+          console.error('查询班主任班级信息失败:', err);
+        }
+      } else if (userType === '家长') {
+        // 家长看自己的孩子（这里简化处理，实际应该从关联表获取）
+        // 暂时显示所有学生数据
+        studentQuery = {};
+      }
+      // 其他角色（管理员、教师等）查看所有数据
+
+      const result = await db.collection('students').where(studentQuery).get();
       if (result.data && result.data.length > 0) {
         const transformedStudents = result.data.map(student => ({
           id: student._id,
@@ -169,7 +207,45 @@ export default function CertificatesPage(props) {
       setLoading(true);
       const tcb = await props.$w.cloud.getCloudInstance();
       const db = tcb.database();
-      const result = await db.collection('certificate').orderBy('issue_date', 'desc').limit(50).get();
+
+      // 获取当前用户信息
+      const currentUser = props.$w.auth.currentUser;
+      const userType = currentUser?.type || '';
+      const userName = currentUser?.name || '';
+
+      // 根据用户类型构建查询条件
+      let certQuery = {};
+      if (userType === '学生') {
+        // 学生只看自己的证书
+        certQuery = {
+          student_name: userName
+        };
+      } else if (userType === '班主任') {
+        // 班主任只看自己班级学生的证书
+        try {
+          const userResult = await db.collection('user').where({
+            name: userName,
+            type: '班主任'
+          }).get();
+          if (userResult.data && userResult.data.length > 0) {
+            const userData = userResult.data[0];
+            if (userData.managed_class_name) {
+              certQuery = {
+                class_name: userData.managed_class_name
+              };
+            }
+          }
+        } catch (err) {
+          console.error('查询班主任班级信息失败:', err);
+        }
+      } else if (userType === '家长') {
+        // 家长看自己孩子的证书（这里简化处理，实际应该从关联表获取）
+        // 暂时显示所有证书
+        certQuery = {};
+      }
+      // 其他角色（管理员、教师等）查看所有证书
+
+      const result = await db.collection('certificate').where(certQuery).orderBy('issue_date', 'desc').limit(50).get();
       if (result.data && result.data.length > 0) {
         const transformedCertificates = result.data.map(cert => ({
           id: cert._id,

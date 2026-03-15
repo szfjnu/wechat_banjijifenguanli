@@ -83,7 +83,12 @@ export default function ExchangePage({
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
 
-      // 加载物品列表
+      // 获取当前用户信息
+      const currentUser = $w.auth.currentUser;
+      const userType = currentUser?.type || '';
+      const userName = currentUser?.name || '';
+
+      // 加载物品列表（所有角色都能看到物品列表）
       const itemsResult = await db.collection('redemption_items').get();
       if (itemsResult.data && itemsResult.data.length > 0) {
         const transformedItems = itemsResult.data.map(item => ({
@@ -105,8 +110,48 @@ export default function ExchangePage({
         setItems(transformedItems);
       }
 
+      // 根据用户类型构建兑换记录查询条件
+      let exchangeQuery = {};
+      let studentQuery = {};
+      if (userType === '学生') {
+        // 学生只看自己的兑换记录
+        exchangeQuery = {
+          student_name: userName
+        };
+        studentQuery = {
+          name: userName
+        };
+      } else if (userType === '班主任') {
+        // 班主任只看自己班级学生的兑换记录
+        try {
+          const userResult = await db.collection('user').where({
+            name: userName,
+            type: '班主任'
+          }).get();
+          if (userResult.data && userResult.data.length > 0) {
+            const userData = userResult.data[0];
+            if (userData.managed_class_name) {
+              exchangeQuery = {
+                class_name: userData.managed_class_name
+              };
+              studentQuery = {
+                class_name: userData.managed_class_name
+              };
+            }
+          }
+        } catch (err) {
+          console.error('查询班主任班级信息失败:', err);
+        }
+      } else if (userType === '家长') {
+        // 家长看自己孩子的兑换记录（这里简化处理，实际应该从关联表获取）
+        // 暂时显示所有兑换记录
+        exchangeQuery = {};
+        studentQuery = {};
+      }
+      // 其他角色（管理员、教师等）查看所有数据
+
       // 加载兑换记录
-      const exchangesResult = await db.collection('redemption_requests').orderBy('redemption_time', 'desc').limit(100).get();
+      const exchangesResult = await db.collection('redemption_requests').where(exchangeQuery).orderBy('redemption_time', 'desc').limit(100).get();
       if (exchangesResult.data && exchangesResult.data.length > 0) {
         const transformedExchanges = exchangesResult.data.map(record => ({
           id: record._id,
@@ -121,8 +166,8 @@ export default function ExchangePage({
         setExchanges(transformedExchanges);
       }
 
-      // 加载当前学生信息（使用第一个学生作为示例）
-      const studentsResult = await db.collection('students').limit(1).get();
+      // 加载当前学生信息（根据用户身份筛选）
+      const studentsResult = await db.collection('students').where(studentQuery).limit(1).get();
       if (studentsResult.data && studentsResult.data.length > 0) {
         const student = studentsResult.data[0];
         setCurrentStudent({
