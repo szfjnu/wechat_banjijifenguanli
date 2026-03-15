@@ -82,19 +82,76 @@ export default function DisciplineRevocationPage(props) {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
 
-      // 查询用户的处分记录
-      const recordResult = await db.collection('discipline_record').where({
-        student_id: currentUser.userId,
+      // 获取当前用户信息
+      const userType = currentUser?.type || '';
+      const userName = currentUser?.name || '';
+
+      // 根据用户类型构建查询条件
+      let disciplineQuery = {
         revocation_status: '考察中'
-      }).get();
+      };
+      let requestQuery = {};
+      if (userType === '学生') {
+        // 学生只看自己的数据
+        disciplineQuery = {
+          ...disciplineQuery,
+          student_name: userName
+        };
+        requestQuery = {
+          student_name: userName
+        };
+      } else if (userType === '班主任') {
+        // 班主任只看自己班级学生的数据
+        try {
+          const userResult = await db.collection('user').where({
+            name: userName,
+            type: '班主任'
+          }).get();
+          if (userResult.data && userResult.data.length > 0) {
+            const userData = userResult.data[0];
+            if (userData.managed_class_name) {
+              // 先获取班级中的学生姓名
+              const studentsResult = await db.collection('students').where({
+                class_name: userData.managed_class_name
+              }).field({
+                name: true
+              }).get();
+              const studentNames = studentsResult.data?.map(s => s.name) || [];
+              if (studentNames.length > 0) {
+                disciplineQuery = {
+                  ...disciplineQuery,
+                  student_name: db.command.in(studentNames)
+                };
+                requestQuery = {
+                  student_name: db.command.in(studentNames)
+                };
+              } else {
+                // 班级中没有学生，返回空结果
+                setDisciplineRecords([]);
+                setRequests([]);
+                setLoading(false);
+                return;
+              }
+            }
+          }
+        } catch (err) {
+          console.error('查询班主任班级信息失败:', err);
+        }
+      } else if (userType === '家长') {
+        // 家长看自己孩子的数据（这里简化处理）
+        disciplineQuery = disciplineQuery;
+        requestQuery = requestQuery;
+      }
+      // 其他角色（管理员、教师等）查看所有数据
+
+      // 查询处分记录
+      const recordResult = await db.collection('discipline_record').where(disciplineQuery).get();
       if (recordResult.data) {
         setDisciplineRecords(recordResult.data);
       }
 
       // 查询撤销申请记录
-      const requestResult = await db.collection('revocation_request').where({
-        student_id: currentUser.userId
-      }).orderBy('request_date', 'desc').get();
+      const requestResult = await db.collection('revocation_request').where(requestQuery).orderBy('request_date', 'desc').get();
       if (requestResult.data) {
         setRequests(requestResult.data);
       }

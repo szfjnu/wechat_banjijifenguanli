@@ -73,9 +73,64 @@ export default function ExchangeAdmin({
   const loadBiddingRecords = async () => {
     try {
       const tcb = await $w.cloud.getCloudInstance();
-      const result = await tcb.database().collection('redemption_requests').where({
+      const db = tcb.database();
+
+      // 获取当前用户信息
+      const currentUser = $w.auth.currentUser;
+      const userType = currentUser?.type || '';
+      const userName = currentUser?.name || '';
+
+      // 构建基础查询条件：待处理的兑换请求
+      let requestQuery = {
         status: 'pending'
-      }).orderBy('request_time', 'desc').limit(50).get();
+      };
+
+      // 根据用户类型添加额外的筛选条件
+      if (userType === '班主任') {
+        // 班主任只看自己班级学生的兑换请求
+        try {
+          const userResult = await db.collection('user').where({
+            name: userName,
+            type: '班主任'
+          }).get();
+          if (userResult.data && userResult.data.length > 0) {
+            const userData = userResult.data[0];
+            if (userData.managed_class_name) {
+              // 先获取班级中的学生姓名
+              const studentsResult = await db.collection('students').where({
+                class_name: userData.managed_class_name
+              }).field({
+                name: true
+              }).get();
+              const studentNames = studentsResult.data?.map(s => s.name) || [];
+              if (studentNames.length > 0) {
+                requestQuery = {
+                  ...requestQuery,
+                  student_name: db.command.in(studentNames)
+                };
+              } else {
+                // 班级中没有学生，返回空结果
+                setBiddingRecords([]);
+                return;
+              }
+            }
+          }
+        } catch (err) {
+          console.error('查询班主任班级信息失败:', err);
+        }
+      } else if (userType === '学生') {
+        // 学生只看自己的兑换请求
+        requestQuery = {
+          ...requestQuery,
+          student_name: userName
+        };
+      } else if (userType === '家长') {
+        // 家长看自己孩子的兑换请求（这里简化处理）
+        requestQuery = requestQuery;
+      }
+      // 其他角色（管理员、教师等）查看所有兑换请求
+
+      const result = await db.collection('redemption_requests').where(requestQuery).orderBy('request_time', 'desc').limit(50).get();
       if (result.data && result.data.length > 0) {
         const transformedBiddingRecords = result.data.map(record => ({
           id: record._id,
@@ -133,7 +188,58 @@ export default function ExchangeAdmin({
   const loadExchangeHistory = async () => {
     try {
       const tcb = await $w.cloud.getCloudInstance();
-      const result = await tcb.database().collection('redemption_requests').orderBy('redemption_time', 'desc').limit(50).get();
+      const db = tcb.database();
+
+      // 获取当前用户信息
+      const currentUser = $w.auth.currentUser;
+      const userType = currentUser?.type || '';
+      const userName = currentUser?.name || '';
+
+      // 根据用户类型构建查询条件
+      let historyQuery = {};
+      if (userType === '班主任') {
+        // 班主任只看自己班级学生的兑换历史
+        try {
+          const userResult = await db.collection('user').where({
+            name: userName,
+            type: '班主任'
+          }).get();
+          if (userResult.data && userResult.data.length > 0) {
+            const userData = userResult.data[0];
+            if (userData.managed_class_name) {
+              // 先获取班级中的学生姓名
+              const studentsResult = await db.collection('students').where({
+                class_name: userData.managed_class_name
+              }).field({
+                name: true
+              }).get();
+              const studentNames = studentsResult.data?.map(s => s.name) || [];
+              if (studentNames.length > 0) {
+                historyQuery = {
+                  student_name: db.command.in(studentNames)
+                };
+              } else {
+                // 班级中没有学生，返回空结果
+                setExchangeHistory([]);
+                return;
+              }
+            }
+          }
+        } catch (err) {
+          console.error('查询班主任班级信息失败:', err);
+        }
+      } else if (userType === '学生') {
+        // 学生只看自己的兑换历史
+        historyQuery = {
+          student_name: userName
+        };
+      } else if (userType === '家长') {
+        // 家长看自己孩子的兑换历史（这里简化处理）
+        historyQuery = historyQuery;
+      }
+      // 其他角色（管理员、教师等）查看所有兑换历史
+
+      const result = await db.collection('redemption_requests').where(historyQuery).orderBy('redemption_time', 'desc').limit(50).get();
       if (result.data && result.data.length > 0) {
         const transformedHistory = result.data.map(record => ({
           id: record._id,

@@ -66,18 +66,58 @@ export default function NoticePublish(props) {
     try {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
-      const result = await db.collection('students').field({
+
+      // 获取当前用户信息
+      const currentUser = $w.auth.currentUser;
+      const userType = currentUser?.type || '';
+      const userName = currentUser?.name || '';
+
+      // 根据用户类型构建查询条件
+      let studentQuery = {};
+      if (userType === '学生') {
+        // 学生只看自己的数据
+        studentQuery = {
+          name: userName
+        };
+      } else if (userType === '班主任') {
+        // 班主任只看自己班级的学生
+        try {
+          const userResult = await db.collection('user').where({
+            name: userName,
+            type: '班主任'
+          }).get();
+          if (userResult.data && userResult.data.length > 0) {
+            const userData = userResult.data[0];
+            if (userData.managed_class_name) {
+              studentQuery = {
+                class_name: userData.managed_class_name
+              };
+            }
+          }
+        } catch (err) {
+          console.error('查询班主任班级信息失败:', err);
+        }
+      } else if (userType === '家长') {
+        // 家长看自己的孩子（这里简化处理，实际应该从关联表获取）
+        // 暂时显示所有学生数据
+        studentQuery = {};
+      }
+      // 其他角色（管理员、教师等）查看所有数据
+
+      const result = await db.collection('students').where(studentQuery).field({
         _id: true,
         name: true,
         student_id: true,
-        group_id: true
+        group_id: true,
+        class_name: true
       }).get();
       if (result.data && result.data.length > 0) {
         const transformedStudents = result.data.map(student => ({
           id: student._id,
           name: student.name,
           studentId: student.student_id,
-          group: student.group_id || '未分组'
+          group: student.group_id || '未分组',
+          className: student.class_name || '未分配班级'
         }));
         setStudents(transformedStudents);
       }
@@ -111,18 +151,39 @@ export default function NoticePublish(props) {
     try {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
-      const result = await db.collection('notice').orderBy('publish_time', 'desc').limit(20).get();
+
+      // 获取当前用户信息
+      const currentUser = $w.auth.currentUser;
+      const userType = currentUser?.type || '';
+      const userName = currentUser?.name || '';
+
+      // 根据用户类型构建查询条件
+      let noticeQuery = {};
+      if (userType === '班主任') {
+        // 班主任只看自己发布的通知
+        noticeQuery = {
+          publisher_name: userName
+        };
+      } else if (userType === '学生' || userType === '家长') {
+        // 学生和家长看自己相关的通知（target_ids 或 target_names 包含自己）
+        // 由于数据库查询限制，这里简化为显示所有通知
+        noticeQuery = {};
+      }
+      // 其他角色（管理员、教师等）查看所有通知
+
+      const result = await db.collection('notice').where(noticeQuery).orderBy('publish_time', 'desc').limit(20).get();
       if (result.data && result.data.length > 0) {
         const transformedNotices = result.data.map(notice => ({
           id: notice._id,
-          title: notice.title,
-          content: notice.content,
-          publisher: notice.publisher,
+          title: notice.notice_title || notice.title,
+          content: notice.notice_content || notice.content,
+          publisher: notice.publisher_name || notice.publisher,
           publishTime: notice.publish_time,
           targetType: notice.target_type,
           targetIds: notice.target_ids || [],
           targetNames: notice.target_names || [],
-          status: notice.status
+          status: notice.status,
+          publisherType: notice.publisher_type
         }));
         setNoticeHistory(transformedNotices);
       }
