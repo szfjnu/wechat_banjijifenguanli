@@ -69,11 +69,22 @@ export default function PointsPage(props) {
       setLoading(true);
       const tcb = await $w.cloud.getCloudInstance();
 
-      // 获取当前用户信息
-      const currentUser = $w.auth.currentUser;
+      // 获取当前用户信息（优先从 localStorage 读取，因为登录页面使用 Mock 数据）
+      let currentUser = $w.auth.currentUser;
+      if (!currentUser || !currentUser.type) {
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) {
+          currentUser = JSON.parse(storedUser);
+        }
+      }
       const userType = currentUser?.type || '';
       const userName = currentUser?.name || '';
       const userId = currentUser?.userId || '';
+      console.log('当前用户信息:', {
+        userType,
+        userName,
+        userId
+      });
 
       // 加载积分规则（从 point_rule 数据模型）
       const rulesResult = await tcb.database().collection('point_rule').where({

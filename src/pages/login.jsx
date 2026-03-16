@@ -212,6 +212,17 @@ export default function LoginPage({
   const handleRoleSelect = async role => {
     try {
       const targetPage = role.targetPage;
+
+      // 创建模拟用户信息并存储到 localStorage
+      const mockUser = {
+        userId: `USER_${Date.now()}`,
+        name: loginForm.name || '张三',
+        nickName: role.name,
+        avatarUrl: null,
+        type: role.id === 'student' ? '学生' : role.id === 'homeroom_teacher' ? '班主任' : role.id === 'parent' ? '学生家长' : role.id === 'class_teacher' ? '教师' : '管理员',
+        role: role.name
+      };
+      localStorage.setItem('currentUser', JSON.stringify(mockUser));
       toast({
         title: '角色选择成功',
         description: `正在进入${role.name}主页`,
