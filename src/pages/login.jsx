@@ -52,16 +52,6 @@ export default function LoginPage({
     }
   };
 
-  // 用户名到角色 ID 的映射
-  const usernameToRoleMap = {
-    'admin': 'admin',
-    'teacher': 'teacher',
-    'class1_teacher': 'class1_teacher',
-    'student': 'student',
-    'student_committee': 'student_committee',
-    'parent': 'parent'
-  };
-
   // 角色配置 - 根据用户身份跳转到对应页面
   const roles = [{
     id: 'admin',
@@ -160,28 +150,12 @@ export default function LoginPage({
         name: '微信用户',
         loginMethod: 'wechat'
       });
-
-      // 创建模拟用户信息并存储到 localStorage
-      const mockUserInfo = {
-        userId: `USER_${Date.now()}`,
-        name: '微信用户',
-        nickName: '学生',
-        avatarUrl: null,
-        type: '学生',
-        role: '学生'
-      };
-      localStorage.setItem('currentUser', JSON.stringify(mockUserInfo));
       toast({
         title: '微信登录成功',
-        description: '欢迎回来',
+        description: '请选择您的角色',
         variant: 'default'
       });
-
-      // 微信登录默认跳转到学生首页
-      $w.utils.navigateTo({
-        pageId: 'home',
-        params: {}
-      });
+      setCurrentStep('role');
     } catch (error) {
       toast({
         title: '登录失败',
@@ -238,14 +212,29 @@ export default function LoginPage({
       if (username === 'admin') {
         setCurrentStep('role');
       } else {
+        // 根据用户角色映射到对应的 role id
+        let roleId = '';
+        if (user.role === '班主任') {
+          roleId = 'homeroom_teacher';
+        } else if (user.role === '教师') {
+          roleId = 'class_teacher';
+        } else if (user.role === '学生') {
+          roleId = 'student';
+        } else if (user.role === '学生（班委）') {
+          roleId = 'student_committee';
+        } else if (user.role === '学生家长') {
+          roleId = 'parent';
+        } else if (user.role === '管理员') {
+          roleId = 'admin';
+        }
+
         // 其他用户直接跳转到对应角色的页面
-        const roleId = usernameToRoleMap[username];
         const role = roles.find(r => r.id === roleId);
         if (role) {
           $w.utils.navigateTo({
             pageId: role.targetPage,
             params: {
-              role: role.id
+              role: roleId
             }
           });
         } else {

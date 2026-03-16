@@ -85,6 +85,93 @@ export function usePermission($w, moduleId, operation) {
 }
 
 /**
+ * 获取用户数据范围Hook
+ * 返回用户的数据访问范围：all（所有数据）、class（本班级数据）、self（仅个人数据）
+ * @param {Object} $w - 页面props中的$w对象
+ * @returns {string} 数据范围
+ */
+export function useDataScope($w) {
+  const [dataScope, setDataScope] = React.useState('self');
+  const [loading, setLoading] = React.useState(true);
+  React.useEffect(() => {
+    fetchDataScope();
+  }, [$w]);
+  const fetchDataScope = async () => {
+    try {
+      setLoading(true);
+
+      // 获取当前用户信息
+      const currentUser = $w.auth.currentUser;
+      if (!currentUser || !currentUser.type) {
+        setDataScope('self');
+        setLoading(false);
+        return;
+      }
+
+      // 根据用户类型获取角色ID映射
+      const roleMap = {
+        'admin': 'admin',
+        'homeroom_teacher': 'homeroom_teacher',
+        'class_teacher': 'class_teacher',
+        'student': 'student',
+        'student_committee': 'student_committee',
+        'parent': 'parent'
+      };
+      const roleId = roleMap[currentUser.type] || 'student';
+
+      // 查询角色数据范围
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('role_permission').where({
+        role_id: roleId
+      }).get();
+      if (result.data.length > 0) {
+        const roleData = result.data[0];
+        setDataScope(roleData.data_scope || 'self');
+      } else {
+        setDataScope('self');
+      }
+    } catch (error) {
+      console.error('获取数据范围失败:', error);
+      setDataScope('self');
+    } finally {
+      setLoading(false);
+    }
+  };
+  return {
+    dataScope,
+    loading,
+    canViewAll: dataScope === 'all',
+    canViewClass: dataScope === 'class' || dataScope === 'all',
+    canViewSelf: dataScope === 'self' || dataScope === 'class' || dataScope === 'all'
+  };
+}
+
+/**
+ * 判断是否显示批量操作按钮
+ * 如果数据权限为 'self'，则隐藏批量操作按钮
+ * @param {Object} $w - 页面props中的$w对象
+ * @returns {boolean} 是否显示批量操作按钮
+ */
+export function useBatchOperations($w) {
+  const {
+    dataScope
+  } = useDataScope($w);
+  const [canBatchOperate, setCanBatchOperate] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
+  React.useEffect(() => {
+    // 只有数据权限为 'all' 或 'class' 时，才允许批量操作
+    setCanBatchOperate(dataScope === 'all' || dataScope === 'class');
+    setLoading(false);
+  }, [dataScope]);
+  return {
+    canBatchOperate,
+    loading,
+    reason: dataScope === 'self' ? '您只能管理自己的数据，无法进行批量操作' : ''
+  };
+}
+
+/**
  * 权限检查高阶组件
  * 如果没有权限，显示权限不足提示
  */
@@ -145,109 +232,95 @@ export function ConditionalRender({
 }
 
 /**
- * 数据级权限过滤工具
- * 根据用户角色过滤数据，实现数据隔离
+ * 批量操作权限保护组件
+ * 如果用户数据权限为 'self'，则显示提示信息，隐藏批量操作按钮
  * @param {Object} $w - 页面props中的$w对象
- * @param {Array} data - 原始数据数组
- * @param {string} dataType - 数据类型（students, grades, points等）
- * @returns {Object} { filteredData: 过滤后的数据, filterInfo: 过滤信息 }
+ * @param {React.ReactNode} children - 有批量操作权限时显示的内容
+ * @param {React.ReactNode} fallback - 无批量操作权限时显示的内容（可选）
  */
-export function useDataFilter($w, data, dataType) {
-  const [filteredData, setFilteredData] = React.useState(data || []);
-  const [filterInfo, setFilterInfo] = React.useState('');
+export function BatchOperationGuard({
+  $w,
+  children,
+  fallback = null
+}) {
+  const {
+    canBatchOperate,
+    loading,
+    reason
+  } = useBatchOperations($w);
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-[40px]">
+        <div className="text-gray-500 text-sm">权限检查中...</div>
+      </div>;
+  }
+  if (!canBatchOperate) {
+    if (fallback) {
+      return fallback;
+    }
+    return <div className="flex items-center justify-center min-h-[60px] bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <Lock className="w-5 h-5 text-blue-500 mr-2" />
+        <p className="text-blue-700 text-sm">{reason}</p>
+      </div>;
+  }
+  return <>{children}</>;
+}
+
+/**
+ * 数据范围过滤Hook
+ * 根据用户的数据范围，生成数据查询条件
+ * @param {Object} $w - 页面props中的$w对象
+ * @param {string} collectionName - 数据集名称
+ * @param {Object} baseQuery - 基础查询条件
+ * @returns {Object} 查询条件对象
+ */
+export function useDataScopeFilter($w, collectionName, baseQuery = {}) {
+  const {
+    dataScope
+  } = useDataScope($w);
+  const [filterQuery, setFilterQuery] = React.useState(baseQuery);
+  const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
-    filterDataByRole();
-  }, [$w, data, dataType]);
-  const filterDataByRole = () => {
-    const currentUser = $w.auth.currentUser;
-    if (!currentUser || !data || !Array.isArray(data)) {
-      setFilteredData(data || []);
-      setFilterInfo('');
-      return;
-    }
-    const userType = currentUser.type || currentUser.nickName || '学生';
-    const userName = currentUser.name || '';
-    let filtered = [...data];
-    let info = '';
-    if (dataType === 'students') {
-      if (userType === '学生') {
-        // 学生只能看到自己的数据
-        filtered = data.filter(item => item.name === userName);
-        info = `显示您的个人数据（共${filtered.length}条）`;
-      } else if (userType === '家长') {
-        // 家长只能看到自己孩子的数据（根据 name 或 parent_phone_number 匹配）
-        filtered = data.filter(item => {
-          // 如果数据中有 parent_phone_number 字段，根据家长的电话匹配
-          if (item.parent_phone_number) {
-            return item.parent_phone_number === currentUser.userId; // 假设 userId 是电话
-          }
-          // 如果没有，暂不过滤（显示所有，实际应该有家长-学生关联表）
-          return true;
-        });
-        if (filtered.length === data.length) {
-          info = '显示所有学生数据（暂无家长-学生关联，请联系管理员）';
-        } else {
-          info = `显示您孩子的数据（共${filtered.length}条）`;
+    applyDataScopeFilter();
+  }, [dataScope, baseQuery, $w]);
+  const applyDataScopeFilter = async () => {
+    try {
+      setLoading(true);
+      const currentUser = $w.auth.currentUser;
+      if (!currentUser) {
+        setFilterQuery(baseQuery);
+        return;
+      }
+      const query = {
+        ...baseQuery
+      };
+
+      // 根据数据范围添加过滤条件
+      if (dataScope === 'self') {
+        // 只能查看自己的数据
+        // 假设数据集中有 user_id 或 student_id 字段
+        if (currentUser.userId) {
+          query.user_id = currentUser.userId;
         }
-      } else if (userType === '班主任' || userType === 'homeroom_teacher') {
-        // 班主任只能看到本班学生（根据 class 字段匹配）
-        // 由于 students 数据模型没有 class 字段，暂时显示所有数据
-        // 实际应该从班级管理获取班主任管理的班级列表，然后过滤
-        info = '显示所有学生数据（暂无班主任-班级关联，请联系管理员）';
-      } else if (userType === '教师' || userType === 'class_teacher') {
-        // 教师可以看到所有学生数据（用于成绩录入等）
-        info = '显示所有学生数据';
-      } else if (userType === 'admin') {
-        // 管理员可以看到所有数据
-        info = '显示所有学生数据';
-      } else if (userType === '学生（班委）' || userType === 'student_committee') {
-        // 学生班委可以看到所有学生数据
-        info = '显示所有学生数据';
-      } else {
-        // 默认只看自己的数据
-        filtered = data.filter(item => item.name === userName);
-        info = `显示您的个人数据（共${filtered.length}条）`;
+      } else if (dataScope === 'class') {
+        // 可以查看本班级的数据
+        // 假设用户有 classId 信息
+        if (currentUser.classId) {
+          query.class_id = currentUser.classId;
+        }
       }
-    } else if (dataType === 'grades') {
-      if (userType === '学生') {
-        // 学生只能看到自己的成绩
-        filtered = data.filter(item => item.student_name === userName);
-        info = `显示您的成绩（共${filtered.length}条）`;
-      } else if (userType === '家长') {
-        // 家长只能看到自己孩子的成绩
-        filtered = data.filter(item => {
-          // 根据 student_name 或关联表匹配
-          return true; // 暂不过滤
-        });
-        info = '显示所有成绩数据（暂无家长-学生关联，请联系管理员）';
-      } else {
-        // 其他角色可以看到所有成绩
-        info = '显示所有成绩数据';
-      }
-    } else if (dataType === 'points') {
-      if (userType === '学生') {
-        // 学生只能看到自己的积分记录
-        filtered = data.filter(item => item.student_name === userName);
-        info = `显示您的积分记录（共${filtered.length}条）`;
-      } else if (userType === '家长') {
-        // 家长只能看到自己孩子的积分记录
-        filtered = data.filter(item => {
-          return true; // 暂不过滤
-        });
-        info = '显示所有积分记录（暂无家长-学生关联，请联系管理员）';
-      } else {
-        // 其他角色可以看到所有积分记录
-        info = '显示所有积分记录';
-      }
-    } else {
-      // 其他数据类型默认不过滤
-      info = '显示所有数据';
+      // dataScope === 'all' 时，不需要额外的过滤条件
+
+      setFilterQuery(query);
+    } catch (error) {
+      console.error('应用数据范围过滤失败:', error);
+      setFilterQuery(baseQuery);
+    } finally {
+      setLoading(false);
     }
-    setFilteredData(filtered);
-    setFilterInfo(info);
   };
   return {
-    filteredData,
-    filterInfo
+    filterQuery,
+    loading,
+    dataScope
   };
 }

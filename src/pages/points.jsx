@@ -13,7 +13,7 @@ const formatPoints = points => {
   return Number(points).toFixed(2);
 };
 import { TabBar } from '@/components/TabBar';
-import { usePermission } from '@/components/PermissionGuard';
+import { usePermission, useDataScope, useBatchOperations, BatchOperationGuard } from '@/components/PermissionGuard';
 export default function PointsPage(props) {
   const {
     $w
@@ -43,6 +43,19 @@ export default function PointsPage(props) {
     permission: canDeductPoints,
     loading: loadingDeductPoints
   } = usePermission($w, 'points', 'deduct');
+
+  // 数据范围检查
+  const {
+    dataScope,
+    canViewAll,
+    canViewClass
+  } = useDataScope($w);
+
+  // 批量操作权限检查
+  const {
+    canBatchOperate,
+    reason: batchReason
+  } = useBatchOperations($w);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showHistory, setShowHistory] = useState(true);
   const [filterCategory, setFilterCategory] = useState('all');
@@ -107,13 +120,39 @@ export default function PointsPage(props) {
       }
 
       // 加载积分记录（从 point_record 数据模型）
-      // 根据用户身份筛选积分记录
+      // 根据用户数据范围筛选积分记录
       let recordsQuery = tcb.database().collection('point_record');
-      if (userType === '学生') {
+      if (dataScope === 'self') {
         // 学生只看自己的积分记录
         recordsQuery = recordsQuery.where({
           student_name: userName
         });
+      } else if (dataScope === 'class') {
+        // 教师和班主任看班级学生的积分记录
+        // 需要先查询用户管理的班级
+        if (userType === '班主任') {
+          try {
+            const userResult = await tcb.database().collection('user').where({
+              name: userName,
+              type: '班主任'
+            }).get();
+            if (userResult.data && userResult.data.length > 0) {
+              const userData = userResult.data[0];
+              if (userData.managed_class_name) {
+                recordsQuery = recordsQuery.where({
+                  class_name: userData.managed_class_name
+                });
+              }
+            }
+          } catch (err) {
+            console.error('查询班主任班级信息失败:', err);
+          }
+        } else if (userType === '教师') {
+          // 教师也按班级过滤
+          recordsQuery = recordsQuery.where({
+            class_name: '高一1班' // 模拟，实际应从用户信息获取
+          });
+        }
       }
       const recordsResult = await recordsQuery.orderBy('record_date', 'desc').limit(50).get();
       if (recordsResult.data && recordsResult.data.length > 0) {
@@ -133,35 +172,38 @@ export default function PointsPage(props) {
         setHistoryRecords([]);
       }
 
-      // 加载学生数据，根据用户身份筛选
+      // 加载学生数据，根据用户数据范围筛选
       let studentsQuery = tcb.database().collection('students');
-      if (userType === '学生') {
+      if (dataScope === 'self') {
         // 学生只看自己的数据
         studentsQuery = studentsQuery.where({
           name: userName
         });
-      } else if (userType === '班主任') {
-        // 班主任只看自己班级的学生
-        try {
-          const userResult = await tcb.database().collection('user').where({
-            name: userName,
-            type: '班主任'
-          }).get();
-          if (userResult.data && userResult.data.length > 0) {
-            const userData = userResult.data[0];
-            if (userData.managed_class_name) {
-              studentsQuery = studentsQuery.where({
-                class_name: userData.managed_class_name
-              });
+      } else if (dataScope === 'class') {
+        // 教师和班主任只看自己班级的学生
+        if (userType === '班主任') {
+          try {
+            const userResult = await tcb.database().collection('user').where({
+              name: userName,
+              type: '班主任'
+            }).get();
+            if (userResult.data && userResult.data.length > 0) {
+              const userData = userResult.data[0];
+              if (userData.managed_class_name) {
+                studentsQuery = studentsQuery.where({
+                  class_name: userData.managed_class_name
+                });
+              }
             }
+          } catch (err) {
+            console.error('查询班主任班级信息失败:', err);
           }
-        } catch (err) {
-          console.error('查询班主任班级信息失败:', err);
+        } else if (userType === '教师') {
+          // 教师也按班级过滤
+          studentsQuery = studentsQuery.where({
+            class_name: '高一1班' // 模拟，实际应从用户信息获取
+          });
         }
-      } else if (userType === '家长') {
-        // 家长看自己的孩子（这里简化处理，实际应该从关联表获取）
-        // 暂时显示所有学生数据
-        studentsQuery = studentsQuery;
       }
       const studentsResult = await studentsQuery.get();
       if (studentsResult.data && studentsResult.data.length > 0) {
@@ -380,38 +422,44 @@ export default function PointsPage(props) {
       <header className="bg-white border-b border-gray-200 p-3 sticky top-0 z-40">
         <div className="flex items-center justify-between">
           <h1 className="text-lg font-bold text-gray-900">积分管理</h1>
-          <Button onClick={() => {
-          setShowAddModal(true);
-          setRecordType('add');
-        }} className="bg-blue-500 text-white h-8 text-xs">
-              <Plus className="w-3.5 h-3.5 mr-1" />
-              添加记录
-            </Button>
+          <BatchOperationGuard $w={$w}>
+            <Button onClick={() => {
+            setShowAddModal(true);
+            setRecordType('add');
+          }} className="bg-blue-500 text-white h-8 text-xs">
+                  <Plus className="w-3.5 h-3.5 mr-1" />
+                  添加记录
+                </Button>
+          </BatchOperationGuard>
         </div>
       </header>
 
       <div className="px-3 py-2">
         <div className="grid grid-cols-3 gap-2">
-            <button onClick={() => {
-          setShowAddModal(true);
-          setRecordType('add');
-        }} className="p-4 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all text-left">
+            <BatchOperationGuard $w={$w}>
+              <button onClick={() => {
+            setShowAddModal(true);
+            setRecordType('add');
+          }} className="p-4 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all text-left">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="w-5 h-5 text-blue-600" />
                 <span className="text-sm font-medium text-gray-700">加分</span>
               </div>
               <p className="text-xs text-gray-500">记录优秀表现</p>
-            </button>
-            <button onClick={() => {
-          setShowAddModal(true);
-          setRecordType('deduct');
-        }} className="p-4 bg-amber-50 hover:bg-amber-100 rounded-xl transition-all text-left">
+              </button>
+            </BatchOperationGuard>
+            <BatchOperationGuard $w={$w}>
+              <button onClick={() => {
+            setShowAddModal(true);
+            setRecordType('deduct');
+          }} className="p-4 bg-amber-50 hover:bg-amber-100 rounded-xl transition-all text-left">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingDown className="w-5 h-5 text-amber-600" />
                 <span className="text-sm font-medium text-gray-700">扣分</span>
               </div>
               <p className="text-xs text-gray-500">记录违纪行为</p>
-            </button>
+              </button>
+            </BatchOperationGuard>
             <button onClick={() => setShowHistory(true)} className="p-4 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-all text-left">
               <div className="flex items-center gap-2 mb-2">
                 <FileText className="w-5 h-5 text-emerald-600" />

@@ -9,7 +9,7 @@ import { getBeijingTimeISO, getBeijingDateString } from '@/lib/utils';
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
-import { usePermission, ConditionalRender } from '@/components/PermissionGuard';
+import { usePermission, useDataScope, useBatchOperations, BatchOperationGuard } from '@/components/PermissionGuard';
 // 格式化积分：整数显示整数，小数最多显示两位
 const formatPoints = points => {
   if (points === undefined || points === null || isNaN(points)) return '0';
@@ -80,6 +80,19 @@ export default function DisciplinePage(props) {
     loading: loadingRejectDiscipline
   } = usePermission($w, 'discipline', 'reject');
 
+  // 数据范围检查
+  const {
+    dataScope,
+    canViewAll,
+    canViewClass
+  } = useDataScope($w);
+
+  // 批量操作权限检查
+  const {
+    canBatchOperate,
+    reason: batchReason
+  } = useBatchOperations($w);
+
   // 加载数据
   useEffect(() => {
     loadData();
@@ -102,13 +115,14 @@ export default function DisciplinePage(props) {
       const userName = currentUser?.name || '';
       console.log('当前用户信息:', {
         userType,
-        userName
+        userName,
+        dataScope
       });
 
-      // 根据用户类型构建查询条件
+      // 根据用户数据范围构建查询条件
       let studentQuery = {};
       let recordQuery = {};
-      if (userType === '学生') {
+      if (dataScope === 'self') {
         // 学生只看自己的数据
         studentQuery = {
           name: userName
@@ -116,34 +130,40 @@ export default function DisciplinePage(props) {
         recordQuery = {
           student_name: userName
         };
-      } else if (userType === '班主任') {
-        // 班主任只看自己班级的学生（需要先获取班主任管理的班级）
-        try {
-          const userResult = await db.collection('user').where({
-            name: userName,
-            type: '班主任'
-          }).get();
-          if (userResult.data && userResult.data.length > 0) {
-            const userData = userResult.data[0];
-            if (userData.managed_class_name) {
-              studentQuery = {
-                class_name: userData.managed_class_name
-              };
-              recordQuery = {
-                class_name: userData.managed_class_name
-              };
+      } else if (dataScope === 'class') {
+        // 教师和班主任只看自己班级的学生
+        if (userType === '班主任') {
+          // 班主任只看自己班级的学生（需要先获取班主任管理的班级）
+          try {
+            const userResult = await db.collection('user').where({
+              name: userName,
+              type: '班主任'
+            }).get();
+            if (userResult.data && userResult.data.length > 0) {
+              const userData = userResult.data[0];
+              if (userData.managed_class_name) {
+                studentQuery = {
+                  class_name: userData.managed_class_name
+                };
+                recordQuery = {
+                  class_name: userData.managed_class_name
+                };
+              }
             }
+          } catch (err) {
+            console.error('查询班主任班级信息失败:', err);
           }
-        } catch (err) {
-          console.error('查询班主任班级信息失败:', err);
+        } else if (userType === '教师') {
+          // 教师也按班级过滤
+          studentQuery = {
+            class_name: '高一1班' // 模拟，实际应从用户信息获取
+          };
+          recordQuery = {
+            class_name: '高一1班' // 模拟，实际应从用户信息获取
+          };
         }
-      } else if (userType === '家长') {
-        // 家长看自己的孩子（这里简化处理，实际应该从关联表获取）
-        // 暂时显示所有学生数据
-        studentQuery = {};
-        recordQuery = {};
       }
-      // 其他角色（管理员、教师等）查看所有数据
+      // 其他角色（管理员等）查看所有数据
 
       // 加载学生数据
       const studentResult = await db.collection('students').where(studentQuery).get();
@@ -613,12 +633,16 @@ export default function DisciplinePage(props) {
           })} variant="outline" size="icon" className="h-8 w-8" title="处分级别设置">
                 <Settings className="w-4 h-4" />
               </Button>
-              <Button onClick={() => setShowExportDialog(true)} variant="outline" size="icon" className="h-8 w-8">
-                <Download className="w-4 h-4" />
-              </Button>
-              <Button onClick={() => setShowCreateDialog(true)} variant="outline" size="icon" className="h-8 w-8">
-                <Plus className="w-4 h-4" />
-              </Button>
+              <BatchOperationGuard $w={$w}>
+                <Button onClick={() => setShowExportDialog(true)} variant="outline" size="icon" className="h-8 w-8">
+                  <Download className="w-4 h-4" />
+                </Button>
+              </BatchOperationGuard>
+              <BatchOperationGuard $w={$w}>
+                <Button onClick={() => setShowCreateDialog(true)} variant="outline" size="icon" className="h-8 w-8">
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </BatchOperationGuard>
             </div>
           </div>
         </header>
@@ -800,9 +824,11 @@ export default function DisciplinePage(props) {
                 <Button onClick={() => setShowCreateDialog(false)} variant="outline" className="px-4 py-2">
                   取消
                 </Button>
-                <Button onClick={handleCreateRecord} className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2">
-                  创建
-                </Button>
+                <BatchOperationGuard $w={$w}>
+                  <Button onClick={handleCreateRecord} className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2">
+                    创建
+                  </Button>
+                </BatchOperationGuard>
               </div>
             </div>
           </div>}
@@ -943,9 +969,11 @@ export default function DisciplinePage(props) {
           }} variant="outline" className="px-4 py-2">
                   取消
                 </Button>
-                <Button onClick={handleRevokeRecord} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2">
-                  确认撤销
-                </Button>
+                <BatchOperationGuard $w={$w}>
+                  <Button onClick={handleRevokeRecord} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2">
+                    确认撤销
+                  </Button>
+                </BatchOperationGuard>
               </div>
             </div>
           </div>}

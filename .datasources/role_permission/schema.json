@@ -1,0 +1,29 @@
+{
+  "name": "role_permission",
+  "title": "角色权限",
+  "schemas": [
+    {
+      "name": "role_id",
+      "title": "角色ID",
+      "type": "String"
+    },
+    {
+      "name": "role_name",
+      "title": "角色名称",
+      "type": "String"
+    },
+    {
+      "name": "permissions",
+      "title": "权限列表",
+      "type": "Array",
+      "items": {
+        "type": "String"
+      }
+    },
+    {
+      "name": "data_scope",
+      "title": "数据范围",
+      "type": "String"
+    }
+  ]
+}

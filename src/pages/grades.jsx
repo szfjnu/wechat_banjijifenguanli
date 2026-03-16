@@ -9,7 +9,7 @@ import { getBeijingDateString, getBeijingTimeISO, getBeijingTime } from '@/lib/u
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
-import { usePermission } from '@/components/PermissionGuard';
+import { usePermission, useDataScope, useBatchOperations, BatchOperationGuard } from '@/components/PermissionGuard';
 
 // 学科预设数据（包含标准学分）
 const SUBJECTS = [{
@@ -123,6 +123,19 @@ export default function GradesPage(props) {
     permission: canDeleteGrades,
     loading: loadingDeleteGrades
   } = usePermission($w, 'grades', 'delete');
+
+  // 数据范围检查
+  const {
+    dataScope,
+    canViewAll,
+    canViewClass
+  } = useDataScope($w);
+
+  // 批量操作权限
+  const {
+    canBatchOperate,
+    reason: batchReason
+  } = useBatchOperations($w);
   const [students, setStudents] = useState([]);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showDetailDialog, setShowDetailDialog] = useState(false);
@@ -214,17 +227,17 @@ export default function GradesPage(props) {
 
       // 根据用户类型构建查询条件
       let query = {};
-      if (userType === '学生') {
-        // 学生只看自己的成绩
+      if (dataScope === 'self') {
+        // 学生或家长只看自己的成绩
         query = {
           student_name: userName
         };
-      } else if (userType === '班主任') {
-        // 班主任只看自己班级的学生成绩（需要先获取班主任管理的班级）
+      } else if (dataScope === 'class') {
+        // 教师或班主任查看班级学生成绩（需要先获取用户管理的班级）
         try {
           const userResult = await db.collection('user').where({
             name: userName,
-            type: '班主任'
+            type: userType
           }).get();
           if (userResult.data && userResult.data.length > 0) {
             const userData = userResult.data[0];
@@ -249,14 +262,14 @@ export default function GradesPage(props) {
             }
           }
         } catch (err) {
-          console.error('查询班主任班级信息失败:', err);
+          console.error('查询班级信息失败:', err);
+          // 查询失败时，显示空数据
+          setGrades([]);
+          setLoading(false);
+          return;
         }
-      } else if (userType === '家长') {
-        // 家长看自己孩子的成绩（这里简化处理，实际应该从关联表获取）
-        // 暂时显示所有学生成绩
-        query = {};
       }
-      // 其他角色（管理员、教师等）查看所有数据
+      // dataScope === 'all'（管理员）查看所有数据
 
       const result = await db.collection('grade').where(query).orderBy('exam_date', 'desc').limit(100).get();
       if (result.data && result.data.length > 0) {
@@ -471,12 +484,16 @@ export default function GradesPage(props) {
               <p className="text-xs text-gray-500">学生成绩录入与统计</p>
             </div>
             <div className="flex gap-1">
-              <Button onClick={() => setShowExportDialog(true)} variant="outline" size="icon" className="h-8 w-8">
-                <Download className="w-4 h-4" />
-              </Button>
-              <Button onClick={() => setShowAddDialog(true)} variant="outline" size="icon" className="h-8 w-8">
-                <Plus className="w-4 h-4" />
-              </Button>
+              <BatchOperationGuard $w={$w}>
+                <Button onClick={() => setShowExportDialog(true)} variant="outline" size="icon" className="h-8 w-8">
+                  <Download className="h-4 w-4" />
+                </Button>
+              </BatchOperationGuard>
+              <BatchOperationGuard $w={$w}>
+                <Button onClick={() => setShowAddDialog(true)} variant="outline" size="icon" className="h-8 w-8">
+                  <Plus className="w-4 w-4" />
+                </Button>
+              </BatchOperationGuard>
             </div>
           </div>
         </header>
