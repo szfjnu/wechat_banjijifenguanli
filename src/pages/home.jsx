@@ -1,21 +1,201 @@
 // @ts-ignore;
 import React, { useState, useEffect } from 'react';
 // @ts-ignore;
-import { Calendar, Users, TrendingUp, AlertCircle, Sun, CloudRain, CloudSnow, Wind, Clock, Star, ChevronRight, Trophy, Plus, Bell, Cloud, CloudLightning, Snowflake, CalendarDays, Calculator } from 'lucide-react';
+import { Calendar, Users, TrendingUp, AlertCircle, Sun, CloudRain, CloudSnow, Wind, Clock, Star, ChevronRight, Trophy, Plus, Bell, Cloud, CloudLightning, Snowflake, CalendarDays, Calculator, BookOpen, ClipboardCheck, FileText, Award, MessageSquare, LogOut, User, Settings } from 'lucide-react';
 // @ts-ignore;
 import { Button, useToast } from '@/components/ui';
 // @ts-ignore;
-import { getBeijingTime } from '@/lib/utils';
+import { getBeijingTime, getBeijingDateString, formatDateTime } from '@/lib/utils';
 
-// 格式化积分显示
-const formatPoints = points => {
-  if (points === null || points === undefined) return '0.00';
-  return Number(points).toFixed(2);
-};
 import { TabBar } from '@/components/TabBar';
 import { StatCard } from '@/components/StatCard';
 import { PointsChart } from '@/components/PointsChart';
 import { TeacherScheduleReminder } from '@/components/TeacherScheduleReminder';
+import { GrowthChart } from '@/components/GrowthChart';
+
+// 角色配置
+const ROLE_CONFIG = {
+  student: {
+    id: 'student',
+    name: '学生',
+    greeting: '同学',
+    theme: 'blue',
+    quickActions: [{
+      icon: Plus,
+      label: '申请志愿',
+      page: 'volunteer'
+    }, {
+      icon: Award,
+      label: '积分兑换',
+      page: 'exchange'
+    }, {
+      icon: BookOpen,
+      label: '我的成绩',
+      page: 'grades'
+    }, {
+      icon: Calendar,
+      label: '课表查询',
+      page: 'schedule-manage'
+    }, {
+      icon: FileText,
+      label: '成长记录',
+      page: 'student-growth'
+    }, {
+      icon: User,
+      label: '个人信息',
+      page: 'students'
+    }],
+    statLabels: {
+      stat1: '我的积分',
+      stat2: '班级排名',
+      stat3: '待办事项'
+    }
+  },
+  teacher: {
+    id: 'teacher',
+    name: '教师',
+    greeting: '老师',
+    theme: 'green',
+    quickActions: [{
+      icon: Plus,
+      label: '记录积分',
+      page: 'points'
+    }, {
+      icon: CalendarDays,
+      label: '排课管理',
+      page: 'schedule-manage'
+    }, {
+      icon: BookOpen,
+      label: '成绩管理',
+      page: 'grades'
+    }, {
+      icon: ClipboardCheck,
+      label: '值日安排',
+      page: 'duty-roster'
+    }, {
+      icon: Users,
+      label: '学生管理',
+      page: 'students'
+    }, {
+      icon: FileText,
+      label: '纪律管理',
+      page: 'discipline'
+    }],
+    statLabels: {
+      stat1: '班级学生',
+      stat2: '平均积分',
+      stat3: '待处理'
+    }
+  },
+  homeroom_teacher: {
+    id: 'homeroom_teacher',
+    name: '班主任',
+    greeting: '班主任',
+    theme: 'purple',
+    quickActions: [{
+      icon: Plus,
+      label: '记录积分',
+      page: 'points'
+    }, {
+      icon: Bell,
+      label: '发布通知',
+      page: 'notice-publish'
+    }, {
+      icon: Users,
+      label: '学生管理',
+      page: 'students'
+    }, {
+      icon: Calendar,
+      label: '课表管理',
+      page: 'schedule-manage'
+    }, {
+      icon: ClipboardCheck,
+      label: '值日安排',
+      page: 'duty-roster'
+    }, {
+      icon: Award,
+      label: '荣誉证书',
+      page: 'certificates'
+    }],
+    statLabels: {
+      stat1: '班级人数',
+      stat2: '平均积分',
+      stat3: '待处理'
+    }
+  },
+  parent: {
+    id: 'parent',
+    name: '家长',
+    greeting: '家长',
+    theme: 'orange',
+    quickActions: [{
+      icon: BookOpen,
+      label: '查看成绩',
+      page: 'grades'
+    }, {
+      icon: Award,
+      label: '积分记录',
+      page: 'points'
+    }, {
+      icon: FileText,
+      label: '成长记录',
+      page: 'student-growth'
+    }, {
+      icon: MessageSquare,
+      label: '家长视图',
+      page: 'parent-view'
+    }, {
+      icon: Users,
+      label: '班级信息',
+      page: 'students'
+    }, {
+      icon: Calendar,
+      label: '日程安排',
+      page: 'schedule-manage'
+    }],
+    statLabels: {
+      stat1: '孩子积分',
+      stat2: '班级排名',
+      stat3: '待办事项'
+    }
+  },
+  admin: {
+    id: 'admin',
+    name: '管理员',
+    greeting: '管理员',
+    theme: 'red',
+    quickActions: [{
+      icon: Plus,
+      label: '记录积分',
+      page: 'points'
+    }, {
+      icon: Users,
+      label: '用户管理',
+      page: 'users-manage'
+    }, {
+      icon: Settings,
+      label: '系统配置',
+      page: 'system-config'
+    }, {
+      icon: ClipboardCheck,
+      label: '权限管理',
+      page: 'permission-audit'
+    }, {
+      icon: Calendar,
+      label: '课表管理',
+      page: 'schedule-manage'
+    }, {
+      icon: FileText,
+      label: '成绩管理',
+      page: 'grades'
+    }],
+    statLabels: {
+      stat1: '学生总数',
+      stat2: '平均积分',
+      stat3: '待处理'
+    }
+  }
+};
 export default function Home(props) {
   const {
     $w
@@ -25,6 +205,18 @@ export default function Home(props) {
   } = useToast();
   const [currentPage, setCurrentPage] = useState('home');
   const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState(null);
+  const [config, setConfig] = useState(null);
+  const [studentData, setStudentData] = useState(null);
+  const [statsData, setStatsData] = useState({
+    stat1: 0,
+    stat2: 0,
+    stat3: 0
+  });
+  const [tasks, setTasks] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const [todaySchedule, setTodaySchedule] = useState([]);
+  const [pointsHistory, setPointsHistory] = useState([]);
   const [weather, setWeather] = useState({
     condition: 'sunny',
     temperature: 23,
@@ -33,19 +225,6 @@ export default function Home(props) {
     wind: '东北风 3级',
     advice: '天气晴朗，适合户外活动'
   });
-  const [students, setStudents] = useState([]);
-  const [pointsData, setPointsData] = useState([]);
-  const [tasks, setTasks] = useState([]);
-  const [todayBirthdays, setTodayBirthdays] = useState([]);
-  const [notifications, setNotifications] = useState([]);
-  const [statsData, setStatsData] = useState({
-    totalStudents: 0,
-    avgScore: 0,
-    pendingTasks: 0
-  });
-  const [userClass, setUserClass] = useState(null);
-  const [hasClass, setHasClass] = useState(true);
-  const [currentUser, setCurrentUser] = useState(null);
   useEffect(() => {
     loadDashboardData();
     loadWeatherData();
@@ -53,10 +232,8 @@ export default function Home(props) {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      const tcb = await $w.cloud.getCloudInstance();
-      const db = tcb.database();
 
-      // 获取当前用户信息（优先从 localStorage 读取，因为登录页面使用 Mock 数据）
+      // 获取当前用户信息
       let user = $w.auth.currentUser;
       if (!user || !user.type) {
         const storedUser = localStorage.getItem('currentUser');
@@ -64,180 +241,44 @@ export default function Home(props) {
           user = JSON.parse(storedUser);
         }
       }
-      setCurrentUser(user);
-      const userType = user?.type || '';
-      const userName = user?.name || '';
-      console.log('当前用户信息:', {
-        userType,
-        userName
-      });
-
-      // 根据用户类型构建查询条件
-      let studentQuery = {};
-      if (userType === '学生') {
-        // 学生只看自己的数据
-        studentQuery = {
-          name: userName
-        };
-      } else if (userType === '班主任') {
-        // 班主任检查是否创建了班级
-        try {
-          const userResult = await db.collection('user').where({
-            name: userName,
-            type: '班主任'
-          }).get();
-          if (userResult.data && userResult.data.length > 0) {
-            const userData = userResult.data[0];
-            if (userData.managed_class_name) {
-              setUserClass(userData.managed_class_name);
-              setHasClass(true);
-              studentQuery = {
-                class_name: userData.managed_class_name
-              };
-            } else {
-              setHasClass(false);
-              // 未创建班级，不显示学生数据
-              setStudents([]);
-              setStatsData({
-                totalStudents: 0,
-                avgScore: 0,
-                pendingTasks: 0
-              });
-              setLoading(false);
-              return;
-            }
-          } else {
-            setHasClass(false);
-          }
-        } catch (err) {
-          console.error('查询班主任班级信息失败:', err);
-          setHasClass(false);
-        }
-      } else if (userType === '家长') {
-        // 家长看自己的孩子（这里简化处理，实际应该从关联表获取）
-        // 暂时显示所有学生数据
-        studentQuery = {};
-      }
-      // 其他角色（管理员、教师等）查看所有数据
-
-      // 1. 先查询符合条件的学生总数（用于统计）
-      const totalStudentsResult = await db.collection('students').where(studentQuery).count();
-      const totalStudents = totalStudentsResult.total || 0;
-
-      // 2. 查询符合条件的学生积分数据（用于计算平均积分）
-      const allStudentsResult = await db.collection('students').where(studentQuery).field({
-        _id: true,
-        name: true,
-        current_score: true
-      }).get();
-      const allStudents = allStudentsResult.data || [];
-
-      // 计算总积分和平均积分
-      const totalScore = allStudents.reduce((sum, s) => sum + (s.current_score || 0), 0);
-      const avgScore = totalStudents > 0 ? Math.round(totalScore / totalStudents) : 0;
-
-      // 3. 查询积分排行榜前10名学生（基于筛选条件）
-      const topStudentsResult = await db.collection('students').where(studentQuery).orderBy('current_score', 'desc').limit(10).get();
-      if (topStudentsResult.data && topStudentsResult.data.length > 0) {
-        const transformedStudents = topStudentsResult.data.map(student => ({
-          id: student._id,
-          name: student.name,
-          group: student.group || '未分组',
-          totalPoints: student.current_score || 0,
-          rank: 0,
-          avatar: student.avatar_url
-        }));
-        setStudents(transformedStudents);
-
-        // 加载积分图表数据
-        const transformedPointsData = topStudentsResult.data.map(student => ({
-          name: student.name,
-          points: formatPoints(student.current_score || 0),
-          daily: formatPoints(student.current_score || 0),
-          dorm: student.dorm_score || 0
-        }));
-        setPointsData(transformedPointsData);
-      } else {
-        setStudents([]);
-        setPointsData([]);
+      if (!user) {
+        console.error('无法获取用户信息');
+        setLoading(false);
+        return;
       }
 
-      // 4. 查询今日待处理任务（从 duty_task 数据模型）
+      // 根据用户类型映射到角色配置
+      let roleId = 'student';
+      if (user.type === '班主任') {
+        roleId = 'homeroom_teacher';
+      } else if (user.type === '教师') {
+        roleId = 'teacher';
+      } else if (user.type === '学生家长') {
+        roleId = 'parent';
+      } else if (user.type === '管理员') {
+        roleId = 'admin';
+      } else if (user.type === '学生（班委）') {
+        roleId = 'student';
+      }
+      setUserRole(roleId);
+      const roleConfig = ROLE_CONFIG[roleId];
+      setConfig(roleConfig);
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
       const today = getBeijingTime();
-      const todayDateString = today.toISOString().split('T')[0];
-      const pendingTasksResult = await db.collection('duty_task').where({
-        date: todayDateString,
-        status: 'pending'
-      }).get();
-      const pendingTasks = pendingTasksResult.data ? pendingTasksResult.data.length : 0;
+      const todayDateString = getBeijingDateString();
+      const userName = user.name || '';
 
-      // 设置统计数据
-      setStatsData({
-        totalStudents,
-        avgScore,
-        pendingTasks
-      });
-
-      // 加载今日生日学生（使用 date_of_birth 字段）
-      const todayMonth = String(today.getMonth() + 1).padStart(2, '0');
-      const todayDay = String(today.getDate()).padStart(2, '0');
-      const todayDateStr = `-${todayMonth}-${todayDay}`;
-      const birthdayResult = await db.collection('students').where({
-        birthday: db.RegExp({
-          regexp: todayDateStr,
-          options: 'i'
-        })
-      }).get();
-      if (birthdayResult.data && birthdayResult.data.length > 0) {
-        const transformedBirthdays = birthdayResult.data.map(student => ({
-          id: student._id,
-          name: student.name,
-          group: student.group || '未分组',
-          avatar: student.avatar_url
-        }));
-        setTodayBirthdays(transformedBirthdays);
-      } else {
-        setTodayBirthdays([]);
+      // 根据角色加载不同数据
+      if (roleId === 'student') {
+        await loadStudentData(db, userName, todayDateString);
+      } else if (roleId === 'parent') {
+        await loadParentData(db, userName, todayDateString);
+      } else if (roleId === 'teacher' || roleId === 'homeroom_teacher') {
+        await loadTeacherData(db, userName, todayDateString, roleId);
+      } else if (roleId === 'admin') {
+        await loadAdminData(db, todayDateString);
       }
-
-      // 加载今日任务
-      setTasks([{
-        id: 1,
-        type: 'value',
-        title: '教室值日',
-        group: '第一组',
-        status: 'pending',
-        time: '16:00'
-      }, {
-        id: 2,
-        type: 'dorm',
-        title: '宿舍检查',
-        group: '第二组',
-        status: 'completed',
-        time: '17:00'
-      }, {
-        id: 3,
-        type: 'activity',
-        title: '志愿活动',
-        group: '第三组',
-        status: 'pending',
-        time: '18:00'
-      }]);
-
-      // 模拟通知
-      setNotifications([{
-        id: 1,
-        title: '积分兑换提醒',
-        message: '投标将于今日截止',
-        type: 'warning',
-        time: '10:00'
-      }, {
-        id: 2,
-        title: '宿舍检查',
-        message: '本周宿舍检查已安排',
-        type: 'info',
-        time: '09:00'
-      }]);
     } catch (error) {
       console.error('加载数据失败:', error);
       toast({
@@ -249,17 +290,194 @@ export default function Home(props) {
       setLoading(false);
     }
   };
+  const loadStudentData = async (db, userName, todayDateString) => {
+    try {
+      // 查询学生个人数据
+      const studentResult = await db.collection('students').where({
+        name: userName
+      }).get();
+      if (studentResult.data && studentResult.data.length > 0) {
+        const student = studentResult.data[0];
+        setStudentData(student);
+
+        // 设置统计数据
+        setStatsData({
+          stat1: student.current_score || 0,
+          stat2: student.rank || 1,
+          stat3: 0 // 待办事项需要从其他数据源获取
+        });
+
+        // 查询个人积分历史
+        const pointsResult = await db.collection('point_record').where({
+          student_name: userName
+        }).orderBy('created_at', 'desc').limit(10).get();
+        if (pointsResult.data) {
+          const history = pointsResult.data.map((record, index) => ({
+            date: formatDateTime(record.created_at, 'date'),
+            points: record.score || 0,
+            rank: index + 1
+          }));
+          setPointsHistory(history);
+        }
+
+        // 查询今日任务（个人值日、志愿等）
+        await loadPersonalTasks(db, userName, student, todayDateString);
+      }
+    } catch (error) {
+      console.error('加载学生数据失败:', error);
+    }
+  };
+  const loadParentData = async (db, userName, todayDateString) => {
+    try {
+      // 查询家长关联的学生
+      const relationResult = await db.collection('parent_student_relation').where({
+        parent_name: userName
+      }).get();
+      if (relationResult.data && relationResult.data.length > 0) {
+        const studentName = relationResult.data[0].student_name;
+
+        // 查询学生数据
+        const studentResult = await db.collection('students').where({
+          name: studentName
+        }).get();
+        if (studentResult.data && studentResult.data.length > 0) {
+          const student = studentResult.data[0];
+          setStudentData(student);
+          setStatsData({
+            stat1: student.current_score || 0,
+            stat2: student.rank || 1,
+            stat3: 0
+          });
+
+          // 查询学生积分历史
+          const pointsResult = await db.collection('point_record').where({
+            student_name: studentName
+          }).orderBy('created_at', 'desc').limit(10).get();
+          if (pointsResult.data) {
+            const history = pointsResult.data.map((record, index) => ({
+              date: formatDateTime(record.created_at, 'date'),
+              points: record.score || 0,
+              rank: index + 1
+            }));
+            setPointsHistory(history);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('加载数据失败:', error);
+    }
+  };
+  const loadTeacherData = async (db, userName, todayDateString, roleId) => {
+    try {
+      // 查询教师管理的班级
+      const classQuery = roleId === 'homeroom_teacher' ? {
+        homeroom_teacher: userName
+      } : {
+        teacher_name: userName
+      };
+      const classResult = await db.collection('classes').where(classQuery).get();
+      if (classResult.data && classResult.data.length > 0) {
+        const className = classResult.data[0].class_name;
+
+        // 查询班级学生统计
+        const studentsResult = await db.collection('students').where({
+          class_name: className
+        }).get();
+        if (studentsResult.data) {
+          const totalStudents = studentsResult.data.length;
+          const avgScore = studentsResult.data.reduce((sum, s) => sum + (s.current_score || 0), 0) / totalStudents;
+          setStatsData({
+            stat1: totalStudents,
+            stat2: Math.round(avgScore),
+            stat3: 0
+          });
+        }
+      } else {
+        // 全校数据（教师没有管理班级）
+        const studentsResult = await db.collection('students').get();
+        if (studentsResult.data) {
+          const totalStudents = studentsResult.data.length;
+          const avgScore = studentsResult.data.reduce((sum, s) => sum + (s.current_score || 0), 0) / totalStudents;
+          setStatsData({
+            stat1: totalStudents,
+            stat2: Math.round(avgScore),
+            stat3: 0
+          });
+        }
+      }
+    } catch (error) {
+      console.error('加载教师数据失败:', error);
+    }
+  };
+  const loadAdminData = async (db, todayDateString) => {
+    try {
+      // 查询全校统计
+      const studentsResult = await db.collection('students').get();
+      if (studentsResult.data) {
+        const totalStudents = studentsResult.data.length;
+        const avgScore = studentsResult.data.reduce((sum, s) => sum + (s.current_score || 0), 0) / totalStudents;
+        setStatsData({
+          stat1: totalStudents,
+          stat2: Math.round(avgScore),
+          stat3: 0
+        });
+      }
+    } catch (error) {
+      console.error('加载管理员数据失败:', error);
+    }
+  };
+  const loadPersonalTasks = async (db, userName, student, todayDateString) => {
+    try {
+      const tasks = [];
+
+      // 查询今日值日任务
+      const dutyResult = await db.collection('duty_task').where({
+        date: todayDateString,
+        student_name: userName
+      }).get();
+      if (dutyResult.data) {
+        dutyResult.data.forEach(task => {
+          tasks.push({
+            id: task._id,
+            type: 'value',
+            title: task.task_type || '值日',
+            group: task.group || '未分组',
+            status: task.status || 'pending',
+            time: task.time || '16:00'
+          });
+        });
+      }
+
+      // 查询今日志愿活动
+      const volunteerResult = await db.collection('volunteer_records').where({
+        student_name: userName,
+        date: todayDateString
+      }).get();
+      if (volunteerResult.data) {
+        volunteerResult.data.forEach(record => {
+          tasks.push({
+            id: record._id,
+            type: 'activity',
+            title: '志愿活动',
+            group: record.activity_name || '志愿',
+            status: record.status || 'pending',
+            time: record.time || '18:00'
+          });
+        });
+      }
+      setTasks(tasks);
+    } catch (error) {
+      console.error('加载个人任务失败:', error);
+    }
+  };
   const loadWeatherData = async () => {
     try {
-      // 根据当前日期生成合适的天气数据
       const today = getBeijingTime();
       const month = today.getMonth() + 1;
       let temperature = 20;
       let condition = 'sunny';
       let description = '晴朗';
       let advice = '天气晴朗，适合户外活动';
-
-      // 根据月份调整天气
       if (month >= 6 && month <= 8) {
         temperature = 28;
         description = '晴朗炎热';
@@ -277,28 +495,16 @@ export default function Home(props) {
         description = '寒冷';
         advice = '天气寒冷，注意保暖';
       }
-
-      // 设置天气数据
       setWeather({
         condition: condition,
         temperature: temperature,
         description: description,
         humidity: 60 + Math.floor(Math.random() * 20),
-        // 60-80%
         wind: '东北风 3级',
         advice: advice
       });
     } catch (error) {
       console.error('加载天气失败:', error);
-      // 使用默认天气数据作为回退，确保天气模块始终显示
-      setWeather({
-        condition: 'sunny',
-        temperature: 23,
-        description: '晴朗',
-        humidity: 65,
-        wind: '东北风 3级',
-        advice: '天气晴朗，适合户外活动'
-      });
     }
   };
   const handlePageChange = pageId => {
@@ -310,12 +516,10 @@ export default function Home(props) {
       });
     }, 100);
   };
-  const handleAddPoints = () => {
+  const handleQuickAction = page => {
     $w.utils.navigateTo({
-      pageId: 'points',
-      params: {
-        action: 'add'
-      }
+      pageId,
+      params: {}
     });
   };
   const getWeatherIcon = () => {
@@ -342,50 +546,20 @@ export default function Home(props) {
         </div>
       </div>;
   }
-
-  // 班主任未创建班级时显示引导界面
-  if (currentUser?.type === '班主任' && !hasClass) {
-    return <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Users className="w-8 h-8 text-blue-600" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">欢迎使用班级管理系统</h2>
-          <p className="text-gray-600">您还未创建班级，请先创建班级开始管理</p>
-        </div>
-        
-        <div className="space-y-4">
-          <div className="bg-blue-50 rounded-lg p-4">
-            <h3 className="font-semibold text-blue-900 mb-2">创建班级后您可以：</h3>
-            <ul className="text-sm text-blue-800 space-y-1">
-              <li>• 管理班级学生信息</li>
-              <li>• 记录学生积分和表现</li>
-              <li>• 发布班级公告和通知</li>
-              <li>• 查看班级统计数据</li>
-            </ul>
-          </div>
-          
-          <Button onClick={() => $w.utils.navigateTo({
-            pageId: 'classes-manage',
-            params: {}
-          })} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3">
-            <Plus className="w-4 h-4 mr-2" />
-            创建班级
-          </Button>
-        </div>
-      </div>
-    </div>;
+  if (!config) {
+    return <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-600">无法加载用户信息，请重新登录</p>
+      </div>;
   }
   return <div className="min-h-screen bg-gray-50 pb-16">
       {/* Header - Fixed Position for WeChat Style */}
-      <header className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-4 py-3 shadow-sm">
+      <header className={`bg-gradient-to-r from-${config.theme}-600 to-${config.theme}-500 text-white px-4 py-3 shadow-sm`}>
         <div className="flex items-center justify-between mb-3">
           <div>
             <h1 className="text-lg font-bold">班级积分管理</h1>
-            <p className="text-blue-100 text-xs mt-0.5">欢迎回来，{$w.auth.currentUser?.name || '老师'}</p>
+            <p className={`${config.theme}-100 text-xs mt-0.5`}>欢迎回来，{$w.auth.currentUser?.name || config.greeting}</p>
           </div>
-          <Button variant="ghost" size="icon" className="text-white hover:bg-blue-400 p-1" onClick={() => $w.utils.navigateTo({
+          <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 p-1" onClick={() => $w.utils.navigateTo({
           pageId: 'students',
           params: {}
         })}>
@@ -395,105 +569,81 @@ export default function Home(props) {
 
         {/* Weather Card - Compact */}
         <div className="bg-white/15 backdrop-blur-sm rounded-lg px-3 py-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                {getWeatherIcon()}
-                <div>
-                  <p className="text-base font-bold">{weather.temperature}°C</p>
-                  <p className="text-xs text-blue-100">{weather.description}</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-xs text-blue-100">{weather.humidity}% 湿度</p>
-                <p className="text-xs text-blue-100">{weather.wind}</p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {getWeatherIcon()}
+              <div>
+                <p className="text-base font-bold">{weather.temperature}°C</p>
+                <p className="text-xs text-white/80">{weather.description}</p>
               </div>
             </div>
-            <p className="text-xs text-blue-200 mt-1.5">{weather.advice}</p>
+            <div className="text-right">
+              <p className="text-xs text-white/80">{weather.humidity}% 湿度</p>
+              <p className="text-xs text-white/80">{weather.wind}</p>
+            </div>
           </div>
+          <p className="text-xs text-white/70 mt-1.5">{weather.advice}</p>
+        </div>
       </header>
 
       {/* Content Area - Compact Spacing */}
       <div className="px-3 py-3 space-y-3">
-        {/* Today's Tasks & Birthdays - Compact Grid */}
-        <div className="grid grid-cols-2 gap-2">
-          {/* Tasks Card */}
-          <div className="bg-white rounded-lg p-3 shadow-sm">
-            <div className="flex items-center gap-1.5 mb-2">
-              <Clock className="w-4 h-4 text-blue-600" />
-              <h3 className="font-medium text-gray-900 text-sm">今日任务</h3>
-            </div>
-            <div className="space-y-1.5">
-              {tasks.slice(0, 3).map(task => <div key={task.id} className={`flex items-center justify-between px-2 py-1.5 rounded ${task.status === 'completed' ? 'bg-green-50' : 'bg-amber-50'}`}>
+        {/* Today's Tasks - Compact Card */}
+        <div className="bg-white rounded-lg p-3 shadow-sm">
+          <div className="flex items-center gap-1.5 mb-2">
+            <Clock className="w-4 h-4 text-blue-600" />
+            <h3 className="font-medium text-gray-900 text-sm">今日任务</h3>
+          </div>
+          <div className="space-y-1.5">
+            {tasks.length > 0 ? tasks.slice(0, 3).map(task => <div key={task.id} className={`flex items-center justify-between px-2 py-1.5 rounded ${task.status === 'completed' ? 'bg-green-50' : 'bg-amber-50'}`}>
                   <div className="flex items-center gap-1.5">
                     <div className={`w-1.5 h-1.5 rounded-full ${task.status === 'completed' ? 'bg-green-500' : 'bg-amber-500'}`} />
                     <span className="text-xs text-gray-700">{task.title}</span>
                   </div>
                   <span className="text-xs text-gray-500">{task.time}</span>
-                </div>)}
-            </div>
-            <Button variant="ghost" size="sm" className="w-full mt-2 text-blue-600 text-xs h-6" onClick={() => $w.utils.navigateTo({
-            pageId: 'points',
-            params: {}
-          })}>
-              查看全部 <ChevronRight className="w-3 h-3 ml-1" />
-            </Button>
-          </div>
-
-          {/* Birthday Card */}
-          <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-lg p-3 shadow-sm">
-            <div className="flex items-center gap-1.5 mb-2">
-              <Star className="w-4 h-4 text-rose-500" />
-              <h3 className="font-medium text-gray-900 text-sm">今日生日</h3>
-            </div>
-            {todayBirthdays.length > 0 ? <div className="space-y-1.5">
-                {todayBirthdays.map(birthday => <div key={birthday.id} className="flex items-center gap-1.5 p-1.5 bg-white rounded">
-                    <div className="w-6 h-6 bg-rose-100 rounded-full flex items-center justify-center">
-                      <span className="text-xs font-medium text-rose-600">
-                        {birthday.name.charAt(0)}
-                      </span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-xs font-medium text-gray-900">{birthday.name}</p>
-                      <p className="text-xs text-gray-500">{birthday.group}</p>
-                    </div>
-                    <Star className="w-3 h-3 text-amber-400" />
-                  </div>)}
-              </div> : <div className="flex items-center justify-center h-14 text-gray-400">
-                <span className="text-xs">今日无生日</span>
+                </div>) : <div className="text-center py-2 text-gray-400 text-xs">
+                今日无任务
               </div>}
           </div>
         </div>
 
-        {/* Teacher Schedule Reminder - New */}
-        <TeacherScheduleReminder $w={$w} />
-
         {/* Quick Stats - Compact Grid */}
         <div className="grid grid-cols-3 gap-2">
-          <StatCard title="学生总数" value={String(statsData.totalStudents)} icon={Users} color="blue" trend={{
-          value: 5
-        }} />
-          <StatCard title="平均积分" value={String(statsData.avgScore)} icon={TrendingUp} color="green" trend={{
-          value: 8.2
-        }} />
-          <StatCard title="待处理" value={String(statsData.pendingTasks)} icon={AlertCircle} color="amber" />
+          <StatCard title={config.statLabels.stat1} value={String(statsData.stat1)} icon={Users} color={config.theme === 'blue' ? 'blue' : config.theme === 'green' ? 'green' : config.theme === 'purple' ? 'purple' : config.theme === 'orange' ? 'orange' : 'red'} />
+          <StatCard title={config.statLabels.stat2} value={String(statsData.stat2)} icon={TrendingUp} color={config.theme === 'blue' ? 'green' : 'blue'} />
+          <StatCard title={config.statLabels.stat3} value={String(statsData.stat3)} icon={AlertCircle} color="amber" />
         </div>
 
-        {/* Points Chart - Compact Card */}
-        <div className="bg-white rounded-lg p-3 shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-medium text-gray-900 flex items-center gap-1.5 text-sm">
-              <Trophy className="w-4 h-4 text-amber-500" />
-              积分排行榜（Top 5）
-            </h3>
-            <Button variant="ghost" size="sm" className="text-xs h-6" onClick={() => $w.utils.navigateTo({
+        {/* Chart Section - Based on Role */}
+        {(userRole === 'student' || userRole === 'parent') && studentData ? <div className="bg-white rounded-lg p-3 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-medium text-gray-900 flex items-center gap-1.5 text-sm">
+                <TrendingUp className="w-4 h-4 text-green-500" />
+                积分成长曲线
+              </h3>
+              <Button variant="ghost" size="sm" className="text-xs h-6" onClick={() => $w.utils.navigateTo({
             pageId: 'points',
             params: {}
           })}>
-              查看全部
-            </Button>
-          </div>
-          <PointsChart data={pointsData} height={220} />
-        </div>
+                查看详情
+              </Button>
+            </div>
+            <GrowthChart data={pointsHistory} height={200} />
+          </div> : <div className="bg-white rounded-lg p-3 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-medium text-gray-900 flex items-center gap-1.5 text-sm">
+                <Trophy className="w-4 h-4 text-amber-500" />
+                积分排行榜（Top 5）
+              </h3>
+              <Button variant="ghost" size="sm" className="text-xs h-6" onClick={() => $w.utils.navigateTo({
+            pageId: 'points',
+            params: {}
+          })}>
+                查看全部
+              </Button>
+            </div>
+            <PointsChart data={[]} height={220} />
+          </div>}
 
         {/* Notifications - Compact */}
         {notifications.length > 0 && <div className="bg-white rounded-lg p-3 shadow-sm">
@@ -514,45 +664,13 @@ export default function Home(props) {
         <div className="bg-white rounded-lg p-3 shadow-sm">
           <h3 className="font-medium text-gray-900 mb-3 text-sm">快捷操作</h3>
           <div className="grid grid-cols-3 gap-2">
-            <Button onClick={handleAddPoints} className="bg-blue-600 hover:bg-blue-700 h-auto flex flex-col items-center gap-1.5 py-3">
-              <Plus className="w-5 h-5" />
-              <span className="text-xs">记录积分</span>
-            </Button>
-            <Button onClick={() => $w.utils.navigateTo({
-            pageId: 'exchange',
-            params: {}
-          })} variant="outline" className="h-auto flex flex-col items-center gap-1.5 py-3">
-              <Trophy className="w-5 h-5" />
-              <span className="text-xs">积分兑换</span>
-            </Button>
-            <Button onClick={() => $w.utils.navigateTo({
-            pageId: 'duty-roster',
-            params: {}
-          })} variant="outline" className="h-auto flex flex-col items-center gap-1.5 py-3">
-              <CalendarDays className="w-5 h-5" />
-              <span className="text-xs">卫生值日</span>
-            </Button>
-            <Button onClick={() => $w.utils.navigateTo({
-            pageId: 'subjects',
-            params: {}
-          })} variant="outline" className="h-auto flex flex-col items-center gap-1.5 py-3">
-              <Calculator className="w-5 h-5" />
-              <span className="text-xs">科目设置</span>
-            </Button>
-            <Button onClick={() => $w.utils.navigateTo({
-            pageId: 'students',
-            params: {}
-          })} variant="outline" className="h-auto flex flex-col items-center gap-1.5 py-3">
-              <Users className="w-5 h-5" />
-              <span className="text-xs">学生管理</span>
-            </Button>
-            <Button onClick={() => $w.utils.navigateTo({
-            pageId: 'grades',
-            params: {}
-          })} variant="outline" className="h-auto flex flex-col items-center gap-1.5 py-3">
-              <Star className="w-5 h-5" />
-              <span className="text-xs">成绩管理</span>
-            </Button>
+            {config.quickActions.map((action, index) => {
+            const Icon = action.icon;
+            return <Button key={index} onClick={() => handleQuickAction(action.page)} className={index === 0 ? `bg-${config.theme}-600 hover:bg-${config.theme}-700 h-auto flex flex-col items-center gap-1.5 py-3` : 'h-auto flex flex-col items-center gap-1.5 py-3'} variant={index === 0 ? 'default' : 'outline'}>
+                  <Icon className="w-5 h-5" />
+                  <span className="text-xs">{action.label}</span>
+                </Button>;
+          })}
           </div>
         </div>
       </div>
