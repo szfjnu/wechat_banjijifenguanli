@@ -191,12 +191,44 @@ export default function LoginPage({
         name: user.name,
         loginMethod: 'password'
       });
+
+      // 创建模拟用户信息并存储到 localStorage
+      const mockUserInfo = {
+        userId: `USER_${Date.now()}`,
+        name: user.name,
+        nickName: user.role,
+        avatarUrl: null,
+        type: user.role,
+        role: user.role
+      };
+      localStorage.setItem('currentUser', JSON.stringify(mockUserInfo));
       toast({
         title: '登录成功',
         description: `欢迎回来，${user.name}`,
         variant: 'default'
       });
-      setCurrentStep('role');
+
+      // 如果是系统管理员，显示角色选择页面（方便调试）
+      if (username === 'admin') {
+        setCurrentStep('role');
+      } else {
+        // 其他用户直接跳转到对应角色的页面
+        const role = roles.find(r => r.id === username);
+        if (role) {
+          $w.utils.navigateTo({
+            pageId: role.targetPage,
+            params: {
+              role: role.id
+            }
+          });
+        } else {
+          // 默认跳转到首页
+          $w.utils.navigateTo({
+            pageId: 'home',
+            params: {}
+          });
+        }
+      }
     } catch (error) {
       toast({
         title: '登录失败',
