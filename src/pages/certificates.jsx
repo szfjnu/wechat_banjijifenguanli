@@ -9,7 +9,7 @@ import { getBeijingDateString, getBeijingTimeISO, getBeijingTime } from '@/lib/u
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
-import { usePermission } from '@/components/PermissionGuard';
+import { usePermission, useDataScope, useBatchOperations, BatchOperationGuard } from '@/components/PermissionGuard';
 // 格式化积分：整数显示整数，小数最多显示两位
 const formatPoints = points => {
   if (points === undefined || points === null || isNaN(points)) return '0';
@@ -120,6 +120,17 @@ export default function CertificatesPage(props) {
     permission: canVerifyCertificates,
     loading: loadingVerifyCertificates
   } = usePermission($w, 'certificates', 'approve');
+
+  // 数据范围和批量操作权限
+  const {
+    dataScope,
+    canViewAll,
+    canViewClass
+  } = useDataScope($w);
+  const {
+    canBatchExport,
+    canBatchDelete
+  } = useBatchOperations($w, 'certificates');
   const [exportRange, setExportRange] = useState('all');
   const [stats, setStats] = useState({
     total: 0,
@@ -158,22 +169,23 @@ export default function CertificatesPage(props) {
       const userName = currentUser?.name || '';
       console.log('当前用户信息:', {
         userType,
-        userName
+        userName,
+        dataScope
       });
 
-      // 根据用户类型构建查询条件
+      // 根据数据范围构建查询条件
       let studentQuery = {};
-      if (userType === '学生') {
-        // 学生只看自己的数据
+      if (dataScope === 'self') {
+        // 学生/家长只看自己的数据
         studentQuery = {
           name: userName
         };
-      } else if (userType === '班主任') {
+      } else if (dataScope === 'class') {
         // 班主任只看自己班级的学生
         try {
           const userResult = await db.collection('user').where({
             name: userName,
-            type: '班主任'
+            type: userType
           }).get();
           if (userResult.data && userResult.data.length > 0) {
             const userData = userResult.data[0];
@@ -184,14 +196,10 @@ export default function CertificatesPage(props) {
             }
           }
         } catch (err) {
-          console.error('查询班主任班级信息失败:', err);
+          console.error('查询班级信息失败:', err);
         }
-      } else if (userType === '家长') {
-        // 家长看自己的孩子（这里简化处理，实际应该从关联表获取）
-        // 暂时显示所有学生数据
-        studentQuery = {};
       }
-      // 其他角色（管理员、教师等）查看所有数据
+      // dataScope === 'all' 时查询所有数据（管理员）
 
       const result = await db.collection('students').where(studentQuery).get();
       if (result.data && result.data.length > 0) {
@@ -552,12 +560,16 @@ export default function CertificatesPage(props) {
               <p className="text-xs text-gray-500">学生获奖与证书管理</p>
             </div>
             <div className="flex gap-1">
-              <Button onClick={() => setShowExportDialog(true)} variant="outline" size="icon" className="h-8 w-8">
-                <Download className="w-4 h-4" />
-              </Button>
-              <Button onClick={() => setShowAddDialog(true)} variant="outline" size="icon" className="h-8 w-8">
-                <Plus className="w-4 h-4" />
-              </Button>
+              <BatchOperationGuard requires="export" module="certificates">
+                <Button onClick={() => setShowExportDialog(true)} variant="outline" size="icon" className="h-8 w-8">
+                  <Download className="w-4 h-4" />
+                </Button>
+              </BatchOperationGuard>
+              <BatchOperationGuard requires="create" module="certificates">
+                <Button onClick={() => setShowAddDialog(true)} variant="outline" size="icon" className="h-8 w-8">
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </BatchOperationGuard>
             </div>
           </div>
         </header>

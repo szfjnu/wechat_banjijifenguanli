@@ -8,7 +8,7 @@ import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger
 import { getBeijingTimeISO, getBeijingTime } from '@/lib/utils';
 
 import { TabBar } from '@/components/TabBar';
-import { usePermission } from '@/components/PermissionGuard';
+import { usePermission, useDataScope, useBatchOperations, BatchOperationGuard } from '@/components/PermissionGuard';
 
 // 格式化积分：整数显示整数，小数最多显示两位
 const formatPoints = points => {
@@ -65,6 +65,16 @@ export default function ExchangePage({
     permission: canApproveExchange,
     loading: loadingApproveExchange
   } = usePermission($w, 'exchange', 'approve');
+
+  // 数据范围和批量操作权限
+  const {
+    dataScope,
+    canViewAll,
+    canViewClass
+  } = useDataScope($w);
+  const {
+    canBatchExport
+  } = useBatchOperations($w, 'exchange');
 
   // 表单状态
   const [bidPoints, setBidPoints] = useState('');

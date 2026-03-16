@@ -9,7 +9,7 @@ import { getBeijingDateString } from '@/lib/utils';
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
-import { usePermission } from '@/components/PermissionGuard';
+import { usePermission, useDataScope, useBatchOperations, BatchOperationGuard } from '@/components/PermissionGuard';
 // 志愿服务活动预设数据
 const ACTIVITY_TYPES = [{
   id: 1,
@@ -91,6 +91,18 @@ export default function VolunteerPage({
     loading: loadingVerifyVolunteer
   } = usePermission($w, 'volunteer', 'verify');
 
+  // 数据范围和批量操作权限
+  const {
+    dataScope,
+    canViewAll,
+    canViewClass
+  } = useDataScope($w);
+  const {
+    canBatchExport,
+    canBatchDelete,
+    canBatchVerify
+  } = useBatchOperations($w, 'volunteer');
+
   // 加载数据
   useEffect(() => {
     loadStudentsData();
@@ -113,22 +125,23 @@ export default function VolunteerPage({
       const userName = currentUser?.name || '';
       console.log('当前用户信息:', {
         userType,
-        userName
+        userName,
+        dataScope
       });
 
-      // 根据用户类型构建查询条件
+      // 根据数据范围构建查询条件
       let studentQuery = {};
-      if (userType === '学生') {
-        // 学生只看自己的数据
+      if (dataScope === 'self') {
+        // 学生/家长只看自己的数据
         studentQuery = {
           name: userName
         };
-      } else if (userType === '班主任') {
+      } else if (dataScope === 'class') {
         // 班主任只看自己班级的学生
         try {
           const userResult = await db.collection('user').where({
             name: userName,
-            type: '班主任'
+            type: userType
           }).get();
           if (userResult.data && userResult.data.length > 0) {
             const userData = userResult.data[0];
@@ -139,14 +152,10 @@ export default function VolunteerPage({
             }
           }
         } catch (err) {
-          console.error('查询班主任班级信息失败:', err);
+          console.error('查询班级信息失败:', err);
         }
-      } else if (userType === '家长') {
-        // 家长看自己的孩子（这里简化处理，实际应该从关联表获取）
-        // 暂时显示所有学生数据
-        studentQuery = {};
       }
-      // 其他角色（管理员、教师等）查看所有数据
+      // dataScope === 'all' 时查询所有数据（管理员）
 
       const result = await db.collection('students').where(studentQuery).get();
       if (result.data && result.data.length > 0) {
@@ -180,22 +189,23 @@ export default function VolunteerPage({
       const userName = currentUser?.name || '';
       console.log('当前用户信息:', {
         userType,
-        userName
+        userName,
+        dataScope
       });
 
-      // 根据用户类型构建查询条件
+      // 根据数据范围构建查询条件
       let recordQuery = {};
-      if (userType === '学生') {
-        // 学生只看自己的志愿服务记录
+      if (dataScope === 'self') {
+        // 学生/家长只看自己的数据
         recordQuery = {
           student_name: userName
         };
-      } else if (userType === '班主任') {
+      } else if (dataScope === 'class') {
         // 班主任只看自己班级学生的志愿服务记录
         try {
           const userResult = await db.collection('user').where({
             name: userName,
-            type: '班主任'
+            type: userType
           }).get();
           if (userResult.data && userResult.data.length > 0) {
             const userData = userResult.data[0];
@@ -219,14 +229,10 @@ export default function VolunteerPage({
             }
           }
         } catch (err) {
-          console.error('查询班主任班级信息失败:', err);
+          console.error('查询班级信息失败:', err);
         }
-      } else if (userType === '家长') {
-        // 家长看自己孩子的志愿服务记录（这里简化处理，实际应该从关联表获取）
-        // 暂时显示所有记录
-        recordQuery = {};
       }
-      // 其他角色（管理员、教师等）查看所有数据
+      // dataScope === 'all' 时查询所有数据（管理员）
 
       const result = await db.collection('volunteer_records').where(recordQuery).orderBy('date', 'desc').limit(50).get();
       if (result.data && result.data.length > 0) {
@@ -418,79 +424,83 @@ export default function VolunteerPage({
               </select>
             </div>
             <div className="flex gap-2 w-full md:w-auto">
-              <Dialog open={showNewDialog} onOpenChange={setShowNewDialog}>
-                <DialogTrigger asChild>
-                  <Button className="bg-gradient-to-r from-rose-500 to-pink-500 text-white hover:from-rose-600 hover:to-pink-600 flex-1 md:flex-none shadow-md">
-                    <Plus className="w-4 h-4 mr-1" />
-                    新建记录
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle className="text-lg font-bold text-gray-800">创建志愿服务记录</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4 mt-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">选择学生 *</label>
-                      <select value={newRecord.studentId} onChange={e => setNewRecord({
-                      ...newRecord,
-                      studentId: e.target.value
-                    })} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-300">
-                        <option value="">请选择学生</option>
-                        {students.map(student => <option key={student.studentId} value={student.studentId}>{student.studentId} - {student.name} ({student.group}) - 当前积分: {student.totalPoints}</option>)}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">活动名称 *</label>
-                      <select value={newRecord.activityName} onChange={e => setNewRecord({
-                      ...newRecord,
-                      activityName: e.target.value
-                    })} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-300">
-                        <option value="">请选择活动</option>
-                        {ACTIVITY_TYPES.map(activity => <option key={activity.id} value={activity.name}>{activity.name} ({activity.category})</option>)}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">服务时长(小时) *</label>
-                      <input type="number" step="0.5" min="0" max="24" value={newRecord.duration} onChange={e => setNewRecord({
-                      ...newRecord,
-                      duration: e.target.value
-                    })} placeholder="输入服务时长，如2.5" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-300" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">服务日期</label>
-                      <input type="date" value={newRecord.date} onChange={e => setNewRecord({
-                      ...newRecord,
-                      date: e.target.value
-                    })} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-300" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">备注</label>
-                      <input type="text" value={newRecord.note} onChange={e => setNewRecord({
-                      ...newRecord,
-                      note: e.target.value
-                    })} placeholder="活动备注，如地点、内容等" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-300" />
-                    </div>
-                    <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg p-3 border border-amber-200">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Award className="w-5 h-5 text-amber-500" strokeWidth={2} />
-                          <span className="text-sm font-medium text-gray-700">预计获得积分</span>
-                        </div>
-                        <span className="text-xl font-bold text-amber-600 font-['Space_Mono']">{calculatePoints(newRecord.duration)}</span>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">每小时服务可获得 2 积分</p>
-                    </div>
-                    <Button onClick={handleSubmit} className="w-full bg-gradient-to-r from-rose-500 to-pink-500 text-white hover:from-rose-600 hover:to-pink-600">
-                      提交记录
+              <BatchOperationGuard requires="create" module="volunteer">
+                <Dialog open={showNewDialog} onOpenChange={setShowNewDialog}>
+                  <DialogTrigger asChild>
+                    <Button className="bg-gradient-to-r from-rose-500 to-pink-500 text-white hover:from-rose-600 hover:to-pink-600 flex-1 md:flex-none shadow-md">
+                      <Plus className="w-4 h-4 mr-1" />
+                      新建记录
                     </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
-              <Button variant="outline" onClick={exportCSV} className="flex-1 md:flex-none border-rose-200 text-rose-600 hover:bg-rose-50">
-                <Download className="w-4 h-4 mr-1" />
-                导出
-              </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="text-lg font-bold text-gray-800">创建志愿服务记录</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 mt-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">选择学生 *</label>
+                        <select value={newRecord.studentId} onChange={e => setNewRecord({
+                        ...newRecord,
+                        studentId: e.target.value
+                      })} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-300">
+                          <option value="">请选择学生</option>
+                          {students.map(student => <option key={student.studentId} value={student.studentId}>{student.studentId} - {student.name} ({student.group}) - 当前积分: {student.totalPoints}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">活动名称 *</label>
+                        <select value={newRecord.activityName} onChange={e => setNewRecord({
+                        ...newRecord,
+                        activityName: e.target.value
+                      })} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-300">
+                          <option value="">请选择活动</option>
+                          {ACTIVITY_TYPES.map(activity => <option key={activity.id} value={activity.name}>{activity.name} ({activity.category})</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">服务时长(小时) *</label>
+                        <input type="number" step="0.5" min="0" max="24" value={newRecord.duration} onChange={e => setNewRecord({
+                        ...newRecord,
+                        duration: e.target.value
+                      })} placeholder="输入服务时长，如2.5" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-300" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">服务日期</label>
+                        <input type="date" value={newRecord.date} onChange={e => setNewRecord({
+                        ...newRecord,
+                        date: e.target.value
+                      })} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-300" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">备注</label>
+                        <input type="text" value={newRecord.note} onChange={e => setNewRecord({
+                        ...newRecord,
+                        note: e.target.value
+                      })} placeholder="活动备注，如地点、内容等" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-300" />
+                      </div>
+                      <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg p-3 border border-amber-200">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Award className="w-5 h-5 text-amber-500" strokeWidth={2} />
+                            <span className="text-sm font-medium text-gray-700">预计获得积分</span>
+                          </div>
+                          <span className="text-xl font-bold text-amber-600 font-['Space_Mono']">{calculatePoints(newRecord.duration)}</span>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">每小时服务可获得 2 积分</p>
+                      </div>
+                      <Button onClick={handleSubmit} className="w-full bg-gradient-to-r from-rose-500 to-pink-500 text-white hover:from-rose-600 hover:to-pink-600">
+                        提交记录
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </BatchOperationGuard>
+              <BatchOperationGuard requires="export" module="volunteer">
+                <Button variant="outline" onClick={exportCSV} className="flex-1 md:flex-none border-rose-200 text-rose-600 hover:bg-rose-50">
+                  <Download className="w-4 h-4 mr-1" />
+                  导出
+                </Button>
+              </BatchOperationGuard>
             </div>
           </div>
         </div>
