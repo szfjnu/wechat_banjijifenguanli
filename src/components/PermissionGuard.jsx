@@ -143,3 +143,111 @@ export function ConditionalRender({
   }
   return permission ? children : fallback;
 }
+
+/**
+ * 数据级权限过滤工具
+ * 根据用户角色过滤数据，实现数据隔离
+ * @param {Object} $w - 页面props中的$w对象
+ * @param {Array} data - 原始数据数组
+ * @param {string} dataType - 数据类型（students, grades, points等）
+ * @returns {Object} { filteredData: 过滤后的数据, filterInfo: 过滤信息 }
+ */
+export function useDataFilter($w, data, dataType) {
+  const [filteredData, setFilteredData] = React.useState(data || []);
+  const [filterInfo, setFilterInfo] = React.useState('');
+  React.useEffect(() => {
+    filterDataByRole();
+  }, [$w, data, dataType]);
+  const filterDataByRole = () => {
+    const currentUser = $w.auth.currentUser;
+    if (!currentUser || !data || !Array.isArray(data)) {
+      setFilteredData(data || []);
+      setFilterInfo('');
+      return;
+    }
+    const userType = currentUser.type || currentUser.nickName || '学生';
+    const userName = currentUser.name || '';
+    let filtered = [...data];
+    let info = '';
+    if (dataType === 'students') {
+      if (userType === '学生') {
+        // 学生只能看到自己的数据
+        filtered = data.filter(item => item.name === userName);
+        info = `显示您的个人数据（共${filtered.length}条）`;
+      } else if (userType === '家长') {
+        // 家长只能看到自己孩子的数据（根据 name 或 parent_phone_number 匹配）
+        filtered = data.filter(item => {
+          // 如果数据中有 parent_phone_number 字段，根据家长的电话匹配
+          if (item.parent_phone_number) {
+            return item.parent_phone_number === currentUser.userId; // 假设 userId 是电话
+          }
+          // 如果没有，暂不过滤（显示所有，实际应该有家长-学生关联表）
+          return true;
+        });
+        if (filtered.length === data.length) {
+          info = '显示所有学生数据（暂无家长-学生关联，请联系管理员）';
+        } else {
+          info = `显示您孩子的数据（共${filtered.length}条）`;
+        }
+      } else if (userType === '班主任' || userType === 'homeroom_teacher') {
+        // 班主任只能看到本班学生（根据 class 字段匹配）
+        // 由于 students 数据模型没有 class 字段，暂时显示所有数据
+        // 实际应该从班级管理获取班主任管理的班级列表，然后过滤
+        info = '显示所有学生数据（暂无班主任-班级关联，请联系管理员）';
+      } else if (userType === '教师' || userType === 'class_teacher') {
+        // 教师可以看到所有学生数据（用于成绩录入等）
+        info = '显示所有学生数据';
+      } else if (userType === 'admin') {
+        // 管理员可以看到所有数据
+        info = '显示所有学生数据';
+      } else if (userType === '学生（班委）' || userType === 'student_committee') {
+        // 学生班委可以看到所有学生数据
+        info = '显示所有学生数据';
+      } else {
+        // 默认只看自己的数据
+        filtered = data.filter(item => item.name === userName);
+        info = `显示您的个人数据（共${filtered.length}条）`;
+      }
+    } else if (dataType === 'grades') {
+      if (userType === '学生') {
+        // 学生只能看到自己的成绩
+        filtered = data.filter(item => item.student_name === userName);
+        info = `显示您的成绩（共${filtered.length}条）`;
+      } else if (userType === '家长') {
+        // 家长只能看到自己孩子的成绩
+        filtered = data.filter(item => {
+          // 根据 student_name 或关联表匹配
+          return true; // 暂不过滤
+        });
+        info = '显示所有成绩数据（暂无家长-学生关联，请联系管理员）';
+      } else {
+        // 其他角色可以看到所有成绩
+        info = '显示所有成绩数据';
+      }
+    } else if (dataType === 'points') {
+      if (userType === '学生') {
+        // 学生只能看到自己的积分记录
+        filtered = data.filter(item => item.student_name === userName);
+        info = `显示您的积分记录（共${filtered.length}条）`;
+      } else if (userType === '家长') {
+        // 家长只能看到自己孩子的积分记录
+        filtered = data.filter(item => {
+          return true; // 暂不过滤
+        });
+        info = '显示所有积分记录（暂无家长-学生关联，请联系管理员）';
+      } else {
+        // 其他角色可以看到所有积分记录
+        info = '显示所有积分记录';
+      }
+    } else {
+      // 其他数据类型默认不过滤
+      info = '显示所有数据';
+    }
+    setFilteredData(filtered);
+    setFilterInfo(info);
+  };
+  return {
+    filteredData,
+    filterInfo
+  };
+}

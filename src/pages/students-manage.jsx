@@ -9,7 +9,7 @@ import { TabBar } from '@/components/TabBar';
 import { StatCard } from '@/components/StatCard';
 import { StudentForm } from '@/components/StudentForm';
 import { StudentDetail } from '@/components/StudentDetail';
-import { usePermission } from '@/components/PermissionGuard';
+import { usePermission, useDataFilter } from '@/components/PermissionGuard';
 
 // 格式化积分：整数显示整数，小数最多显示两位
 const formatPoints = points => {
@@ -53,7 +53,7 @@ export default function StudentsManage(props) {
     loading: loadingExportStudent
   } = usePermission($w, 'students', 'export');
   const [loading, setLoading] = useState(true);
-  const [students, setStudents] = useState([]);
+  const [allStudents, setAllStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [selectedClass, setSelectedClass] = useState('all');
   const [selectedDorm, setSelectedDorm] = useState('all');
@@ -64,54 +64,38 @@ export default function StudentsManage(props) {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [sortBy, setSortBy] = useState('current_score');
   const [sortOrder, setSortOrder] = useState('desc');
+
+  // 使用数据过滤工具
+  const {
+    filteredData: roleFilteredStudents,
+    filterInfo: dataFilterInfo
+  } = useDataFilter($w, allStudents, 'students');
   useEffect(() => {
     loadStudentsData();
   }, []);
   useEffect(() => {
-    filterAndSortStudents();
-  }, [students, selectedClass, selectedDorm, searchQuery, sortBy, sortOrder]);
+    setFilteredStudents(roleFilteredStudents);
+  }, [roleFilteredStudents]);
+  useEffect(() => {
+    applyFilters();
+  }, [filteredStudents, selectedClass, selectedDorm, searchQuery, sortBy, sortOrder]);
   const loadStudentsData = async () => {
     try {
       setLoading(true);
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
 
-      // 获取当前用户信息
-      const currentUser = $w.auth.currentUser;
-      const userType = currentUser?.type || '';
-      const userName = currentUser?.name || '';
-      const userId = currentUser?.userId || '';
-
-      // 根据用户类型构建查询条件
-      let query = {};
-      if (userType === '学生') {
-        // 学生只看自己的数据
-        query = {
-          name: userName
-        };
-      } else if (userType === '班主任') {
-        // 班主任看自己班级的学生（这里简化为不筛选，实际应该从班级管理获取班主任管理的班级）
-        // 由于缺少班主任-班级关联模型，暂时班主任能看到所有学生
-        query = {};
-      } else if (userType === '家长') {
-        // 家长看自己的孩子（这里简化为不筛选，实际应该从关联表获取）
-        // 由于缺少家长-学生关联模型，暂时家长能看到所有学生
-        query = {};
-      }
-      const result = await db.collection('students').where(query).get();
+      // 获取所有学生数据（不在这里做角色过滤，由 useDataFilter 统一处理）
+      const result = await db.collection('students').where({}).get();
 
       // 添加调试日志
       console.log('students-manage.jsx 加载学生数据:', {
-        用户类型: userType,
-        用户名称: userName,
-        查询条件: query,
         数据总数: result.data ? result.data.length : 0,
         数据库集合名: 'students',
         查询结果: result
       });
       if (result.data && result.data.length > 0) {
-        setStudents(result.data);
-        setFilteredStudents(result.data);
+        setAllStudents(result.data);
         toast({
           title: '加载成功',
           description: `成功加载 ${result.data.length} 名学生数据`,
@@ -137,8 +121,8 @@ export default function StudentsManage(props) {
       setLoading(false);
     }
   };
-  const filterAndSortStudents = () => {
-    let filtered = [...students];
+  const applyFilters = () => {
+    let filtered = [...roleFilteredStudents];
 
     // 按班级筛选
     if (selectedClass !== 'all') {
@@ -409,7 +393,10 @@ export default function StudentsManage(props) {
         {/* 学生列表 */}
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <div className="p-4 border-b">
-            <h2 className="font-semibold text-gray-900">学生列表 ({filteredStudents.length})</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold text-gray-900">学生列表 ({filteredStudents.length})</h2>
+              {dataFilterInfo && <span className="text-sm text-gray-500">{dataFilterInfo}</span>}
+            </div>
           </div>
 
           {filteredStudents.length === 0 ? <div className="p-12 text-center text-gray-400">
