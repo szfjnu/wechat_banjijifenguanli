@@ -217,6 +217,7 @@ export default function Home(props) {
   const [notifications, setNotifications] = useState([]);
   const [todaySchedule, setTodaySchedule] = useState([]);
   const [pointsHistory, setPointsHistory] = useState([]);
+  const [rankings, setRankings] = useState([]);
   const [weather, setWeather] = useState({
     condition: 'sunny',
     temperature: 23,
@@ -391,6 +392,15 @@ export default function Home(props) {
             stat2: Math.round(avgScore),
             stat3: 0
           });
+
+          // 加载班级积分排行榜（Top 5）
+          const sortedStudents = studentsResult.data.sort((a, b) => (b.current_score || 0) - (a.current_score || 0)).slice(0, 5);
+          setRankings(sortedStudents.map(s => ({
+            name: s.name,
+            score: s.current_score || 0,
+            className: s.class_name,
+            studentId: s.student_id
+          })));
         }
       } else {
         // 全校数据（教师没有管理班级）
@@ -421,6 +431,15 @@ export default function Home(props) {
           stat2: Math.round(avgScore),
           stat3: 0
         });
+
+        // 加载全校积分排行榜（Top 5）
+        const sortedStudents = studentsResult.data.sort((a, b) => (b.current_score || 0) - (a.current_score || 0)).slice(0, 5);
+        setRankings(sortedStudents.map(s => ({
+          name: s.name,
+          score: s.current_score || 0,
+          className: s.class_name,
+          studentId: s.student_id
+        })));
       }
     } catch (error) {
       console.error('加载管理员数据失败:', error);
@@ -642,7 +661,7 @@ export default function Home(props) {
                 查看全部
               </Button>
             </div>
-            <PointsChart data={[]} height={220} />
+            <PointsChart data={rankings} height={220} />
           </div>}
 
         {/* Notifications - Compact */}
