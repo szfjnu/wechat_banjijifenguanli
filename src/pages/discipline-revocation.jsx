@@ -82,9 +82,20 @@ export default function DisciplineRevocationPage(props) {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
 
-      // 获取当前用户信息
-      const userType = currentUser?.type || '';
-      const userName = currentUser?.name || '';
+      // 获取当前用户信息（优先从 localStorage 读取，因为登录页面使用 Mock 数据）
+      let currentUserData = currentUser;
+      if (!currentUserData || !currentUserData.type) {
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) {
+          currentUserData = JSON.parse(storedUser);
+        }
+      }
+      const userType = currentUserData?.type || '';
+      const userName = currentUserData?.name || '';
+      console.log('当前用户信息:', {
+        userType,
+        userName
+      });
 
       // 根据用户类型构建查询条件
       let disciplineQuery = {

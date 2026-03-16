@@ -56,11 +56,21 @@ export default function Home(props) {
       const tcb = await $w.cloud.getCloudInstance();
       const db = tcb.database();
 
-      // 获取当前用户信息
-      const user = $w.auth.currentUser;
+      // 获取当前用户信息（优先从 localStorage 读取，因为登录页面使用 Mock 数据）
+      let user = $w.auth.currentUser;
+      if (!user || !user.type) {
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) {
+          user = JSON.parse(storedUser);
+        }
+      }
       setCurrentUser(user);
       const userType = user?.type || '';
       const userName = user?.name || '';
+      console.log('当前用户信息:', {
+        userType,
+        userName
+      });
 
       // 根据用户类型构建查询条件
       let studentQuery = {};

@@ -73,10 +73,20 @@ export default function RevocationVolunteerPage(props) {
       const tcb = await props.$w.cloud.getCloudInstance();
       const db = tcb.database();
 
-      // 获取当前用户信息
-      const currentUser = props.$w.auth.currentUser;
+      // 获取当前用户信息（优先从 localStorage 读取，因为登录页面使用 Mock 数据）
+      let currentUser = props.$w.auth.currentUser;
+      if (!currentUser || !currentUser.type) {
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) {
+          currentUser = JSON.parse(storedUser);
+        }
+      }
       const userType = currentUser?.type || '';
       const userName = currentUser?.name || '';
+      console.log('当前用户信息:', {
+        userType,
+        userName
+      });
 
       // 根据用户类型构建查询条件
       let disciplineQuery = {
