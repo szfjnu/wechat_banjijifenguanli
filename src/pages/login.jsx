@@ -216,7 +216,7 @@ export default function LoginPage({
       // 创建模拟用户信息并存储到 localStorage
       const mockUser = {
         userId: `USER_${Date.now()}`,
-        name: loginForm.name || '张三',
+        name: username || '张三',
         nickName: role.name,
         avatarUrl: null,
         type: role.id === 'student' ? '学生' : role.id === 'homeroom_teacher' ? '班主任' : role.id === 'parent' ? '学生家长' : role.id === 'class_teacher' ? '教师' : '管理员',
