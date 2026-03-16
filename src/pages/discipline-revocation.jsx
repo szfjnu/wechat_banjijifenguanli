@@ -4,28 +4,13 @@ import React, { useState, useEffect } from 'react';
 import { Button, useToast, Progress, Card, CardContent } from '@/components/ui';
 // @ts-ignore;
 import { Trophy, Calendar, Clock, FileText, Upload, AlertCircle, CheckCircle, XCircle, File, Eye, Plus, History } from 'lucide-react';
+// @ts-ignore;
+import { getBeijingDateString, getBeijingTime } from '@/lib/utils';
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 import { ProgressStatCard } from '@/components/ProgressStatCard';
 import { usePermission } from '@/components/PermissionGuard';
-
-// 获取北京时间（UTC+8）
-const getBeijingTime = () => {
-  const now = new Date();
-  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-  const beijingOffset = 8;
-  return new Date(utc + 3600000 * beijingOffset);
-};
-
-// 获取北京时间字符串（YYYY-MM-DD格式）
-const getBeijingDateString = () => {
-  const beijingTime = getBeijingTime();
-  const year = beijingTime.getFullYear();
-  const month = String(beijingTime.getMonth() + 1).padStart(2, '0');
-  const day = String(beijingTime.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
 export default function DisciplineRevocationPage(props) {
   const {
     $w

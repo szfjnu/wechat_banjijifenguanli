@@ -5,19 +5,11 @@ import { Button, useToast, Progress, Card, CardContent } from '@/components/ui';
 // @ts-ignore;
 import { Trophy, Calendar, Clock, FileText, AlertCircle, CheckCircle, Timer, BookOpen, Activity, TrendingUp, ChevronRight, TrendingDown } from 'lucide-react';
 // @ts-ignore;
-import { getBeijingDateString } from '@/lib/utils';
+import { getBeijingDateString, getBeijingTime } from '@/lib/utils';
 
 import { TabBar } from '@/components/TabBar';
 import { ProgressStatCard } from '@/components/ProgressStatCard';
 import { usePermission } from '@/components/PermissionGuard';
-
-// 获取北京时间（UTC+8）
-const getBeijingTime = () => {
-  const now = new Date();
-  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-  const beijingOffset = 8;
-  return new Date(utc + 3600000 * beijingOffset);
-};
 export default function DisciplineProgressPage(props) {
   const {
     $w

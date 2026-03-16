@@ -4,20 +4,12 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Calendar, Clock, Search, Filter, Heart, TrendingUp, Users, Award, Info, ChevronDown, Download } from 'lucide-react';
 // @ts-ignore;
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, useToast } from '@/components/ui';
+// @ts-ignore;
+import { getBeijingDateString } from '@/lib/utils';
 
 import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 import { usePermission } from '@/components/PermissionGuard';
-
-// 获取北京日期字符串
-const getBeijingDateString = () => {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
-
 // 志愿服务活动预设数据
 const ACTIVITY_TYPES = [{
   id: 1,
