@@ -9,6 +9,15 @@ import { StatCard } from '@/components/StatCard';
 import { TabBar } from '@/components/TabBar';
 import { usePermission } from '@/components/PermissionGuard';
 
+// 获取北京日期字符串
+const getBeijingDateString = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 // 志愿服务活动预设数据
 const ACTIVITY_TYPES = [{
   id: 1,
