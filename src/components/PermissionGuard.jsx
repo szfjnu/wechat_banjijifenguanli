@@ -44,16 +44,17 @@ export function usePermission($w, moduleId, operation) {
         return;
       }
 
-      // 根据用户类型获取角色ID映射
+      // 根据用户类型获取角色ID映射（登录时存储的是中文类型，需要映射到 role_id）
       const roleMap = {
-        'admin': 'admin',
-        'homeroom_teacher': 'homeroom_teacher',
-        'class_teacher': 'class_teacher',
-        'student': 'student',
-        'student_committee': 'student_committee',
-        'parent': 'parent'
+        '管理员': 'admin',
+        '班主任': 'head_teacher',
+        '教师': 'teacher',
+        '学生': 'student',
+        '学生家长': 'parent',
+        '宿舍管理员': 'dorm_admin'
       };
       const roleId = roleMap[currentUser.type] || 'student';
+      console.log('用户类型:', currentUser.type, '-> 映射的 role_id:', roleId);
 
       // 查询角色权限
       const tcb = await $w.cloud.getCloudInstance();
@@ -128,16 +129,17 @@ export function useDataScope($w) {
         return;
       }
 
-      // 根据用户类型获取角色ID映射
+      // 根据用户类型获取角色ID映射（登录时存储的是中文类型，需要映射到 role_id）
       const roleMap = {
-        'admin': 'admin',
-        'homeroom_teacher': 'homeroom_teacher',
-        'class_teacher': 'class_teacher',
-        'student': 'student',
-        'student_committee': 'student_committee',
-        'parent': 'parent'
+        '管理员': 'admin',
+        '班主任': 'head_teacher',
+        '教师': 'teacher',
+        '学生': 'student',
+        '学生家长': 'parent',
+        '宿舍管理员': 'dorm_admin'
       };
       const roleId = roleMap[currentUser.type] || 'student';
+      console.log('用户类型:', currentUser.type, '-> 映射的 role_id:', roleId);
 
       // 查询角色数据范围
       const tcb = await $w.cloud.getCloudInstance();
