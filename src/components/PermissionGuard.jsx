@@ -26,8 +26,18 @@ export function usePermission($w, moduleId, operation) {
     try {
       setLoading(true);
 
-      // 获取当前用户信息
-      const currentUser = $w.auth.currentUser;
+      // 获取当前用户信息（优先从 $w.auth.currentUser，如果为空则从 localStorage 读取）
+      let currentUser = $w.auth.currentUser;
+      if (!currentUser || !currentUser.type) {
+        try {
+          const storedUser = localStorage.getItem('currentUser');
+          if (storedUser) {
+            currentUser = JSON.parse(storedUser);
+          }
+        } catch (err) {
+          console.error('从 localStorage 读取用户信息失败:', err);
+        }
+      }
       if (!currentUser || !currentUser.type) {
         setPermission(false);
         setLoading(false);
@@ -100,8 +110,18 @@ export function useDataScope($w) {
     try {
       setLoading(true);
 
-      // 获取当前用户信息
-      const currentUser = $w.auth.currentUser;
+      // 获取当前用户信息（优先从 $w.auth.currentUser，如果为空则从 localStorage 读取）
+      let currentUser = $w.auth.currentUser;
+      if (!currentUser || !currentUser.type) {
+        try {
+          const storedUser = localStorage.getItem('currentUser');
+          if (storedUser) {
+            currentUser = JSON.parse(storedUser);
+          }
+        } catch (err) {
+          console.error('从 localStorage 读取用户信息失败:', err);
+        }
+      }
       if (!currentUser || !currentUser.type) {
         setDataScope('self');
         setLoading(false);
