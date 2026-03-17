@@ -11,3 +11,4 @@ export * from './ExcelExport.jsx';
 export * from './ReportGenerator.jsx';
 export * from './ProgressStatCard.jsx';
 export * from './PermissionGuard.jsx';
+export * from './BirthdayReminder.jsx';

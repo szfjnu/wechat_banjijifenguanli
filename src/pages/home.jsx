@@ -12,6 +12,7 @@ import { StatCard } from '@/components/StatCard';
 import { PointsChart } from '@/components/PointsChart';
 import { TeacherScheduleReminder } from '@/components/TeacherScheduleReminder';
 import { GrowthChart } from '@/components/GrowthChart';
+import { BirthdayReminder } from '@/components/BirthdayReminder';
 
 // 角色配置
 const ROLE_CONFIG = {
@@ -607,6 +608,12 @@ export default function Home(props) {
 
       {/* Content Area - Compact Spacing */}
       <div className="px-3 py-3 space-y-3">
+        {/* Birthday Reminder */}
+        <BirthdayReminder $w={$w} />
+
+        {/* Schedule Reminder */}
+        <TeacherScheduleReminder $w={$w} />
+
         {/* Today's Tasks - Compact Card */}
         <div className="bg-white rounded-lg p-3 shadow-sm">
           <div className="flex items-center gap-1.5 mb-2">
