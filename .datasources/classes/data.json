@@ -1,0 +1,46 @@
+{
+  "data": [
+    {
+      "class_id": "class_001",
+      "class_name": "高一(1)班",
+      "class_code": "CLASS-A1B2C3",
+      "grade_level": "高一",
+      "head_teacher_id": "teacher_001",
+      "head_teacher_name": "王老师",
+      "student_count": 45,
+      "description": "高一年级1班，积极向上的班集体",
+      "semester_id": 1,
+      "status": "active",
+      "created_at": "2024-09-01T08:00:00.000Z",
+      "updated_at": "2025-01-15T10:30:00.000Z"
+    },
+    {
+      "class_id": "class_002",
+      "class_name": "高一(2)班",
+      "class_code": "CLASS-D4E5F6",
+      "grade_level": "高一",
+      "head_teacher_id": "teacher_002",
+      "head_teacher_name": "李老师",
+      "student_count": 42,
+      "description": "高一年级2班，勤奋好学的班集体",
+      "semester_id": 1,
+      "status": "active",
+      "created_at": "2024-09-01T08:00:00.000Z",
+      "updated_at": "2025-01-15T10:30:00.000Z"
+    },
+    {
+      "class_id": "class_003",
+      "class_name": "高一(3)班",
+      "class_code": "CLASS-G7H8I9",
+      "grade_level": "高一",
+      "head_teacher_id": "teacher_003",
+      "head_teacher_name": "张老师",
+      "student_count": 38,
+      "description": "高一年级3班，团结友爱的班集体",
+      "semester_id": 1,
+      "status": "active",
+      "created_at": "2024-09-01T08:00:00.000Z",
+      "updated_at": "2025-01-15T10:30:00.000Z"
+    }
+  ]
+}

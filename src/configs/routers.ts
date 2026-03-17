@@ -35,6 +35,9 @@ import USERS_MANAGE from '../pages/users-manage.jsx';
 import CLASSES_MANAGE from '../pages/classes-manage.jsx';
 import SYSTEM_CONFIG from '../pages/system-config.jsx';
 import PERMISSION_AUDIT from '../pages/permission-audit.jsx';
+import WELCOME from '../pages/welcome.jsx';
+import CREATE_CLASS from '../pages/create-class.jsx';
+import JOIN_CLASS from '../pages/join-class.jsx';
 export const routers = [{
   id: "home",
   component: HOME
@@ -146,4 +149,13 @@ export const routers = [{
 }, {
   id: "permission-audit",
   component: PERMISSION_AUDIT
+}, {
+  id: "welcome",
+  component: WELCOME
+}, {
+  id: "create-class",
+  component: CREATE_CLASS
+}, {
+  id: "join-class",
+  component: JOIN_CLASS
 }]

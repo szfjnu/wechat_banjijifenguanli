@@ -1,0 +1,56 @@
+{
+  "name": "user_class_relation",
+  "title": "用户班级关联",
+  "schemas": [
+    {
+      "name": "user_id",
+      "title": "用户ID",
+      "type": "String"
+    },
+    {
+      "name": "user_name",
+      "title": "用户姓名",
+      "type": "String"
+    },
+    {
+      "name": "class_id",
+      "title": "班级ID",
+      "type": "String"
+    },
+    {
+      "name": "class_name",
+      "title": "班级名称",
+      "type": "String"
+    },
+    {
+      "name": "role",
+      "title": "角色",
+      "type": "String"
+    },
+    {
+      "name": "is_owner",
+      "title": "是否班级管理员",
+      "type": "Boolean"
+    },
+    {
+      "name": "joined_at",
+      "title": "加入时间",
+      "type": "String"
+    },
+    {
+      "name": "status",
+      "title": "状态",
+      "type": "String"
+    },
+    {
+      "name": "created_at",
+      "title": "创建时间",
+      "type": "String"
+    },
+    {
+      "name": "updated_at",
+      "title": "更新时间",
+      "type": "String"
+    }
+  ]
+}

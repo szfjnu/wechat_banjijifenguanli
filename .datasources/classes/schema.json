@@ -1,0 +1,66 @@
+{
+  "name": "classes",
+  "title": "班级信息管理",
+  "schemas": [
+    {
+      "name": "class_id",
+      "title": "班级ID",
+      "type": "String"
+    },
+    {
+      "name": "class_name",
+      "title": "班级名称",
+      "type": "String"
+    },
+    {
+      "name": "class_code",
+      "title": "班级代码",
+      "type": "String"
+    },
+    {
+      "name": "grade_level",
+      "title": "年级",
+      "type": "String"
+    },
+    {
+      "name": "head_teacher_id",
+      "title": "班主任ID",
+      "type": "String"
+    },
+    {
+      "name": "head_teacher_name",
+      "title": "班主任姓名",
+      "type": "String"
+    },
+    {
+      "name": "student_count",
+      "title": "学生人数",
+      "type": "Number"
+    },
+    {
+      "name": "description",
+      "title": "班级描述",
+      "type": "String"
+    },
+    {
+      "name": "semester_id",
+      "title": "学期ID",
+      "type": "Number"
+    },
+    {
+      "name": "status",
+      "title": "状态",
+      "type": "String"
+    },
+    {
+      "name": "created_at",
+      "title": "创建时间",
+      "type": "String"
+    },
+    {
+      "name": "updated_at",
+      "title": "更新时间",
+      "type": "String"
+    }
+  ]
+}
