@@ -92,7 +92,7 @@ export default function GroupsPage(props) {
       setSemesters(transformedSemesters);
 
       // 加载分组数据
-      const groupResult = await db.collection('group').get();
+      const groupResult = await db.collection('student_groups').get();
       const transformedGroups = groupResult.data.map(g => ({
         _id: g._id,
         id: g._id,
@@ -193,7 +193,7 @@ export default function GroupsPage(props) {
         setLoadingAction(false);
         return;
       }
-      const result = await db.collection('group').add({
+      const result = await db.collection('student_groups').add({
         name: formData.name,
         semester_id: parseInt(formData.semesterId),
         semester_name: semester.name,
@@ -291,7 +291,7 @@ export default function GroupsPage(props) {
         setLoadingAction(false);
         return;
       }
-      await db.collection('group').doc(selectedGroup._id).update({
+      await db.collection('student_groups').doc(selectedGroup._id).update({
         name: formData.name,
         semester_id: parseInt(formData.semesterId),
         semester_name: semester.name,
@@ -379,7 +379,7 @@ export default function GroupsPage(props) {
           });
         }
       }
-      await db.collection('group').doc(groupId).remove();
+      await db.collection('student_groups').doc(groupId).remove();
       const updatedGroups = groups.filter(g => g._id !== groupId);
       setGroups(updatedGroups);
       toast({
