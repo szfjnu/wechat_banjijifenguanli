@@ -34,7 +34,7 @@
     },
     {
       "name": "duration",
-      "title": "服务时长(小时)",
+      "title": "服务令(小时)",
       "type": "Number"
     },
     {

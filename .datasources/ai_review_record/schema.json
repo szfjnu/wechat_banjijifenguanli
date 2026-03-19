@@ -64,7 +64,7 @@
     },
     {
       "name": "volunteer_hours",
-      "title": "志愿时长",
+      "title": "服务令",
       "type": "Number"
     },
     {

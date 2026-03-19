@@ -1,0 +1,68 @@
+{
+  "name": "volunteer_point_config",
+  "title": "志愿服务积分转换配置",
+  "schemas": [
+    {
+      "name": "config_id",
+      "title": "配置ID",
+      "type": "String"
+    },
+    {
+      "name": "hours_per_point",
+      "title": "转换比例（小时/积分）",
+      "type": "Number",
+      "description": "1积分等于多少小时，默认为0.5（即1小时=2积分）"
+    },
+    {
+      "name": "points_per_hour",
+      "title": "转换比例（积分/小时）",
+      "type": "Number",
+      "description": "1小时等于多少积分，默认为2（即1小时=2积分）"
+    },
+    {
+      "name": "min_duration",
+      "title": "最小服务令（小时）",
+      "type": "Number",
+      "description": "可计算积分的最小服务令，默认为0.5小时"
+    },
+    {
+      "name": "rounding_rule",
+      "title": "舍入规则",
+      "type": "String",
+      "description": "up-向上取整, down-向下取整, round-四舍五入"
+    },
+    {
+      "name": "description",
+      "title": "配置说明",
+      "type": "String"
+    },
+    {
+      "name": "is_active",
+      "title": "是否启用",
+      "type": "Boolean",
+      "description": "是否启用该配置"
+    },
+    {
+      "name": "created_at",
+      "title": "创建时间",
+      "type": "DateTime",
+      "format": "string"
+    },
+    {
+      "name": "updated_at",
+      "title": "更新时间",
+      "type": "DateTime",
+      "format": "string"
+    },
+    {
+      "name": "created_by",
+      "title": "创建人",
+      "type": "String"
+    },
+    {
+      "name": "updated_by",
+      "title": "更新人",
+      "type": "String"
+    }
+  ]
+}

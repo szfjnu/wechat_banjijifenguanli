@@ -29,7 +29,7 @@
     },
     {
       "name": "volunteer_hours_required",
-      "title": "志愿服务时长要求（小时）",
+      "title": "服务令要求（小时）",
       "type": "Number"
     },
     {

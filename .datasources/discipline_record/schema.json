@@ -104,12 +104,12 @@
     },
     {
       "name": "volunteer_hours_required",
-      "title": "志愿服务时长要求",
+      "title": "服务令要求",
       "type": "Number"
     },
     {
       "name": "completed_volunteer_hours",
-      "title": "已完成志愿服务时长",
+      "title": "已完成服务令",
       "type": "Number"
     },
     {

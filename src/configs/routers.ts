@@ -38,6 +38,7 @@ import PERMISSION_AUDIT from '../pages/permission-audit.jsx';
 import WELCOME from '../pages/welcome.jsx';
 import CREATE_CLASS from '../pages/create-class.jsx';
 import JOIN_CLASS from '../pages/join-class.jsx';
+import VOLUNTEER_POINT-CONFIG from '../pages/volunteer-point-config.jsx';
 export const routers = [{
   id: "home",
   component: HOME
@@ -158,4 +159,7 @@ export const routers = [{
 }, {
   id: "join-class",
   component: JOIN_CLASS
+}, {
+  id: "volunteer-point-config",
+  component: VOLUNTEER_POINT-CONFIG
 }]

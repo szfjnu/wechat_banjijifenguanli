@@ -190,7 +190,7 @@ export default function RevocationVolunteerPage(props) {
     if (!formData.hours || !formData.serviceDate || !formData.description) {
       toast({
         title: '请填写完整信息',
-        description: '服务时长、服务日期和服务内容为必填项',
+        description: '服务令、服务日期和服务内容为必填项',
         variant: 'destructive'
       });
       return;
@@ -217,7 +217,7 @@ export default function RevocationVolunteerPage(props) {
         updated_at: new Date()
       });
 
-      // 更新处分记录的已完成志愿服务时长
+      // 更新处分记录的已完成服务令
       const selectedRecord = disciplineRecords.find(r => r._id === selectedRecordId);
       const newCompletedHours = (selectedRecord.completed_volunteer_hours || 0) + parseFloat(formData.hours);
 
@@ -317,10 +317,10 @@ export default function RevocationVolunteerPage(props) {
             </Card>
 
             {selectedRecord && <div className="grid md:grid-cols-3 gap-6 mb-6">
-                {/* 服务时长进度 */}
+                {/* 服务令进度 */}
                 <Card className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-semibold text-gray-900">志愿服务时长</h3>
+                    <h3 className="font-semibold text-gray-900">服务令</h3>
                     <Clock className="w-5 h-5 text-indigo-600" />
                   </div>
                   <div className="text-3xl font-bold text-indigo-600 mb-2">
@@ -391,7 +391,7 @@ export default function RevocationVolunteerPage(props) {
                       </Select>
                     </div>
                     <div>
-                      <Label>服务时长（小时）*</Label>
+                      <Label>服务令*</Label>
                       <Input type="number" step="0.1" min="0" value={formData.hours} onChange={e => setFormData({
                   ...formData,
                   hours: e.target.value

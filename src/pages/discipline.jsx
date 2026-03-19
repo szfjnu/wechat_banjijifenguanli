@@ -788,7 +788,7 @@ export default function DisciplinePage(props) {
                 })} placeholder="0" />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">志愿时长（小时）</label>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">服务令</label>
                         <input type="number" min="0" step="0.5" className="w-full px-2 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-xs" value={newRecord.volunteerHoursRequired} onChange={e => setNewRecord({
                   ...newRecord,
                   volunteerHoursRequired: e.target.value

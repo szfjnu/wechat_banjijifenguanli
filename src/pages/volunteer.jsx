@@ -107,6 +107,7 @@ export default function VolunteerPage({
   useEffect(() => {
     loadStudentsData();
     loadHistoryData();
+    loadPointConfig();
   }, []);
   const loadStudentsData = async () => {
     try {
@@ -272,6 +273,11 @@ export default function VolunteerPage({
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [showDetailDialog, setShowDetailDialog] = useState(false);
   const [showNewDialog, setShowNewDialog] = useState(false);
+  const [pointConfig, setPointConfig] = useState({
+    points_per_hour: 2,
+    min_duration: 0.5,
+    rounding_rule: 'round'
+  });
   const [newRecord, setNewRecord] = useState({
     studentId: '',
     activityName: '',
@@ -288,6 +294,26 @@ export default function VolunteerPage({
     uniqueStudents: [...new Set(history.map(r => r.studentName))].length
   };
 
+  // 加载积分转换配置
+  const loadPointConfig = async () => {
+    try {
+      const tcb = await $w.cloud.getCloudInstance();
+      const db = tcb.database();
+      const result = await db.collection('volunteer_point_config').where({
+        is_active: true
+      }).limit(1).get();
+      if (result.data.length > 0) {
+        setPointConfig({
+          points_per_hour: result.data[0].points_per_hour || 2,
+          min_duration: result.data[0].min_duration || 0.5,
+          rounding_rule: result.data[0].rounding_rule || 'round'
+        });
+      }
+    } catch (error) {
+      console.error('加载积分转换配置失败:', error);
+    }
+  };
+
   // 筛选历史记录
   const filteredHistory = history.filter(record => {
     const matchesSearch = record.studentName.includes(searchTerm) || record.activityName.includes(searchTerm) || record.note?.includes(searchTerm);
@@ -296,10 +322,37 @@ export default function VolunteerPage({
     return matchesSearch && matchesStudent && matchesActivity;
   });
 
-  // 自动计算积分
+  // 自动计算积分（根据配置）
   const calculatePoints = hours => {
     const numHours = parseFloat(hours) || 0;
-    return numHours * 2;
+    const {
+      points_per_hour,
+      min_duration,
+      rounding_rule
+    } = pointConfig;
+
+    // 检查最小服务令
+    if (numHours < min_duration) {
+      return 0;
+    }
+
+    // 计算基础积分
+    let points = numHours * points_per_hour;
+
+    // 应用舍入规则
+    switch (rounding_rule) {
+      case 'up':
+        points = Math.ceil(points);
+        break;
+      case 'down':
+        points = Math.floor(points);
+        break;
+      case 'round':
+      default:
+        points = Math.round(points);
+        break;
+    }
+    return points;
   };
 
   // 提交新记录
@@ -360,9 +413,18 @@ export default function VolunteerPage({
         date: getBeijingDateString(),
         note: ''
       });
+      const {
+        min_duration,
+        rounding_rule
+      } = pointConfig;
+      const ruleText = {
+        up: '向上取整',
+        down: '向下取整',
+        round: '四舍五入'
+      }[rounding_rule] || '四舍五入';
       toast({
         title: '志愿服务记录已创建',
-        description: `${student?.name} - ${newRecord.activityName}，时长 ${newRecord.duration} 小时，获得 ${points} 积分`
+        description: `${student?.name} - ${newRecord.activityName}，服务令 ${newRecord.duration} 小时，获得 ${points} 积分（${ruleText}，最小服务令${min_duration}小时）`
       });
     } catch (error) {
       console.error('创建志愿服务记录失败:', error);
@@ -376,7 +438,7 @@ export default function VolunteerPage({
 
   // 导出CSV
   const exportCSV = () => {
-    const headers = ['学号', '姓名', '小组', '活动名称', '活动类别', '服务时长(小时)', '获得积分', '服务日期', '备注', '记录人', '记录时间'];
+    const headers = ['学号', '姓名', '小组', '活动名称', '活动类别', '服务令(小时)', '获得积分', '服务日期', '备注', '记录人', '记录时间'];
     const rows = filteredHistory.map(record => [record.studentId, record.studentName, record.group, record.activityName, record.activityCategory, record.duration, record.points, record.date, record.note || '', record.operator, record.createdAt || getBeijingTime().toLocaleString()]);
     const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n');
     const blob = new Blob([csvContent], {
@@ -399,7 +461,7 @@ export default function VolunteerPage({
         <h1 className="text-xl font-bold text-gray-800 mb-3 font-['Playfair_Display']">志愿服务管理</h1>
         <div className="grid grid-cols-2 gap-2">
           <StatCard title="总记录数" value={stats.totalRecords} icon={Heart} color="blue" />
-          <StatCard title="总时长" value={`${stats.totalHours}h`} subtitle="小时" icon={Clock} color="amber" />
+          <StatCard title="总服务令" value={`${stats.totalHours}h`} subtitle="小时" icon={Clock} color="amber" />
           <StatCard title="奖励积分" value={stats.totalPoints} icon={TrendingUp} color="orange" />
           <StatCard title="参与人数" value={stats.uniqueStudents} icon={Users} color="green" />
         </div>
@@ -458,11 +520,11 @@ export default function VolunteerPage({
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">服务时长(小时) *</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">服务令(小时) *</label>
                         <input type="number" step="0.5" min="0" max="24" value={newRecord.duration} onChange={e => setNewRecord({
                         ...newRecord,
                         duration: e.target.value
-                      })} placeholder="输入服务时长，如2.5" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-300" />
+                      })} placeholder="输入服务令时长，如2.5" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-300" />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">服务日期</label>
@@ -486,7 +548,18 @@ export default function VolunteerPage({
                           </div>
                           <span className="text-xl font-bold text-amber-600 font-['Space_Mono']">{calculatePoints(newRecord.duration)}</span>
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">每小时服务可获得 2 积分</p>
+                        <div className="mt-2 space-y-1">
+                          <p className="text-xs text-gray-500">1小时 = {pointConfig.points_per_hour}积分（{pointConfig.rounding_rule === 'up' ? '向上取整' : pointConfig.rounding_rule === 'down' ? '向下取整' : '四舍五入'}）</p>
+                          <p className="text-xs text-gray-500">最小服务令：{pointConfig.min_duration}小时</p>
+                        </div>
+                      </div>
+                      <div className="bg-blue-50 rounded-lg p-3 border border-blue-200 flex items-start gap-2">
+                        <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" strokeWidth={2} />
+                        <div className="text-xs text-blue-700">
+                          <p>当前积分规则：1小时 = {pointConfig.points_per_hour}积分</p>
+                          <p>舍入规则：{pointConfig.rounding_rule === 'up' ? '向上取整' : pointConfig.rounding_rule === 'down' ? '向下取整' : '四舍五入'}</p>
+                          <p>最小服务令：{pointConfig.min_duration}小时（低于此值不计积分）</p>
+                        </div>
                       </div>
                       <Button onClick={handleSubmit} className="w-full bg-gradient-to-r from-rose-500 to-pink-500 text-white hover:from-rose-600 hover:to-pink-600">
                         提交记录
@@ -603,7 +676,7 @@ export default function VolunteerPage({
                   <span className="px-2 py-0.5 bg-rose-100 text-rose-600 rounded text-sm">{selectedRecord.activityCategory}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-sm text-gray-500">服务时长</span>
+                  <span className="text-sm text-gray-500">服务令</span>
                   <span className="text-sm font-medium text-gray-800 font-['Space_Mono']">{selectedRecord.duration} 小时</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">

@@ -291,14 +291,14 @@ export default function DisciplineProgressPage(props) {
                         撤销条件完成情况
                       </h4>
 
-                      {/* 志愿服务时长 */}
+                      {/* 服务令 */}
                       <div className="bg-white/60 rounded-lg p-4 border border-gray-200 hover:bg-white/80 transition-colors duration-200">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
                             <div className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-500/20">
                               <Activity className="w-3.5 h-3.5 text-blue-500" />
                             </div>
-                            <span className="font-medium text-gray-800">志愿服务时长</span>
+                            <span className="font-medium text-gray-800">服务令</span>
                           </div>
                           <span className={`text-lg font-bold ${parseInt(volunteerProgress) >= 100 ? 'text-green-600' : 'text-blue-600'}`}>
                             {record.completed_volunteer_hours} / {record.volunteer_hours_required} 小时

@@ -147,7 +147,7 @@ export default function AIReviewPage(props) {
     }
   };
 
-  // 加载学生志愿时长（按时间范围）
+  // 加载学生服务令（按时间范围）
   const loadStudentVolunteerHours = async (studentId, timeRange) => {
     try {
       const tcb = await props.$w.cloud.getCloudInstance();
@@ -161,14 +161,14 @@ export default function AIReviewPage(props) {
       const totalHours = result.data.reduce((sum, record) => sum + (parseFloat(record.duration) || 0), 0);
       return totalHours;
     } catch (error) {
-      console.error('加载志愿时长失败:', error);
+      console.error('加载服务令失败:', error);
       return 0;
     }
   };
 
   // 加载已保存的点评记录
 
-  // 加载学生详细数据（GPA、证书、志愿时长）
+  // 加载学生详细数据（GPA、证书、服务令）
   const loadStudentDetail = async student => {
     try {
       const gpa = await loadStudentGrades(student.studentId, selectedTimeRange);
@@ -300,7 +300,7 @@ export default function AIReviewPage(props) {
 
 ### 整体表现概况
 
-本学期全班同学整体表现优秀，在德智体美劳各方面均有显著进步。班级总积分达到${formatPoints(data.totalPoints)}分，平均GPA为${data.gpa}，每位同学平均获得${data.certificates}项技能证书，累计志愿服务时长${data.volunteerHours}小时。
+本学期全班同学整体表现优秀，在德智体美劳各方面均有显著进步。班级总积分达到${formatPoints(data.totalPoints)}分，平均GPA为${data.gpa}，每位同学平均获得${data.certificates}项技能证书，累计获得${data.volunteerHours}个服务令。
 
 ### 积分管理表现
 
@@ -312,7 +312,7 @@ export default function AIReviewPage(props) {
 
 ### 综合素养发展
 
-班级在综合素养方面表现良好，同学们积极参与各类活动和竞赛，获得${data.certificates}项技能证书。志愿服务活动参与度高，累计服务时长${data.volunteerHours}小时，展现了良好的社会责任感。
+班级在综合素养方面表现良好，同学们积极参与各类活动和竞赛，获得${data.certificates}项技能证书。志愿服务活动参与度高，累计获得${data.volunteerHours}个服务令，展现了良好的社会责任感。
 
 ### 改进建议
 
@@ -350,7 +350,7 @@ ${name}同学在本学期表现优异，总积分达到${formatPoints(data.total
 
 ### 综合素养发展
 
-在综合素养方面全面发展，已获得${data.certificates}项技能证书，展现了良好的专业能力和学习能力。积极参与志愿服务活动，累计服务时长${data.volunteerHours}小时，体现了良好的社会责任感和服务意识。
+在综合素养方面全面发展，已获得${data.certificates}项技能证书，展现了良好的专业能力和学习能力。积极参与志愿服务活动，累计获得${data.volunteerHours}个服务令，体现了良好的社会责任感和服务意识。
 
 ### 成长建议
 
@@ -514,7 +514,7 @@ ${name}同学在本学期表现优异，总积分达到${formatPoints(data.total
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-blue-600">{studentDetail?.volunteerHours || '加载中...'}</div>
-                      <div className="text-xs text-gray-600">志愿时长</div>
+                      <div className="text-xs text-gray-600">服务令</div>
                     </div>
                   </div>
                 </div>}

@@ -14,7 +14,7 @@
     },
     {
       "name": "hours",
-      "title": "服务时长",
+      "title": "服务令",
       "type": "Number"
     },
     {
