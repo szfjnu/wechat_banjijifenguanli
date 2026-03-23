@@ -113,7 +113,7 @@
     "status": "revoked",
     "expiry_date": "2025-05-01",
     "revoke_reason": "表现良好，改正错误，同学认可",
-    "revoked_date": 1741267200000,
+    "revoked_date": "2025-03-02T00:00:00.000Z",
     "operator_name": "班主任",
     "revoke_requests": [
       {
