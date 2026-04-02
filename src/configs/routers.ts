@@ -39,6 +39,8 @@ import WELCOME from '../pages/welcome.jsx';
 import CREATE_CLASS from '../pages/create-class.jsx';
 import JOIN_CLASS from '../pages/join-class.jsx';
 import VOLUNTEER_POINT-CONFIG from '../pages/volunteer-point-config.jsx';
+import DORM_SETTINGS from '../pages/dorm-settings.jsx';
+import DORM_STATISTICS from '../pages/dorm-statistics.jsx';
 export const routers = [{
   id: "home",
   component: HOME
@@ -162,4 +164,10 @@ export const routers = [{
 }, {
   id: "volunteer-point-config",
   component: VOLUNTEER_POINT-CONFIG
+}, {
+  id: "dorm-settings",
+  component: DORM_SETTINGS
+}, {
+  id: "dorm-statistics",
+  component: DORM_STATISTICS
 }]

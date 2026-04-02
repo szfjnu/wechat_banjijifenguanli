@@ -1,0 +1,36 @@
+[
+  {
+    "_id": "cfg_001",
+    "config_id": "cfg_001",
+    "config_name": "2024-2025学年第一学期宿舍积分配置",
+    "deduction_ratio": 0.5,
+    "addition_ratio": 1,
+    "semester_id": "sem_2024_1",
+    "semester_name": "2024-2025学年第一学期",
+    "effective_date": "2024-09-01",
+    "expiry_date": "2025-02-01",
+    "is_enabled": true,
+    "description": "本学期宿舍扣分转换为综合积分的比例为0.5，即宿舍扣1分=综合积分扣0.5分；宿舍加分比例为1.0，即宿舍加1分=综合积分加1.0分",
+    "creator": "系统管理员",
+    "remarks": "此配置适用于所有宿舍管理相关扣分和加分项目",
+    "createdAt": 1739577600000,
+    "updatedAt": 1739577600000
+  },
+  {
+    "_id": "cfg_002",
+    "config_id": "cfg_002",
+    "config_name": "2024-2025学年第二学期宿舍积分配置",
+    "deduction_ratio": 0.5,
+    "addition_ratio": 1,
+    "semester_id": "sem_2024_2",
+    "semester_name": "2024-2025学年第二学期",
+    "effective_date": "2025-02-01",
+    "expiry_date": "2025-07-01",
+    "is_enabled": false,
+    "description": "本学期宿舍扣分转换为综合积分的比例为0.5，即宿舍扣1分=综合积分扣0.5分；宿舍加分比例为1.0，即宿舍加1分=综合积分加1.0分",
+    "creator": "系统管理员",
+    "remarks": "配置将在学期开始时启用",
+    "createdAt": 1739155200000,
+    "updatedAt": 1739155200000
+  }
+]

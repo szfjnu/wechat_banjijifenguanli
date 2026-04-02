@@ -4,33 +4,33 @@
   "schemas": [
     {
       "name": "item_id",
-      "title": "扣分项目ID",
-      "type": "String"
-    },
-    {
-      "name": "item_code",
-      "title": "扣分项目编号",
+      "title": "项目ID",
       "type": "String"
     },
     {
       "name": "item_name",
-      "title": "扣分项目名称",
+      "title": "项目名称",
       "type": "String"
     },
     {
-      "name": "item_category",
-      "title": "扣分项目分类",
+      "name": "category",
+      "title": "类别",
       "type": "String"
-    },
-    {
-      "name": "description",
-      "title": "描述",
-      "type": "MultiLineString"
     },
     {
       "name": "points",
-      "title": "分值",
+      "title": "积分值",
       "type": "Number"
+    },
+    {
+      "name": "config_id",
+      "title": "积分配置ID",
+      "type": "String"
+    },
+    {
+      "name": "point_type",
+      "title": "积分类型",
+      "type": "String"
     },
     {
       "name": "is_enabled",
@@ -38,36 +38,19 @@
       "type": "Boolean"
     },
     {
-      "name": "priority",
-      "title": "优先级",
-      "type": "Number"
-    },
-    {
-      "name": "icon_name",
-      "title": "图标名称",
-      "type": "String"
-    },
-    {
-      "name": "creator",
-      "title": "创建人",
-      "type": "String"
-    },
-    {
-      "name": "created_date",
-      "title": "创建日期",
-      "type": "Date",
-      "format": "string"
-    },
-    {
-      "name": "update_date",
-      "title": "更新日期",
-      "type": "Date",
-      "format": "string"
-    },
-    {
-      "name": "remark",
-      "title": "备注",
+      "name": "description",
+      "title": "描述",
       "type": "MultiLineString"
+    },
+    {
+      "name": "severity",
+      "title": "严重程度",
+      "type": "String"
+    },
+    {
+      "name": "frequency",
+      "title": "检查频率",
+      "type": "String"
     }
   ]
 }

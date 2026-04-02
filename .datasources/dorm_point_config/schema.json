@@ -1,0 +1,66 @@
+{
+  "name": "dorm_point_config",
+  "title": "宿舍积分配置",
+  "schemas": [
+    {
+      "name": "config_id",
+      "title": "配置ID",
+      "type": "String"
+    },
+    {
+      "name": "config_name",
+      "title": "配置名称",
+      "type": "String"
+    },
+    {
+      "name": "deduction_ratio",
+      "title": "扣分转换比例",
+      "type": "Number"
+    },
+    {
+      "name": "addition_ratio",
+      "title": "加分转换比例",
+      "type": "Number"
+    },
+    {
+      "name": "semester_id",
+      "title": "学期ID",
+      "type": "String"
+    },
+    {
+      "name": "semester_name",
+      "title": "学期名称",
+      "type": "String"
+    },
+    {
+      "name": "effective_date",
+      "title": "生效日期",
+      "type": "Date"
+    },
+    {
+      "name": "expiry_date",
+      "title": "失效日期",
+      "type": "Date"
+    },
+    {
+      "name": "is_enabled",
+      "title": "是否启用",
+      "type": "Boolean"
+    },
+    {
+      "name": "description",
+      "title": "配置说明",
+      "type": "MultiLineString"
+    },
+    {
+      "name": "creator",
+      "title": "创建人",
+      "type": "String"
+    },
+    {
+      "name": "remarks",
+      "title": "备注",
+      "type": "MultiLineString"
+    }
+  ]
+}
